@@ -1,5 +1,5 @@
-XPC = LibStub("AceAddon-3.0"):NewAddon("ZUI_XPChart")
-local L = LibStub("AceLocale-3.0"):GetLocale("ZUI_XPChartLocale")
+XPC = LibStub("AceAddon-3.0"):NewAddon("XPChart")
+local L = LibStub("AceLocale-3.0"):GetLocale("XPChartLocale")
 local XPC_GUI = LibStub("AceGUI-3.0")
 
 local defaults = {
@@ -27,7 +27,7 @@ SlashCmdList["XPC"] = function()
 end
 
 function XPC:OnInitialize()
-  self.db = LibStub("AceDB-3.0"):New("ZUI_XPChartDB", defaults, true)
+  self.db = LibStub("AceDB-3.0"):New("XPChartDB", defaults, true)
   --self.db:ResetDB()
   XPC:ToggleGraphLines()
 

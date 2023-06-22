@@ -1,7 +1,7 @@
 ## Interface: 11402
-## Title: ZUI XP Chart
+## Title: XP Chart
 ## Author: ZUI
-## SavedVariables: ZUI_XPChartDB
+## SavedVariables: XPChartDB
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
 

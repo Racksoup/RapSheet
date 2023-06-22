@@ -1,1 +1,1 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("ZUI_XPChartLocale", "enUS", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("XPChartLocale", "enUS", true)
