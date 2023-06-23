@@ -6,8 +6,8 @@ local defaults = {
   global = {
     toons = {
     },
-    XPToLevel = {
-      Classic = {
+    levelCharts = {
+      classic = {
         400,    900,    1400,   2100,   2800,   3600,   4500,   5400,   6500,   7600, -- 1-10
         8800,   10100,  11400,  12900,  14400,  16000,  17700,  19400,  21300,  23200, -- 11- 20
         25200,  27300,  29400,  31700,  34000,  36400,  38900,  41400,  44300,  47400, -- 21-30
@@ -15,6 +15,25 @@ local defaults = {
         95800,  101000, 106300, 111800, 117500, 123200, 129100, 135100, 141200, 147500, -- 41-50
         153900, 160400, 167100, 173900, 180800, 187900, 195000, 202300, 209800, 217400 -- 51-60
       },
+      wrath = {
+        400,     900,     1400,    2100,    2800,    3600,    4500,    5400,    6500,    7600,
+        8700,    9800,    11000,   12300,   13600,   15000,   16400,   17800,   19300,   20800,
+        22400,   24000,   25500,   27200,   28900,   30500,   32200,   33900,   36300,   38800,
+        41600,   44600,   48000,   51400,   55000,   58700,   62400,   66200,   70200,   74300,
+        78500,   82800,   87100,   91600,   96300,   101000,  105800,  110700,  115700,  120900,
+        126100,  131500,  137000,  142500,  148200,  154000,  159900,  165800,  172000,  290000,
+        317000,  349000,  386000,  428000,  475000,  527000,  585000,  648000,  717000,  1523800,
+        1539000, 1555700, 1571800, 1587900, 1604200, 1620700, 1637400, 1653900, 1670800
+      },
+      dragonlands = {
+        250,    590,    1065,   1675,   2420,   3305,   4325,   5485,   6775,   8205, 
+        9765,   11030,  12360,  13755,  15220,  16750,  18345,  20005,  21730,  23525, 
+        25385,  27310,  29305,  31365,  33490,  35680,  37935,  40260,  42650,  45105, 
+        45590,  46005,  46360,  46655,  46880,  47045,  47145,  47185,  47160,  47070, 
+        46915,  46700,  46420,  46075,  45670,  45200,  44670,  44070,  43410,  42690,
+        47565,  52600,  57785,  63135,  68635,  74295,  80110,  86085,  92215,  194815,
+        214540, 234805, 255610, 276945, 298820, 321235, 344185, 367675, 391700 
+      }
     },
   }
 }
@@ -46,6 +65,15 @@ function XPC:CreateUI()
   XPC_GUI.Lines = {}
   -- init db vars
   XPC:InitToonData()
+  -- set level chart  
+  XPC.levelChart = XPC.db.global.levelCharts.classic
+  version, build, datex, tocversion = GetBuildInfo()
+  if (tocversion > 30000) then 
+    XPC.levelChart = XPC.db.global.levelCharts.wrath
+  end
+  if (tocversion > 40000) then 
+    XPC.levelChart = XPC.db.global.levelCharts.dragonlands
+  end
 
   -- build
   XPC:BuildChartLayout()
@@ -177,7 +205,6 @@ function XPC:BuildYAxis(highestLevel, frameHeightInterval, totalXPOfHighestLevel
       end 
     end
     
-    
     -- make y-axis text
     local x 
     if (highestLevel < 5) then
@@ -192,7 +219,7 @@ function XPC:BuildYAxis(highestLevel, frameHeightInterval, totalXPOfHighestLevel
       local totalXPOfGraphIndex = 0
       local lineLevelPercentage = (i / numOfTextObjs)
       for j = 2, (highestLevel * lineLevelPercentage) do 
-        totalXPOfGraphIndex = totalXPOfGraphIndex + XPC.db.global.XPToLevel.Classic[j - 1]
+        totalXPOfGraphIndex = totalXPOfGraphIndex + XPC.levelChart[j - 1]
       end
       local fstring = XPC_GUI.MainFrame:CreateFontString(nil, "OVERLAY", "GameToolTipText")
       fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
@@ -407,7 +434,7 @@ function XPC:GetGraphData()
 
   -- save total collected xp from highest level toon
   for i = 2, highestLevel do 
-    totalXPOfHighestLevelToon = totalXPOfHighestLevelToon + XPC.db.global.XPToLevel.Classic[i - 1]
+    totalXPOfHighestLevelToon = totalXPOfHighestLevelToon + XPC.levelChart[i - 1]
   end
   totalXPOfHighestLevelToon = totalXPOfHighestLevelToon + XPOnLastLvl
 
@@ -424,7 +451,12 @@ end
 function XPC:StartTimePlayedLoop() 
   -- only track data if the player is less than lvl 60
   local currLvl = UnitLevel("player")
-  if (currLvl < 60) then
+  local maxLevel = 60
+  version, build, datex, tocversion = GetBuildInfo()
+  if (tocversion > 30000) then 
+    maxLevel = 70
+  end
+  if (currLvl < maxLevel) then
     -- create frame&script to track time played msg
     XPC_GUI.scripts = CreateFrame("Frame")
     XPC_GUI.scripts:RegisterEvent("TIME_PLAYED_MSG")
@@ -447,7 +479,7 @@ function XPC:OnTimePlayedEvent(self, event, ...)
     local arg1, arg2 = ...
     local totalXP = 0
     for i = 1, currLvl -1 do 
-      totalXP = totalXP + XPC.db.global.XPToLevel.Classic[i]
+      totalXP = totalXP + XPC.levelChart[i]
     end
     totalXP = totalXP + currXP
 
