@@ -23,6 +23,7 @@ SLASH_XPC1 = "/xpc"
 
 SlashCmdList["XPC"] = function()
   RequestTimePlayed()
+  XPC:BuildGraph()
   XPC_GUI.MainFrame:Show()
 end
 
@@ -39,14 +40,16 @@ function XPC:CreateUI()
   -- variables
   local name, server = UnitFullName('player', true)
   XPC.currToonName = name .. "-" .. server
+  XPC_GUI = {}
+  XPC_GUI.XAxis = {}
+  XPC_GUI.YAxis = {}
+  XPC_GUI.Lines = {}
   -- init db vars
   XPC:InitToonData()
 
   -- build
   XPC:BuildChartLayout()
   XPC:BuildSideFrameLayout();
-  XPC_GUI.MainFrame:Hide()
-  XPC_GUI.MainFrame.SideFrame:Hide()
 end
 
 function XPC:BuildChartLayout()
@@ -78,157 +81,132 @@ function XPC:BuildChartLayout()
   optionsButton:SetPoint("TOPRIGHT", -100, -7)
   optionsButton:SetText("Options")
   optionsButton:SetScript("OnClick", function() XPC_GUI.MainFrame.SideFrame:Show() end)
-
-  local mostTimePlayed, highestLevel, totalXPOfHighestLevelToon = XPC:GetGraphData()
   
-  local frameWidth = 1150
-  local frameHeight = 590
-  local frameWidthInterval = frameWidth / mostTimePlayed 
-  local frameHeightInterval = frameHeight / totalXPOfHighestLevelToon
-  local mostDaysPlayed = math.floor(XPC:StoD(mostTimePlayed))
+  XPC:BuildGraph()
+  
+  mainFrame:Hide()
+end
+
+function XPC:BuildGraph()
+  -- reset axis and lines
+  for i, v in ipairs(XPC_GUI.XAxis) do
+    v.fstring:Hide()
+    v.line:Hide()
+  end
+  for i, v in ipairs(XPC_GUI.YAxis) do
+    v.fstring:Hide()
+    v.line:Hide()
+  end
+  for i, v in ipairs(XPC_GUI.Lines) do
+    v:Hide()
+  end
+
+  -- setup values to make graph and lines
+  local mostTimePlayed, highestLevel, totalXPOfHighestLevelToon, frameWidth, frameHeight, frameWidthInterval, frameHeightInterval, mostDaysPlayed = XPC:GetGraphData()
 
   XPC:BuildXAxis(mostTimePlayed, mostDaysPlayed, frameWidthInterval, frameHeight)
   XPC:BuildYAxis(highestLevel, frameHeightInterval, totalXPOfHighestLevelToon, frameWidth)
   XPC:BuildAllLines(frameWidthInterval, frameHeightInterval)
-  XPC:BuildSideFrameLayout()
-  
-  mainFrame:Show()
 end
 
-function XPC:InitToonData()
-  local toons = XPC.db.global.toons
-  -- if toon data doesn't exist create it
-  if (toons[XPC.currToonName] == nil) then 
-    toons[XPC.currToonName] = {
-      lineVisible = true,
-      lineColor = {r = 1, g = 0, b = 0, a = 1},
-      levelData = {}
-    }
-    -- call time played to init levelData
-    RequestTimePlayed()
+function XPC:BuildXAxis(mostTimePlayed, mostDaysPlayed, frameWidthInterval, frameHeight)
+  -- find spacing. we want to divide by 5 then 4 then 3 then 2 trying to find a mod% full remainder value
+  -- if mod == division
+  -- else go with divide by 4 and decimal points
+  local function BuildXAxisHoursOrDays(hoursOrDays)
+    if (hoursOrDays == 24) then mostDaysPlayed = XPC:StoD(mostTimePlayed)end
+    local numOfTextObjs = 0
+    local modNum = 0
+    local alignLines = 8
+    local offset = 10
+
+    -- mod mostDaysPlayed from 5 to 1.
+    for i=5, 0, -1 do      
+      modNum = math.floor(mostDaysPlayed) % i
+      -- if modNum is 0 break the loop and set numOfTextObjs to i 
+      if (modNum == 0) then
+        -- if we reach 1 numOfTextObjs should be 4
+        if (i == 1) then numOfTextObjs = 4 
+        else numOfTextObjs = i end
+        break
+      end 
+    end
+
+    -- make x-axis text
+    for i=1, numOfTextObjs do 
+      local fstring = XPC_GUI.MainFrame:CreateFontString(nil, "OVERLAY", "GameToolTipText")
+      fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
+      fstring:SetText(math.floor(10 * (mostDaysPlayed * hoursOrDays) * (i / numOfTextObjs)) /10)
+      fstring:SetPoint("BOTTOMLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) - alignLines + offset, 4)
+      local line = XPC_GUI.MainFrame:CreateLine()
+      line:SetColorTexture(0.7,0.7,0.7,.1)
+      line:SetStartPoint("BOTTOMLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) + alignLines + offset, 0)
+      line:SetEndPoint("TOPLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) + alignLines + offset, -20)
+      table.insert(XPC_GUI.XAxis, {line = line, fstring = fstring})
+    end
+  end
+    
+  if (mostDaysPlayed < 5) then
+    BuildXAxisHoursOrDays(24)
+  else
+    BuildXAxisHoursOrDays(1)
   end
 end
 
-function XPC:GetGraphData()
-  -- find and save highest amount of time played on any character, highest level of any character
-  local mostTimePlayed = 0
-  local highestLevel = 0
-  local totalXPOfHighestLevelToon = 0
-  local XPOnLastLvl = 0
-  for i, toon in pairs(XPC.db.global.toons) do
-    if (toon.lineVisible == true) then
-      local lastData = toon.levelData[#toon.levelData]
-      if (lastData.timePlayed > mostTimePlayed) then 
-        mostTimePlayed = lastData.timePlayed 
-      end
-      if (lastData.level > highestLevel) then 
-        highestLevel = lastData.level 
-        XPOnLastLvl = 0 
-      end
-      if (lastData.level == highestLevel) then 
-        if (lastData.XPGainedThisLevel > XPOnLastLvl) then 
-          XPOnLastLvl = lastData.XPGainedThisLevel  
-        end
-      end
-    end 
-  end
+function XPC:BuildYAxis(highestLevel, frameHeightInterval, totalXPOfHighestLevelToon, frameWidth)
+  -- find spacing. we want to divide by 5 then 4 then 3 then 2 trying to find a mod% full remainder value
+  -- if mod == division
+  -- else go with divide by 4 and decimal points
 
-  -- save total collected xp from highest level toon
-  for i = 2, highestLevel do 
-    totalXPOfHighestLevelToon = totalXPOfHighestLevelToon + XPC.db.global.XPToLevel.Classic[i - 1]
-  end
-  totalXPOfHighestLevelToon = totalXPOfHighestLevelToon + XPOnLastLvl
+  local alignLines = 5
+  local offset = 6
 
-  return mostTimePlayed, highestLevel, totalXPOfHighestLevelToon
-end
+  if (highestLevel < 60) then
+    local numOfTextObjs = 0
+    local modNum = 0
 
-function  XPC:BuildSideFrameLayout()
-  local r,g,b,a = 1, 0, 0, 1;
-  
-
-  local function myColorCallback(restore)
-    local newR, newG, newB, newA;
-    if restore then
-      -- The user bailed, we extract the old color from the table created by ShowColorPicker.
-      newR, newG, newB, newA = unpack(restore);
-    else
-      -- Something changed
-      newA, newR, newG, newB = OpacitySliderFrame:GetValue(), ColorPickerFrame:GetColorRGB();
+    -- mod highestLevel from 15 to 1.
+    for i=15, 0, -1 do      
+      modNum = highestLevel % i
+      -- if modNum is 0 break the loop and set numOfTextObjs to i 
+      if (modNum == 0) then
+        -- if we reach 1 numOfTextObjs should be 4
+        if (i <= 4) then numOfTextObjs = 8 
+        else numOfTextObjs = i end
+        break
+      end 
     end
     
-    -- Update our internal storage.
-    r, g, b, a = newR, newG, newB, newA;
-    -- And update any UI elements that use this color...
-    XPC.db.global.toons[XPC.currColorToon].lineColor.r = r
-    XPC.db.global.toons[XPC.currColorToon].lineColor.g = g
-    XPC.db.global.toons[XPC.currColorToon].lineColor.b = b
-    XPC.db.global.toons[XPC.currColorToon].lineColor.a = a
-  end
-
-  -- side frame
-  XPC_GUI.MainFrame.SideFrame = CreateFrame("Frame", nil, XPC_GUI.MainFrame, "InsetFrameTemplate")
-  local sideFrame = XPC_GUI.MainFrame.SideFrame
-  sideFrame:SetMovable(true)
-  sideFrame:EnableMouse(true)
-  sideFrame:RegisterForDrag("LeftButton")
-  sideFrame:SetScript("OnDragStart", function(self)
-    self:StartMoving()
-  end)
-  sideFrame:SetScript("OnDragStop", function(self)
-    self:StopMovingOrSizing()
-  end)
-  sideFrame:SetPoint("CENTER", 200, 0);
-  sideFrame:SetWidth(400)
-  sideFrame:SetHeight(400) 
-
-  -- close button 
-  local closeButton = CreateFrame("Button", nil, sideFrame, "UIPanelCloseButtonNoScripts")
-  closeButton:SetPoint("TOPRIGHT")
-  closeButton:SetScript('OnClick', function() sideFrame:Hide() end)
-  
-  -- make line for each toon
-  local lastbtn
-  local firstLoop = true
-  local toons = XPC.db.global.toons
-  for k, toon in pairs(toons) do
     
-    -- make button change toon color (sets point for label and checkbox to position off of)
-    local button
-    if (firstLoop) then
-      button = CreateFrame("Button", toon, XPC_GUI.MainFrame.SideFrame, "UIPanelButtonTemplate")
-      button:SetPoint("TOPRIGHT", -16 , -40)
-      firstLoop = false;
+    -- make y-axis text
+    local x 
+    if (highestLevel < 5) then
+      x = 1
+    elseif (highestLevel < 10) then
+      x = 3
     else
-      button = CreateFrame("Button", toon, lastbtn, "UIPanelButtonTemplate")
-      button:SetPoint("TOP", 0, -30)
+      x = 4
     end
-    button:SetWidth(100)
-    button:SetHeight(25)
-    button:SetText("Pick Color")
-    button:SetScript("OnClick", function() 
-      XPC.currColorToon = k
-      local color = toon.lineColor
-      XPC:ShowColorPicker(color.r, color.g, color.b, color.a, myColorCallback) 
-    end)
-    -- lists all lines after eachother using first btn pos
-    lastbtn = button
 
-    -- toon name
-    local buttonLabel = button:CreateFontString(nil, "OVERLAY", "GameToolTipText")
-    buttonLabel:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    buttonLabel:SetPoint("LEFT", -240, 0)
-    local fString = string.format("Show - %s", k)
-    buttonLabel:SetText(fString)
+    for i = x, numOfTextObjs do 
+      local totalXPOfGraphIndex = 0
+      local lineLevelPercentage = (i / numOfTextObjs)
+      for j = 2, (highestLevel * lineLevelPercentage) do 
+        totalXPOfGraphIndex = totalXPOfGraphIndex + XPC.db.global.XPToLevel.Classic[j - 1]
+      end
+      local fstring = XPC_GUI.MainFrame:CreateFontString(nil, "OVERLAY", "GameToolTipText")
+      fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
+      fstring:SetText(highestLevel * lineLevelPercentage)
 
-    -- show toon checkbox
-    local checkbox = CreateFrame("CheckButton", nil, button, "ChatConfigCheckButtonTemplate")
-    checkbox:SetPoint("LEFT", -265, 0)
-    checkbox:SetSize(20, 20)
-    checkbox:SetChecked(toon.lineVisible)
-    checkbox:SetScript("OnClick", function() 
-      toon.lineVisible = not toon.lineVisible 
-    end)
-  end 
+      fstring:SetPoint("BOTTOMLEFT", 5, frameHeightInterval * totalXPOfGraphIndex -alignLines + offset)
+      local line = XPC_GUI.MainFrame:CreateLine()
+      line:SetColorTexture(0.7,0.7,0.7,.1)
+      line:SetStartPoint("BOTTOMLEFT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines + offset)
+      line:SetEndPoint("BOTTOMRIGHT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines + offset)
+
+      table.insert(XPC_GUI.YAxis, {line = line, fstring = fstring})
+    end
+  end
 end
 
 function XPC:BuildAllLines(frameWidthInterval, frameHeightInterval)
@@ -275,10 +253,10 @@ function XPC:BuildFullLine(frameWidthInterval, frameHeightInterval, toon, counte
       local StartTime = v.timePlayed
       local StartXP = v.totalXP
       -- stops from making last line with incomplete data
-      if (i <= #v - counterLimit) then 
-        local EndTime = v[i + counterLimit].timePlayed
-        local EndXP = v[i + counterLimit].totalXP
-        XPC:BuildALine(frameWidthInterval, frameHeightInterval, StartTime, StartXP, EndTime, EndXP, v.lineColor)
+      if (i <= #toon.levelData - counterLimit) then 
+        local EndTime = toon.levelData[i + counterLimit].timePlayed
+        local EndXP = toon.levelData[i + counterLimit].totalXP
+        XPC:BuildALine(frameWidthInterval, frameHeightInterval, StartTime, StartXP, EndTime, EndXP, toon.lineColor)
       end
       counter = 1
     else 
@@ -287,134 +265,158 @@ function XPC:BuildFullLine(frameWidthInterval, frameHeightInterval, toon, counte
   end
 end
 
-function XPC:BuildALine(frameWidthInterval, frameHeightInterval, StartTime, StartXP, EndTime, EndXP, LC)
+function XPC:BuildALine(frameWidthInterval, frameHeightInterval, StartTime, StartXP, EndTime, EndXP, color)
   local line = XPC_GUI.MainFrame:CreateLine()
   local offset = 10
   
-  line:SetColorTexture(LC[1], LC[2], LC[3], LC[4])
+  line:SetColorTexture(color.r, color.g, color.b, color.a)
   line:SetStartPoint("BOTTOMLEFT", frameWidthInterval * StartTime + offset, frameHeightInterval * StartXP + offset )
   line:SetEndPoint("BOTTOMLEFT", frameWidthInterval * EndTime + offset, frameHeightInterval * EndXP + offset )
+
+  table.insert(XPC_GUI.Lines, line)
 end
 
-function XPC:BuildXAxis(mostTimePlayed, mostDaysPlayed, frameWidthInterval, frameHeight)
-  -- find spacing. we want to divide by 5 then 4 then 3 then 2 trying to find a mod% full remainder value
-  -- if mod == division
-  -- else go with divide by 4 and decimal points
-  local mostDaysPlayed = mostDaysPlayed
-  if (mostDaysPlayed < 5) then
-    mostDaysPlayed = XPC:StoD(mostTimePlayed)
-
-    local numOfTextObjs = 0
-    local modNum = 0
-    local alignLines = 8
-    local offset = 10
-
-    -- mod mostDaysPlayed from 5 to 1.
-    for i=5, 0, -1 do      
-      modNum = math.floor(mostDaysPlayed) % i
-      -- if modNum is 0 break the loop and set numOfTextObjs to i 
-      if (modNum == 0) then
-        -- if we reach 1 numOfTextObjs should be 4
-        if (i == 1) then numOfTextObjs = 4 
-        else numOfTextObjs = i end
-        break
-      end 
-    end
-
-    -- make x-axis text
-    for i=1, numOfTextObjs do 
-      local fstring = XPC_GUI.MainFrame:CreateFontString(nil, "OVERLAY", "GameToolTipText")
-      fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
-      fstring:SetText(math.floor(10 * (mostDaysPlayed * 24) * (i / numOfTextObjs)) /10)
-      fstring:SetPoint("BOTTOMLEFT", frameWidthInterval * XPC:DtoS(mostDaysPlayed) * (i / numOfTextObjs) - alignLines + offset, 4)
-      local line = XPC_GUI.MainFrame:CreateLine()
-      line:SetColorTexture(0.7,0.7,0.7,.1)
-      line:SetStartPoint("BOTTOMLEFT", frameWidthInterval * XPC:DtoS(mostDaysPlayed) * (i / numOfTextObjs) + alignLines + offset, 0)
-      line:SetEndPoint("TOPLEFT", frameWidthInterval * XPC:DtoS(mostDaysPlayed) * (i / numOfTextObjs) + alignLines + offset, -20)
-    end
-  else
-    local numOfTextObjs = 0
-    local modNum = 0
-    
-    -- mod mostDaysPlayed from 5 to 1.
-    for i=5, 0, -1 do      
-      modNum = math.floor(mostDaysPlayed) % i
-      -- if modNum is 0 break the loop and set numOfTextObjs to i 
-      if (modNum == 0) then
-        -- if we reach 1 numOfTextObjs should be 4
-        if (i == 1) then numOfTextObjs = 4 
-        else numOfTextObjs = i end
-        break
-      end 
-    end
-      
-    -- make x-axis text
-    for i=1, numOfTextObjs do 
-      local fstring = XPC_GUI.MainFrame:CreateFontString(nil, "OVERLAY", "GameToolTipText")
-      local offset = 8
-      fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
-      fstring:SetText(math.floor(100 * mostDaysPlayed * (i / numOfTextObjs)) /100)
-      fstring:SetPoint("BOTTOMLEFT", frameWidthInterval * XPC:DtoS(mostDaysPlayed) * (i / numOfTextObjs) - offset, 4)
-      local line = XPC_GUI.MainFrame:CreateLine()
-      line:SetColorTexture(0.7,0.7,0.7,.1)
-      line:SetStartPoint("BOTTOMLEFT", frameWidthInterval * XPC:DtoS(mostDaysPlayed) * (i / numOfTextObjs) + offset, 0)
-      line:SetEndPoint("TOPLEFT", frameWidthInterval * XPC:DtoS(mostDaysPlayed) * (i / numOfTextObjs) +offset, -20)
-    end
-  end
-end
-
-function XPC:BuildYAxis(highestLevel, frameHeightInterval, totalXPOfHighestLevelToon, frameWidth)
-  -- find spacing. we want to divide by 5 then 4 then 3 then 2 trying to find a mod% full remainder value
-  -- if mod == division
-  -- else go with divide by 4 and decimal points
-
-  local alignLines = 5
-  local offset = 6
-
-  if (highestLevel < 60) then
-    local numOfTextObjs = 0
-    local modNum = 0
-
-    -- mod highestLevel from 15 to 1.
-    for i=15, 0, -1 do      
-      modNum = highestLevel % i
-      -- if modNum is 0 break the loop and set numOfTextObjs to i 
-      if (modNum == 0) then
-        -- if we reach 1 numOfTextObjs should be 4
-        if (i <= 4) then numOfTextObjs = 8 
-        else numOfTextObjs = i end
-        break
-      end 
-    end
-    
-    
-    -- make y-axis text
-    local x 
-    if (highestLevel < 5) then
-      x = 1
-    elseif (highestLevel < 10) then
-      x = 3
+function XPC:BuildSideFrameLayout()
+  local function myColorCallback(restore)
+    local newR, newG, newB, newA;
+    if restore then
+      -- The user bailed, we extract the old color from the table created by ShowColorPicker.
+      newR, newG, newB, newA = unpack(restore);
     else
-      x = 4
+      -- Something changed
+      newA, newR, newG, newB = OpacitySliderFrame:GetValue(), ColorPickerFrame:GetColorRGB();
     end
-
-    for i = x, numOfTextObjs do 
-      local totalXPOfGraphIndex = 0
-      local lineLevelPercentage = (i / numOfTextObjs)
-      for j = 2, (highestLevel * lineLevelPercentage) do 
-          totalXPOfGraphIndex = totalXPOfGraphIndex + XPC.db.global.XPToLevel.Classic[j - 1]
-      end
-      local fstring = XPC_GUI.MainFrame:CreateFontString(nil, "OVERLAY", "GameToolTipText")
-      fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
-      fstring:SetText(highestLevel * lineLevelPercentage)
-
-      fstring:SetPoint("BOTTOMLEFT", 5, frameHeightInterval * totalXPOfGraphIndex -alignLines + offset)
-      local line = XPC_GUI.MainFrame:CreateLine()
-      line:SetColorTexture(0.7,0.7,0.7,.1)
-      line:SetStartPoint("BOTTOMLEFT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines + offset)
-      line:SetEndPoint("BOTTOMRIGHT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines + offset)
-    end
+    
+    -- Update our internal storage.
+    r, g, b, a = newR, newG, newB, newA;
+    -- And update any UI elements that use this color...
+    local color = XPC.db.global.toons[XPC.currColorToon].lineColor
+    color.r = r
+    color.g = g
+    color.b = b
+    color.a = a
   end
+  
+  -- side frame
+  XPC_GUI.MainFrame.SideFrame = CreateFrame("Frame", nil, XPC_GUI.MainFrame, "InsetFrameTemplate")
+  local sideFrame = XPC_GUI.MainFrame.SideFrame
+  sideFrame:SetMovable(true)
+  sideFrame:EnableMouse(true)
+  sideFrame:RegisterForDrag("LeftButton")
+  sideFrame:SetScript("OnDragStart", function(self)
+    self:StartMoving()
+  end)
+  sideFrame:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+  end)
+  sideFrame:SetPoint("CENTER", 200, 0);
+  sideFrame:SetWidth(400)
+  sideFrame:SetHeight(400) 
+
+  -- close button 
+  local closeButton = CreateFrame("Button", nil, sideFrame, "UIPanelCloseButtonNoScripts")
+  closeButton:SetPoint("TOPRIGHT")
+  closeButton:SetScript('OnClick', function() sideFrame:Hide() end)
+  
+  -- make line for each toon
+  local lastbtn
+  local firstLoop = true
+  local toons = XPC.db.global.toons
+  for k, toon in pairs(toons) do
+    
+    -- make button change toon color (sets point for label and checkbox to position off of)
+    local button
+    if (firstLoop) then
+      button = CreateFrame("Button", toon, XPC_GUI.MainFrame.SideFrame, "UIPanelButtonTemplate")
+      button:SetPoint("TOPRIGHT", -16 , -40)
+      firstLoop = false;
+    else
+      button = CreateFrame("Button", toon, lastbtn, "UIPanelButtonTemplate")
+      button:SetPoint("TOP", 0, -30)
+    end
+    button:SetWidth(100)
+    button:SetHeight(25)
+    button:SetText("Pick Color")
+    button:SetScript("OnClick", function() 
+      XPC.currColorToon = k
+      XPC:ShowColorPicker(toon.lineColor, myColorCallback) 
+    end)
+    -- lists all lines after eachother using first btn pos
+    lastbtn = button
+
+    -- toon name
+    local buttonLabel = button:CreateFontString(nil, "OVERLAY", "GameToolTipText")
+    buttonLabel:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    buttonLabel:SetPoint("LEFT", -240, 0)
+    local fString = string.format("Show - %s", k)
+    buttonLabel:SetText(fString)
+
+    -- show toon checkbox
+    local checkbox = CreateFrame("CheckButton", nil, button, "ChatConfigCheckButtonTemplate")
+    checkbox:SetPoint("LEFT", -265, 0)
+    checkbox:SetSize(20, 20)
+    checkbox:SetChecked(toon.lineVisible)
+    checkbox:SetScript("OnClick", function() 
+      toon.lineVisible = not toon.lineVisible 
+      XPC:BuildGraph()
+    end)
+  end 
+
+  sideFrame:Hide()
+end
+
+function XPC:InitToonData()
+  local toons = XPC.db.global.toons
+  -- if toon data doesn't exist create it
+  if (toons[XPC.currToonName] == nil) then 
+    toons[XPC.currToonName] = {
+      lineVisible = true,
+      lineColor = {r = 1, g = 0, b = 0, a = 1},
+      levelData = {}
+    }
+    -- call time played to init levelData
+    RequestTimePlayed()
+  end
+end
+
+function XPC:GetGraphData()
+  -- find and save highest amount of time played on any character, highest level of any character
+  local mostTimePlayed = 0
+  local highestLevel = 0
+  local totalXPOfHighestLevelToon = 0
+  local XPOnLastLvl = 0
+  for i, toon in pairs(XPC.db.global.toons) do
+    if (toon.lineVisible == true) then
+      local lastData = toon.levelData[#toon.levelData]
+      if (lastData.timePlayed > mostTimePlayed) then 
+        mostTimePlayed = lastData.timePlayed 
+      end
+      if (lastData.level > highestLevel) then 
+        highestLevel = lastData.level 
+        XPOnLastLvl = 0 
+      end
+      if (lastData.level == highestLevel) then 
+        if (lastData.XPGainedThisLevel > XPOnLastLvl) then 
+          XPOnLastLvl = lastData.XPGainedThisLevel  
+        end
+      end
+    end 
+  end
+
+  -- save total collected xp from highest level toon
+  for i = 2, highestLevel do 
+    totalXPOfHighestLevelToon = totalXPOfHighestLevelToon + XPC.db.global.XPToLevel.Classic[i - 1]
+  end
+  totalXPOfHighestLevelToon = totalXPOfHighestLevelToon + XPOnLastLvl
+
+  -- frame values
+  local frameWidth = 1150
+  local frameHeight = 590
+  local frameWidthInterval = frameWidth / mostTimePlayed 
+  local frameHeightInterval = frameHeight / totalXPOfHighestLevelToon
+  local mostDaysPlayed = math.floor(XPC:StoD(mostTimePlayed))
+
+  return mostTimePlayed, highestLevel, totalXPOfHighestLevelToon, frameWidth, frameHeight, frameWidthInterval, frameHeightInterval, mostDaysPlayed
 end
 
 function XPC:StartTimePlayedLoop() 
@@ -447,7 +449,6 @@ function XPC:OnTimePlayedEvent(self, event, ...)
     end
     totalXP = totalXP + currXP
 
-    print('here')
     table.insert(XPC.db.global.toons[XPC.currToonName].levelData, {
       timePlayed = arg1, 
       level = currLvl, 
@@ -465,7 +466,8 @@ function XPC:DtoS(val)
     return val * 60 * 60 * 24
 end
 
-function XPC:ShowColorPicker(r, g, b, a, changedCallback)
+function XPC:ShowColorPicker(color, changedCallback)
+  local r, g, b, a = color.r, color.g, color.b, color.a;
   ColorPickerFrame.hasOpacity, ColorPickerFrame.opacity = (a ~= nil), a;
   ColorPickerFrame.previousValues = {r,g,b,a};
   ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc = 
@@ -476,7 +478,6 @@ function XPC:ShowColorPicker(r, g, b, a, changedCallback)
 end
 
 
--- restructure. this code is bs
 -- condense to one addon
 -- make for all game versions with xp tables 
 -- minimap icon
