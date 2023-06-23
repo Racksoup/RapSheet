@@ -453,7 +453,13 @@ function XPC:StartTimePlayedLoop()
   local currLvl = UnitLevel("player")
   local maxLevel = 60
   version, build, datex, tocversion = GetBuildInfo()
+  if (tocversion > 20000) then 
+    maxLevel = 70
+  end
   if (tocversion > 30000) then 
+    maxLevel = 80
+  end
+  if (tocversion > 40000) then 
     maxLevel = 70
   end
   if (currLvl < maxLevel) then
