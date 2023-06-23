@@ -295,6 +295,8 @@ function XPC:BuildSideFrameLayout()
     color.g = g
     color.b = b
     color.a = a
+
+    XPC:BuildGraph()
   end
   
   -- side frame
