@@ -1,6 +1,23 @@
 XPC = LibStub("AceAddon-3.0"):NewAddon("XPChart")
 local L = LibStub("AceLocale-3.0"):GetLocale("XPChartLocale")
-local XPC_GUI = LibStub("AceGUI-3.0")
+local XPC_GUI = {}
+local icon = LibStub("LibDBIcon-1.0")
+local XPC_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("XPC", {
+  type = "data source",
+  text = "XP Chart",
+  icon = "interface/icons/inv_misc_book_12.blp",
+  OnClick = function()
+    if (XPC_GUI.MainFrame:IsVisible()) then 
+      XPC_GUI.MainFrame:Hide()
+      print('l')
+    else 
+      XPC_GUI.MainFrame:Show()
+    end
+  end,
+  OnTooltipShow = function(tooltip)
+    tooltip:SetText("XP Chart")
+  end,
+})
 
 local defaults = {
   global = {
@@ -48,6 +65,7 @@ end
 
 function XPC:OnInitialize()
   self.db = LibStub("AceDB-3.0"):New("XPChartDB", defaults, true)
+  icon:Register("XPChart", XPC_LDB, self.db.realm.minimap)
   -- self.db:ResetDB()
 
   XPC:StartTimePlayedLoop()
@@ -518,10 +536,10 @@ function XPC:ShowColorPicker(color, changedCallback)
 end
 
 
--- condense to one addon
--- make for all game versions with xp tables 
 -- minimap icon
 -- reset all data button
+-- delete character 
+-- scroll on sidebar
 
 -- max levels checkbox. perspective with max xp as height for the chart (shows progress out of full level 60 xp amount, 6,079,800)
 -- even levels checkbox. view where every level is spaced equally on y-axis
