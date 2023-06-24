@@ -10,7 +10,7 @@ local XPC_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("XPC", {
     if (XPC_GUI.main:IsVisible()) then 
       XPC_GUI.main:Hide()
     else 
-      XPC:ShowXPGraph()
+      XPC:ShowView()
       XPC_GUI.main:Show()
     end
   end,
@@ -157,10 +157,10 @@ function XPC:BuildMainWindow()
   local xpGraphBtn = main.xpGraphBtn
   xpGraphBtn:SetSize(120, 25)
   xpGraphBtn:SetPoint("TOPLEFT", 20, -12)
-  xpGraphBtn:SetText("XP Graph")
+  xpGraphBtn:SetText("XP Gained")
   xpGraphBtn:SetScript("OnClick", function()
     XPC.db.global.settings.view = 'xpGraph'
-    XPC:ChangeView()
+    XPC:ShowView()
   end)
 
   -- all toons chart button 
@@ -168,10 +168,10 @@ function XPC:BuildMainWindow()
   local allToonsBtn = main.allToonsBtn
   allToonsBtn:SetSize(120, 25)
   allToonsBtn:SetPoint("TOPLEFT", 150, -12)
-  allToonsBtn:SetText("All Toons Chart")
+  allToonsBtn:SetText("Stats - All")
   allToonsBtn:SetScript("OnClick", function()
     XPC.db.global.settings.view = 'allToonsChart'
-    XPC:ChangeView()
+    XPC:ShowView()
   end)
 
   -- single toon chart button 
@@ -179,15 +179,15 @@ function XPC:BuildMainWindow()
   local singleToon = main.singleToon
   singleToon:SetSize(120, 25)
   singleToon:SetPoint("TOPLEFT", 280, -12)
-  singleToon:SetText("Single Toon Chart")
+  singleToon:SetText("Stats - Single")
   singleToon:SetScript("OnClick", function()
     XPC.db.global.settings.view = 'singleToonChart'
-    XPC:ChangeView()
+    XPC:ShowView()
   end)
   
   XPC:BuildXPGraphOptions()
   -- show chart or graph
-  XPC:ChangeView()
+  XPC:ShowView()
   
   main:Hide()
 end
@@ -206,7 +206,7 @@ function XPC:InitToonData()
   end
 end
 
-function XPC:ChangeView()
+function XPC:ShowView()
   local view = XPC.db.global.settings.view
   XPC:HideXPGraph()
   XPC:HideSingleToonChart()
@@ -293,22 +293,3 @@ end
 
 -- reset all data button
 -- delete character data
-
--- max levels checkbox. perspective with max xp as height for the chart (shows progress out of full level 60 xp amount, 6,079,800)
--- even levels checkbox. view where every level is spaced equally on y-axis
-
--- all character stats view.
--- percentage and number of quest/farm xp gained  
--- potions used
--- food / bandages used
--- gold made per level 
--- average/overall dps per level
--- average/overall damage taken per level
--- time in combat
--- number of monsters killed
-
--- single charater stats view
--- list of monsters killed by name. overall, per level. includes while in groups
--- number of monsters killed. overall, per level, in a group overall, in a group per level
--- number of quests comleted. overall, per level
--- list of quests completed per level
