@@ -3,11 +3,6 @@ function XPC:BuildSingleToon()
   local single = XPC_GUI.main.single
   single:SetSize(1200, 650)
   single:SetPoint("TOPLEFT")
-
-  single.chart = CreateFrame("Frame", chart, single)
-  local chart = single.chart
-  chart:SetSize(1150, 595)
-  chart:SetPoint("BOTTOMLEFT")
   
   -- switch toons button
   single.toonsBtn = CreateFrame("Button", nil, single, "UIPanelButtonTemplate")
@@ -23,6 +18,11 @@ function XPC:BuildSingleToon()
       chooseToon:Show()
     end
   end)
+
+  single.chart = CreateFrame("Frame", chart, single)
+  local chart = single.chart
+  chart:SetSize(1200, 605)
+  chart:SetPoint("BOTTOMLEFT")
 
   XPC:BuildChooseToon()
 
