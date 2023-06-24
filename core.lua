@@ -73,9 +73,24 @@ function XPC:OnInitialize()
   XPC:CreateUI()
 end
 
+
+function ScrollFrame_OnMouseWheel(self, delta)
+  local newValue = self:GetVerticalScroll() - (delta * 20);
+ 
+  if (newValue < 0) then
+    newValue = 0;
+  elseif (newValue > self:GetVerticalScrollRange()) then
+    newValue = self:GetVerticalScrollRange();
+  end
+ 
+  self:SetVerticalScroll(newValue);
+end
+
+
 function XPC:CreateUI()
   -- variables
-  local name, server = UnitFullName('player', true)
+  local name = UnitName('player')
+  local server = GetRealmName()
   XPC.currToonName = name .. "-" .. server
   XPC_GUI = {}
   XPC_GUI.XAxis = {}
@@ -357,8 +372,26 @@ function XPC:BuildSideFrameLayout()
     self:StopMovingOrSizing()
   end)
   sideFrame:SetPoint("CENTER", 200, 0);
-  sideFrame:SetWidth(400)
-  sideFrame:SetHeight(400) 
+  sideFrame:SetWidth(360)
+  sideFrame:SetHeight(341) 
+  
+  -- scroll frame
+  sideFrame.scrollFrame = CreateFrame("ScrollFrame", nil, sideFrame, "UIPanelScrollFrameTemplate")
+  local scrollFrame = sideFrame.scrollFrame
+  scrollFrame:SetScript('OnMouseWheel', ScrollFrame_OnMouseWheel)
+  scrollFrame:SetPoint("TOPRIGHT", -31, -30)
+  scrollFrame:SetSize(310, 302)
+
+  -- side frame content
+  sideFrame.content = CreateFrame("Frame", nil, scrollFrame)
+  local content = sideFrame.content
+  local numOfToons = 0
+  for k,v in pairs(XPC.db.global.toons) do
+    numOfToons = numOfToons + 1
+  end
+  content:SetSize(310, numOfToons * 30 + 5)
+  content:SetClipsChildren(true)
+  scrollFrame:SetScrollChild(content)
 
   -- close button 
   local closeButton = CreateFrame("Button", nil, sideFrame, "UIPanelCloseButtonNoScripts")
@@ -366,47 +399,35 @@ function XPC:BuildSideFrameLayout()
   closeButton:SetScript('OnClick', function() sideFrame:Hide() end)
   
   -- make line for each toon
-  local lastbtn
-  local firstLoop = true
-  local toons = XPC.db.global.toons
-  for k, toon in pairs(toons) do
-    
-    -- make button change toon color (sets point for label and checkbox to position off of)
-    local button
-    if (firstLoop) then
-      button = CreateFrame("Button", toon, XPC_GUI.MainFrame.SideFrame, "UIPanelButtonTemplate")
-      button:SetPoint("TOPRIGHT", -16 , -40)
-      firstLoop = false;
-    else
-      button = CreateFrame("Button", toon, lastbtn, "UIPanelButtonTemplate")
-      button:SetPoint("TOP", 0, -30)
-    end
-    button:SetWidth(100)
-    button:SetHeight(25)
-    button:SetText("Pick Color")
+  local i = 0
+  for k, toon in pairs(XPC.db.global.toons) do
+    local button = CreateFrame("Button", toon, content, "UIPanelButtonTemplate")
+    button:SetPoint("TOPLEFT", 35, i * -30)
+    button:SetSize(25, 25)
+    button:SetText("C")
     button:SetScript("OnClick", function() 
       XPC.currColorToon = k
       XPC:ShowColorPicker(toon.lineColor, myColorCallback) 
     end)
-    -- lists all lines after eachother using first btn pos
-    lastbtn = button
 
     -- toon name
-    local buttonLabel = button:CreateFontString(nil, "OVERLAY", "GameToolTipText")
-    buttonLabel:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    buttonLabel:SetPoint("LEFT", -240, 0)
-    local fString = string.format("Show - %s", k)
-    buttonLabel:SetText(fString)
+    local label = content:CreateFontString(nil, "OVERLAY", "GameToolTipText")
+    label:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    label:SetTextScale(1.2)
+    label:SetPoint("TOPLEFT", 70, (i * -30) -5)
+    label:SetText(k)
 
     -- show toon checkbox
-    local checkbox = CreateFrame("CheckButton", nil, button, "ChatConfigCheckButtonTemplate")
-    checkbox:SetPoint("LEFT", -265, 0)
-    checkbox:SetSize(20, 20)
+    local checkbox = CreateFrame("CheckButton", nil, content, "ChatConfigCheckButtonTemplate")
+    checkbox:SetPoint("TOPLEFT", 0, i * -30)
+    checkbox:SetSize(25, 25)
     checkbox:SetChecked(toon.lineVisible)
     checkbox:SetScript("OnClick", function() 
       toon.lineVisible = not toon.lineVisible 
       XPC:BuildGraph()
     end)
+
+    i = i + 1
   end 
 
   sideFrame:Hide()
@@ -435,16 +456,18 @@ function XPC:GetGraphData()
   for i, toon in pairs(XPC.db.global.toons) do
     if (toon.lineVisible == true) then
       local lastData = toon.levelData[#toon.levelData]
-      if (lastData.timePlayed > mostTimePlayed) then 
-        mostTimePlayed = lastData.timePlayed 
-      end
-      if (lastData.level > highestLevel) then 
-        highestLevel = lastData.level 
-        XPOnLastLvl = 0 
-      end
-      if (lastData.level == highestLevel) then 
-        if (lastData.XPGainedThisLevel > XPOnLastLvl) then 
-          XPOnLastLvl = lastData.XPGainedThisLevel  
+      if (lastData) then
+        if (lastData.timePlayed > mostTimePlayed) then 
+          mostTimePlayed = lastData.timePlayed 
+        end
+        if (lastData.level > highestLevel) then 
+          highestLevel = lastData.level 
+          XPOnLastLvl = 0 
+        end
+        if (lastData.level == highestLevel) then 
+          if (lastData.XPGainedThisLevel > XPOnLastLvl) then 
+            XPOnLastLvl = lastData.XPGainedThisLevel  
+          end
         end
       end
     end 
@@ -536,10 +559,8 @@ function XPC:ShowColorPicker(color, changedCallback)
 end
 
 
--- minimap icon
 -- reset all data button
--- delete character 
--- scroll on sidebar
+-- delete character data
 
 -- max levels checkbox. perspective with max xp as height for the chart (shows progress out of full level 60 xp amount, 6,079,800)
 -- even levels checkbox. view where every level is spaced equally on y-axis
