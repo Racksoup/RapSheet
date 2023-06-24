@@ -62,7 +62,7 @@ SLASH_XPC1 = "/xpc"
 
 SlashCmdList["XPC"] = function()
   RequestTimePlayed()
-  XPC:ShowXPGraph()
+  XPC:ShowView()
   XPC_GUI.main:Show()
 end
 
@@ -94,10 +94,14 @@ function XPC:CreateUI()
   local name = UnitName('player')
   local server = GetRealmName()
   XPC.currToonName = name .. "-" .. server
-  XPC_GUI = {}
   XPC_GUI.XAxis = {}
   XPC_GUI.YAxis = {}
   XPC_GUI.Lines = {}
+  XPC.currSingleToon = XPC.currToonName
+  XPC.numOfToons = 0
+  for k,v in pairs(XPC.db.global.toons) do
+    XPC.numOfToons = XPC.numOfToons + 1
+  end
   -- init db vars
   XPC:InitToonData()
   -- set level chart  

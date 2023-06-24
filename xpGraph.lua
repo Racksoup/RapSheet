@@ -304,11 +304,7 @@ function XPC:BuildXPGraphOptions()
   -- side frame content
   options.content = CreateFrame("Frame", nil, scrollFrame)
   local content = options.content
-  local numOfToons = 0
-  for k,v in pairs(XPC.db.global.toons) do
-    numOfToons = numOfToons + 1
-  end
-  content:SetSize(310, numOfToons * 30 + 5)
+  content:SetSize(310, XPC.numOfToons * 30 + 5)
   content:SetClipsChildren(true)
   scrollFrame:SetScrollChild(content)
 
@@ -331,8 +327,7 @@ function XPC:BuildXPGraphOptions()
 
     -- toon name
     local label = content:CreateFontString(nil, "OVERLAY", "GameToolTipText")
-    label:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    label:SetTextScale(1.2)
+    label:SetFont("Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE")
     label:SetPoint("TOPLEFT", 70, (i * -30) -5)
     label:SetText(k)
 
