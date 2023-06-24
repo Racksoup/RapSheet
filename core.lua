@@ -72,6 +72,7 @@ function XPC:OnInitialize()
   -- self.db:ResetDB()
 
   XPC:StartTimePlayedLoop()
+  XPC:StatsTracker()
 
   XPC:CreateUI()
 end
@@ -141,7 +142,7 @@ function XPC:BuildMainWindow()
   main.optionsBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
   local optionsBtn = main.optionsBtn
   optionsBtn:SetSize(120, 25)
-  optionsBtn:SetPoint("TOPRIGHT", -100, -7)
+  optionsBtn:SetPoint("TOPRIGHT", -80, -12)
   optionsBtn:SetText("Options")
   optionsBtn:SetScript("OnClick", function() 
     local options = XPC_GUI.main.options
@@ -186,6 +187,7 @@ function XPC:BuildMainWindow()
   end)
   
   XPC:BuildXPGraphOptions()
+  XPC:BuildSingleToon()
   -- show chart or graph
   XPC:ShowView()
   
@@ -209,15 +211,15 @@ end
 function XPC:ShowView()
   local view = XPC.db.global.settings.view
   XPC:HideXPGraph()
-  XPC:HideSingleToonChart()
+  XPC_GUI.main.single:Hide()
   XPC:HideAllToonsChart()
   if (view == 'xpGraph') then
     XPC:ShowXPGraph()
   end
-  if (view == 'singleToon') then
+  if (view == 'singleToonChart') then
     XPC:ShowSingleToonChart()
   end
-  if (view == 'AllToons') then
+  if (view == 'AllToonsChart') then
     XPC:ShowAllToonsChart()
   end
 end
@@ -272,6 +274,34 @@ function XPC:OnTimePlayedEvent(self, event, ...)
   end
 end
 
+function XPC:StatsTracker()
+  XPC_GUI.statsTracker = CreateFrame("Frame", statsTracker)
+  local tracker = XPC_GUI.statsTracker
+
+  tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+  tracker:SetScript("OnEvent", function(self, event, ...) 
+    if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
+      local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = CombatLogGetCurrentEventInfo()
+      if (sourceName == GetUnitName("player")) then
+        if (subevent == "SWING_DAMAGE" or subevent == "SPELL_DAMAGE" or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
+          local spellId, spellName, spellSchool
+          local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand
+
+          if subevent == "SWING_DAMAGE" then
+            amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          elseif (subevent == "SPELL_DAMAGE"  or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
+            spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          end
+
+          local currDamageDealt = XPC.db.global.toons[XPC.currToonName].statsData[tostring(UnitLevel('player'))].damageDealt
+          currDamageDealt = currDamageDealt + amount 
+        end
+      end
+    end
+  end)
+end
+
 function XPC:StoD(val)
     return val / 60 / 60 / 24
 end
@@ -293,3 +323,5 @@ end
 
 -- reset all data button
 -- delete character data
+
+-- change addon name to 'Level Stats'??? maybe

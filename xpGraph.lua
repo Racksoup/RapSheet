@@ -290,7 +290,7 @@ function XPC:BuildXPGraphOptions()
   options:SetScript("OnDragStop", function(self)
     self:StopMovingOrSizing()
   end)
-  options:SetPoint("CENTER", 200, 0);
+  options:SetPoint("TOPRIGHT", -60, -60);
   options:SetWidth(360)
   options:SetHeight(341) 
   
@@ -354,3 +354,6 @@ end
 
 -- max levels checkbox. perspective with max xp as height for the chart (shows progress out of full level 60 xp amount, 6,079,800)
 -- even levels checkbox. view where every level is spaced equally on y-axis
+
+-- if no lines visible on startup show current toon
+-- create real graph object to hold all lines and fstrings. makes hiding a lot easier
