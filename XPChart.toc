@@ -10,3 +10,5 @@ embeds.xml
 enUS.lua
 core.lua
 xpGraph.lua
+singleToonChart.lua
+allToonsChart.lua

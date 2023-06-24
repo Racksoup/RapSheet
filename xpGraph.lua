@@ -40,7 +40,8 @@ function XPC:GetGraphData()
   return mostTimePlayed, highestLevel, totalXPOfHighestLevelToon, frameWidth, frameHeight, frameWidthInterval, frameHeightInterval, mostDaysPlayed
 end
 
-function XPC:BuildXPGraph()
+function XPC:HideXPGraph()
+  XPC_GUI.main.optionsBtn:Hide()
   -- reset axis and lines
   for i, v in ipairs(XPC_GUI.XAxis) do
     v.fstring:Hide()
@@ -53,6 +54,11 @@ function XPC:BuildXPGraph()
   for i, v in ipairs(XPC_GUI.Lines) do
     v:Hide()
   end
+end
+
+function XPC:ShowXPGraph()
+  XPC:HideXPGraph()
+  XPC_GUI.main.optionsBtn:Show()
 
   -- setup values to make graph and lines
   local mostTimePlayed, highestLevel, totalXPOfHighestLevelToon, frameWidth, frameHeight, frameWidthInterval, frameHeightInterval, mostDaysPlayed = XPC:GetGraphData()
@@ -269,7 +275,7 @@ function XPC:BuildXPGraphOptions()
     color.b = b
     color.a = a
 
-    XPC:BuildXPGraph()
+    XPC:ShowXPGraph()
   end
   
   -- side frame
@@ -337,7 +343,7 @@ function XPC:BuildXPGraphOptions()
     checkbox:SetChecked(toon.lineVisible)
     checkbox:SetScript("OnClick", function() 
       toon.lineVisible = not toon.lineVisible 
-      XPC:BuildXPGraph()
+      XPC:ShowXPGraph()
     end)
 
     i = i + 1

@@ -10,7 +10,7 @@ local XPC_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("XPC", {
     if (XPC_GUI.main:IsVisible()) then 
       XPC_GUI.main:Hide()
     else 
-      XPC:BuildXPGraph()
+      XPC:ShowXPGraph()
       XPC_GUI.main:Show()
     end
   end,
@@ -21,6 +21,9 @@ local XPC_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("XPC", {
 
 local defaults = {
   global = {
+    settings = {
+      view = 'xpGraph'
+    },
     toons = {
     },
     levelCharts = {
@@ -59,7 +62,7 @@ SLASH_XPC1 = "/xpc"
 
 SlashCmdList["XPC"] = function()
   RequestTimePlayed()
-  XPC:BuildXPGraph()
+  XPC:ShowXPGraph()
   XPC_GUI.main:Show()
 end
 
@@ -108,7 +111,6 @@ function XPC:CreateUI()
 
   -- build
   XPC:BuildMainWindow()
-  XPC:BuildXPGraphOptions();
 end
 
 function XPC:BuildMainWindow()
@@ -138,7 +140,7 @@ function XPC:BuildMainWindow()
   -- options button
   main.optionsBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
   local optionsBtn = main.optionsBtn
-  optionsBtn:SetSize(150, 16)
+  optionsBtn:SetSize(120, 25)
   optionsBtn:SetPoint("TOPRIGHT", -100, -7)
   optionsBtn:SetText("Options")
   optionsBtn:SetScript("OnClick", function() 
@@ -149,9 +151,43 @@ function XPC:BuildMainWindow()
       options:Show()
     end
   end)
+
+  -- xp graph view button
+  main.xpGraphBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
+  local xpGraphBtn = main.xpGraphBtn
+  xpGraphBtn:SetSize(120, 25)
+  xpGraphBtn:SetPoint("TOPLEFT", 20, -12)
+  xpGraphBtn:SetText("XP Graph")
+  xpGraphBtn:SetScript("OnClick", function()
+    XPC.db.global.settings.view = 'xpGraph'
+    XPC:ChangeView()
+  end)
+
+  -- all toons chart button 
+  main.allToonsBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
+  local allToonsBtn = main.allToonsBtn
+  allToonsBtn:SetSize(120, 25)
+  allToonsBtn:SetPoint("TOPLEFT", 150, -12)
+  allToonsBtn:SetText("All Toons Chart")
+  allToonsBtn:SetScript("OnClick", function()
+    XPC.db.global.settings.view = 'allToonsChart'
+    XPC:ChangeView()
+  end)
+
+  -- single toon chart button 
+  main.singleToon = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
+  local singleToon = main.singleToon
+  singleToon:SetSize(120, 25)
+  singleToon:SetPoint("TOPLEFT", 280, -12)
+  singleToon:SetText("Single Toon Chart")
+  singleToon:SetScript("OnClick", function()
+    XPC.db.global.settings.view = 'singleToonChart'
+    XPC:ChangeView()
+  end)
   
-  -- start with xp chart view
-  XPC:BuildXPGraph()
+  XPC:BuildXPGraphOptions()
+  -- show chart or graph
+  XPC:ChangeView()
   
   main:Hide()
 end
@@ -167,6 +203,22 @@ function XPC:InitToonData()
     }
     -- call time played to init levelData
     RequestTimePlayed()
+  end
+end
+
+function XPC:ChangeView()
+  local view = XPC.db.global.settings.view
+  XPC:HideXPGraph()
+  XPC:HideSingleToonChart()
+  XPC:HideAllToonsChart()
+  if (view == 'xpGraph') then
+    XPC:ShowXPGraph()
+  end
+  if (view == 'singleToon') then
+    XPC:ShowSingleToonChart()
+  end
+  if (view == 'AllToons') then
+    XPC:ShowAllToonsChart()
   end
 end
 
