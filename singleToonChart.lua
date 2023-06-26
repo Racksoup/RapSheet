@@ -1,6 +1,10 @@
 function Single_OnMouseWheel(self, delta) 
+  local single = XPC_GUI.main.single
+  local chart = XPC_GUI.main.single.chart
+  local point, relativeTo, relativePoint, offsetX, offsetY = chart:GetPoint()
   
   if (IsShiftKeyDown()) then
+    -- slider 
     local hSlider = XPC_GUI.main.single.hSlider
     local newValue = hSlider:GetValue() - (delta * .5);
     local minValue, maxValue = hSlider:GetMinMaxValues()
@@ -16,7 +20,18 @@ function Single_OnMouseWheel(self, delta)
     end
     
     hSlider:SetValue(newValue + hSlider:GetValue())
+
+    -- chart
+    local sliderValue = hSlider:GetValue()
+    local scrollDist = sliderValue / maxValue
+    local scrollMaxLength = chart:GetWidth()  - single:GetWidth()
+    local scrollPos = (scrollMaxLength / 100) * (scrollDist * 100) - 40
+    if (scrollPos < 6) then scrollPos = 0 end
+    print(scrollPos)
+    chart:SetPoint(point, relativeTo, relativePoint, scrollPos, offsetY)
+
   else
+    -- slider
     local vSlider = XPC_GUI.main.single.vSlider
     local newValue = vSlider:GetValue() - (delta * .5);
     local minValue, maxValue = vSlider:GetMinMaxValues()
@@ -30,8 +45,17 @@ function Single_OnMouseWheel(self, delta)
     elseif (newValue < vSlider:GetValue()) then
       newValue = -1* vSlider:GetValueStep()
     end
-   
+    
     vSlider:SetValue(newValue + vSlider:GetValue())
+
+    -- chart
+    local sliderValue = vSlider:GetValue()
+    local scrollDist = sliderValue / maxValue
+    local scrollMaxLength = chart:GetHeight()  - single:GetHeight()
+    local scrollPos = (scrollMaxLength / 100) * (scrollDist * 100) - 40
+    if (scrollPos < -34) then scrollPos = -40 end
+    print(scrollPos)
+    chart:SetPoint(point, relativeTo, relativePoint, offsetX, scrollPos)
   end
 end
 
@@ -87,7 +111,7 @@ function XPC:BuildSingleToon()
   -- Chart
   single.chart = CreateFrame("Frame", chart, single)
   local chart = single.chart
-  chart:SetSize(1500, 705)
+  chart:SetSize(1500, 905)
   -- slider:SetScrollChild(chart)
   chart:SetPoint("TOPLEFT", 0, -40)
 
