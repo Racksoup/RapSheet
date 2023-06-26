@@ -10,6 +10,7 @@ local XPC_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("XPC", {
     if (XPC_GUI.main:IsVisible()) then 
       XPC_GUI.main:Hide()
     else 
+      RequestTimePlayed()
       XPC:ShowView()
       XPC_GUI.main:Show()
     end
@@ -94,10 +95,10 @@ function XPC:CreateUI()
   local name = UnitName('player')
   local server = GetRealmName()
   XPC.currToonName = name .. "-" .. server
+  XPC.currSingleToon = XPC.currToonName
   XPC_GUI.XAxis = {}
   XPC_GUI.YAxis = {}
   XPC_GUI.Lines = {}
-  XPC.currSingleToon = XPC.currToonName
   XPC.numOfToons = 0
   for k,v in pairs(XPC.db.global.toons) do
     XPC.numOfToons = XPC.numOfToons + 1

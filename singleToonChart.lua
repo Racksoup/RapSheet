@@ -19,10 +19,29 @@ function XPC:BuildSingleToon()
     end
   end)
 
+  -- Chart
   single.chart = CreateFrame("Frame", chart, single)
   local chart = single.chart
   chart:SetSize(1200, 605)
   chart:SetPoint("BOTTOMLEFT")
+  -- H-Line
+  chart.hLine = chart:CreateLine()
+  chart.hLine:SetColorTexture(0.7,0.7,0.7,.5)
+  chart.hLine:SetStartPoint("TOPLEFT", 60, -40)
+  chart.hLine:SetEndPoint("TOPRIGHT", 0, -40)
+  -- V-Line
+  chart.vLine = chart:CreateLine()
+  chart.vLine:SetColorTexture(0.7,0.7,0.7,.5)
+  chart.vLine:SetStartPoint("TOPLEFT", 60, -40)
+  chart.vLine:SetEndPoint("BOTTOMLEFT", 60, 0)
+  
+  -- H-Values
+  chart.dmgDone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.dmgDone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.dmgDone:SetPoint("TOPLEFT", 80, -20)
+  chart.dmgDone:SetText('Dmg Done')
+  -- V-Value table init
+  chart.vValues = {}
 
   XPC:BuildChooseToon()
 
@@ -30,9 +49,32 @@ function XPC:BuildSingleToon()
 end
 
 function XPC:ShowSingleToonChart()
-
-
+  local chart = XPC_GUI.main.single.chart
   XPC_GUI.main.single:Show()
+
+  -- Hide content that changes
+  chart:Hide()
+  for i, v in ipairs(chart.vValues) do
+    v:Hide()
+  end
+  chart.vValues = {}
+
+  -- V-values
+  local levelData = XPC.db.global.toons[XPC.currSingleToon].levelData
+  local level = levelData[#levelData].level
+  for i = 0, level do 
+    local value = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+    value:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    if (i == 0) then 
+      value:SetPoint("TOPLEFT", 12, -60 + (i * -30) )
+      value:SetText('Total') 
+    else 
+      value:SetPoint("TOPLEFT", 24, -60 + (i * -30) )
+      value:SetText(i) end
+    table.insert(chart.vValues, value)
+  end
+
+  chart:Show()
 end
 
 function XPC:BuildChooseToon()
@@ -82,7 +124,10 @@ function XPC:BuildChooseToon()
     local nameBtn = CreateFrame("Button", nil, content)
     nameBtn:SetSize(250, 22)
     nameBtn:SetPoint("TOPLEFT", 5, (i * -30) -2)
-    nameBtn:SetScript("OnClick", function() XPC.currSingleToon = k end)
+    nameBtn:SetScript("OnClick", function() 
+      XPC.currSingleToon = k  
+      XPC:ShowSingleToonChart()
+    end)
 
     i = i + 1
   end 
@@ -90,7 +135,6 @@ function XPC:BuildChooseToon()
   chooseToon:Hide()
 end
 
--- button to switch toons
 -- button to see list of quests completed per level
 -- button to see list of monsters killed by name.  per level. solo and total
 
