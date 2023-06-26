@@ -1,8 +1,47 @@
+function Single_OnMouseWheel(self, delta) 
+  
+  if (IsShiftKeyDown()) then
+    local hSlider = XPC_GUI.main.single.hSlider
+    local newValue = hSlider:GetValue() - (delta * .5);
+    local minValue, maxValue = hSlider:GetMinMaxValues()
+    
+    if (newValue < minValue) then
+      newValue = minValue
+    elseif (newValue > maxValue) then
+      newValue = maxValue
+    elseif (newValue > hSlider:GetValue()) then
+      newValue = hSlider:GetValueStep()
+    elseif (newValue < hSlider:GetValue()) then
+      newValue = -1* hSlider:GetValueStep()
+    end
+    
+    hSlider:SetValue(newValue + hSlider:GetValue())
+  else
+    local vSlider = XPC_GUI.main.single.vSlider
+    local newValue = vSlider:GetValue() - (delta * .5);
+    local minValue, maxValue = vSlider:GetMinMaxValues()
+    
+    if (newValue < minValue) then
+      newValue = minValue
+    elseif (newValue > maxValue) then
+      newValue = maxValue
+    elseif (newValue > vSlider:GetValue()) then
+      newValue = vSlider:GetValueStep()
+    elseif (newValue < vSlider:GetValue()) then
+      newValue = -1* vSlider:GetValueStep()
+    end
+   
+    vSlider:SetValue(newValue + vSlider:GetValue())
+  end
+end
+
 function XPC:BuildSingleToon()
   XPC_GUI.main.single = CreateFrame("Frame", single, XPC_GUI.main)
   local single = XPC_GUI.main.single
-  single:SetSize(1200, 650)
+  single:SetSize(1175, 634)
   single:SetPoint("TOPLEFT")
+  single:SetClipsChildren(true)
+  single:SetScript("OnMouseWheel", Single_OnMouseWheel)
   
   -- switch toons button
   single.toonsBtn = CreateFrame("Button", nil, single, "UIPanelButtonTemplate")
@@ -19,11 +58,39 @@ function XPC:BuildSingleToon()
     end
   end)
 
+  -- Chart hSlider
+  XPC_GUI.main.single.hSlider = CreateFrame("Slider", nil, XPC_GUI.main, "OptionsSliderTemplate")
+  local hSlider = XPC_GUI.main.single.hSlider
+  hSlider:SetPoint("BOTTOMLEFT", 4, 1)
+  hSlider:SetSize(1192, 20)
+  hSlider:SetValueStep(1)
+  hSlider:SetMinMaxValues(1, 100)
+  hSlider:SetValue(5)
+  hSlider:SetObeyStepOnDrag(true)
+  hSlider:SetOrientation("HORIZONTAL")
+  hSlider.High:Hide()
+  hSlider.Low:Hide()
+  
+  -- Chart vSlider
+  XPC_GUI.main.single.vSlider = CreateFrame("Slider", nil, XPC_GUI.main, "OptionsSliderTemplate")
+  local vSlider = XPC_GUI.main.single.vSlider
+  vSlider:SetPoint("TOPRIGHT", -6, -25)
+  vSlider:SetSize(20, 610)
+  vSlider:SetValueStep(1)
+  vSlider:SetMinMaxValues(1, 100)
+  vSlider:SetValue(5)
+  vSlider:SetObeyStepOnDrag(true)
+  vSlider:SetOrientation("VERTICAL")
+  vSlider.High:Hide()
+  vSlider.Low:Hide()
+
   -- Chart
   single.chart = CreateFrame("Frame", chart, single)
   local chart = single.chart
-  chart:SetSize(1200, 605)
-  chart:SetPoint("BOTTOMLEFT")
+  chart:SetSize(1500, 705)
+  -- slider:SetScrollChild(chart)
+  chart:SetPoint("TOPLEFT", 0, -40)
+
   -- H-Line
   chart.hLine = chart:CreateLine()
   chart.hLine:SetColorTexture(0.7,0.7,0.7,.5)
@@ -73,6 +140,12 @@ function XPC:ShowSingleToonChart()
       value:SetText(i) end
     table.insert(chart.vValues, value)
   end
+
+  -- create chart content 
+  chart.content = CreateFrame("Frame", content, chart)
+  local content = chart.content
+  content:SetSize(1140, 575)
+  content:SetPoint("TOPLEFT")
 
   chart:Show()
 end
