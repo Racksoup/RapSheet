@@ -72,10 +72,11 @@ function XPC:OnInitialize()
   icon:Register("XPChart", XPC_LDB, self.db.realm.minimap)
   -- self.db:ResetDB()
 
+  
+  XPC:CreateUI()
+
   XPC:StartTimePlayedLoop()
   XPC:StatsTracker()
-
-  XPC:CreateUI()
 end
 
 function ScrollFrame_OnMouseWheel(self, delta)
@@ -206,7 +207,8 @@ function XPC:InitToonData()
     toons[XPC.currToonName] = {
       lineVisible = true,
       lineColor = {r = 1, g = 0, b = 0, a = 1},
-      levelData = {}
+      levelData = {},
+      statsData = {}
     }
     -- call time played to init levelData
     RequestTimePlayed()
@@ -283,8 +285,19 @@ function XPC:StatsTracker()
   XPC_GUI.statsTracker = CreateFrame("Frame", statsTracker)
   local tracker = XPC_GUI.statsTracker
 
+  
+  -- init statsData and its level objects
+  local toon = XPC.db.global.toons[XPC.currToonName]
+  if (toon.statsData == nil) then toon.statsData = {} end
+  if (toon.statsData[tostring(UnitLevel('player'))] == nil) then 
+    toon.statsData[tostring(UnitLevel('player'))] = {
+      damageDealt = 0
+    } 
+  end
+
   tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
+  -- damage dealt tracker
   tracker:SetScript("OnEvent", function(self, event, ...) 
     if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
       local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = CombatLogGetCurrentEventInfo()
@@ -299,8 +312,8 @@ function XPC:StatsTracker()
             spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
           end
 
-          local currDamageDealt = XPC.db.global.toons[XPC.currToonName].statsData[tostring(UnitLevel('player'))].damageDealt
-          currDamageDealt = currDamageDealt + amount 
+          -- local currDamageDealt = toon.statsData[tostring(UnitLevel('player'))].damageDealt
+          toon.statsData[tostring(UnitLevel('player'))].damageDealt = toon.statsData[tostring(UnitLevel('player'))].damageDealt + amount 
         end
       end
     end
