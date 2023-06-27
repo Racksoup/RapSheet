@@ -4,7 +4,7 @@ function Single_OnMouseWheel(self, delta)
   local point, relativeTo, relativePoint, offsetX, offsetY = chart:GetPoint()
   
   if (IsShiftKeyDown()) then
-    -- slider 
+    -- horizontal slider 
     local hSlider = XPC_GUI.main.single.hSlider
     local newValue = hSlider:GetValue() - (delta * .5);
     local minValue, maxValue = hSlider:GetMinMaxValues()
@@ -19,19 +19,20 @@ function Single_OnMouseWheel(self, delta)
       newValue = -1* hSlider:GetValueStep()
     end
     
+    print(newValue)
     hSlider:SetValue(newValue + hSlider:GetValue())
 
     -- chart
     local sliderValue = hSlider:GetValue()
     local scrollDist = sliderValue / maxValue
     local scrollMaxLength = chart:GetWidth()  - single:GetWidth()
-    local scrollPos = (scrollMaxLength / 100) * (scrollDist * 100) - 40
-    if (scrollPos < 6) then scrollPos = 0 end
+    local scrollPos = (scrollMaxLength / 100) * (-scrollDist * 100)
+    if (scrollPos > -hSlider:GetValueStep()) then scrollPos = 0 end
     print(scrollPos)
     chart:SetPoint(point, relativeTo, relativePoint, scrollPos, offsetY)
 
   else
-    -- slider
+    -- vertical slider
     local vSlider = XPC_GUI.main.single.vSlider
     local newValue = vSlider:GetValue() - (delta * .5);
     local minValue, maxValue = vSlider:GetMinMaxValues()
@@ -53,7 +54,7 @@ function Single_OnMouseWheel(self, delta)
     local scrollDist = sliderValue / maxValue
     local scrollMaxLength = chart:GetHeight()  - single:GetHeight()
     local scrollPos = (scrollMaxLength / 100) * (scrollDist * 100) - 40
-    if (scrollPos < -34) then scrollPos = -40 end
+    if (scrollPos < vSlider:GetValueStep() - 34) then scrollPos = -40 end
     print(scrollPos)
     chart:SetPoint(point, relativeTo, relativePoint, offsetX, scrollPos)
   end
@@ -87,9 +88,9 @@ function XPC:BuildSingleToon()
   local hSlider = XPC_GUI.main.single.hSlider
   hSlider:SetPoint("BOTTOMLEFT", 4, 1)
   hSlider:SetSize(1192, 20)
-  hSlider:SetValueStep(1)
+  hSlider:SetValueStep(20)
   hSlider:SetMinMaxValues(1, 100)
-  hSlider:SetValue(5)
+  hSlider:SetValue(1)
   hSlider:SetObeyStepOnDrag(true)
   hSlider:SetOrientation("HORIZONTAL")
   hSlider.High:Hide()
@@ -100,9 +101,9 @@ function XPC:BuildSingleToon()
   local vSlider = XPC_GUI.main.single.vSlider
   vSlider:SetPoint("TOPRIGHT", -6, -25)
   vSlider:SetSize(20, 610)
-  vSlider:SetValueStep(1)
+  vSlider:SetValueStep(20)
   vSlider:SetMinMaxValues(1, 100)
-  vSlider:SetValue(5)
+  vSlider:SetValue(1)
   vSlider:SetObeyStepOnDrag(true)
   vSlider:SetOrientation("VERTICAL")
   vSlider.High:Hide()
