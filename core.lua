@@ -148,7 +148,7 @@ function XPC:BuildMainWindow()
   main.optionsBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
   local optionsBtn = main.optionsBtn
   optionsBtn:SetSize(120, 25)
-  optionsBtn:SetPoint("TOPRIGHT", -80, -12)
+  optionsBtn:SetPoint("TOPRIGHT", -80, -14)
   optionsBtn:SetText("Options")
   optionsBtn:SetScript("OnClick", function() 
     local options = XPC_GUI.main.options
@@ -163,7 +163,7 @@ function XPC:BuildMainWindow()
   main.xpGraphBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
   local xpGraphBtn = main.xpGraphBtn
   xpGraphBtn:SetSize(120, 25)
-  xpGraphBtn:SetPoint("TOPLEFT", 20, -12)
+  xpGraphBtn:SetPoint("TOPLEFT", 20, -14)
   xpGraphBtn:SetText("XP Gained")
   xpGraphBtn:SetScript("OnClick", function()
     XPC.db.global.settings.view = 'xpGraph'
@@ -174,7 +174,7 @@ function XPC:BuildMainWindow()
   main.allToonsBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
   local allToonsBtn = main.allToonsBtn
   allToonsBtn:SetSize(120, 25)
-  allToonsBtn:SetPoint("TOPLEFT", 150, -12)
+  allToonsBtn:SetPoint("TOPLEFT", 150, -14)
   allToonsBtn:SetText("Stats - All")
   allToonsBtn:SetScript("OnClick", function()
     XPC.db.global.settings.view = 'allToonsChart'
@@ -185,7 +185,7 @@ function XPC:BuildMainWindow()
   main.singleToon = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
   local singleToon = main.singleToon
   singleToon:SetSize(120, 25)
-  singleToon:SetPoint("TOPLEFT", 280, -12)
+  singleToon:SetPoint("TOPLEFT", 280, -14)
   singleToon:SetText("Stats - Single")
   singleToon:SetScript("OnClick", function()
     XPC.db.global.settings.view = 'singleToonChart'
@@ -218,7 +218,7 @@ end
 function XPC:ShowView()
   local view = XPC.db.global.settings.view
   XPC:HideXPGraph()
-  XPC_GUI.main.single:Hide()
+  XPC:HideSingleToonChart()
   XPC:HideAllToonsChart()
   if (view == 'xpGraph') then
     XPC:ShowXPGraph()

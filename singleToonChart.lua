@@ -1,3 +1,4 @@
+-- scroll function for both vertical and horizontal scrolling using 2 sliders. 
 function Single_OnMouseWheel(self, delta) 
   local single = XPC_GUI.main.single
   local chart = XPC_GUI.main.single.chart
@@ -19,17 +20,10 @@ function Single_OnMouseWheel(self, delta)
       newValue = -1* hSlider:GetValueStep()
     end
     
-    print(newValue)
     hSlider:SetValue(newValue + hSlider:GetValue())
 
     -- chart
-    local sliderValue = hSlider:GetValue()
-    local scrollDist = sliderValue / maxValue
-    local scrollMaxLength = chart:GetWidth()  - single:GetWidth()
-    local scrollPos = (scrollMaxLength / 100) * (-scrollDist * 100)
-    if (scrollPos > -hSlider:GetValueStep()) then scrollPos = 0 end
-    print(scrollPos)
-    chart:SetPoint(point, relativeTo, relativePoint, scrollPos, offsetY)
+    XPC:ChartScroller(hSlider, maxValue)
 
   else
     -- vertical slider
@@ -50,29 +44,53 @@ function Single_OnMouseWheel(self, delta)
     vSlider:SetValue(newValue + vSlider:GetValue())
 
     -- chart
-    local sliderValue = vSlider:GetValue()
-    local scrollDist = sliderValue / maxValue
+    XPC:ChartScroller(vSlider, maxValue)
+  end
+end
+
+function XPC:ChartScroller(slider, maxValue)
+  local single = XPC_GUI.main.single
+  local chart = XPC_GUI.main.single.chart
+  local point, relativeTo, relativePoint, offsetX, offsetY = chart:GetPoint()
+  
+  local sliderValue = slider:GetValue()
+  local scrollDist = sliderValue / maxValue
+  if (slider:GetOrientation() == "HORIZONTAL") then 
+    local scrollMaxLength = chart:GetWidth()  - single:GetWidth()
+    local scrollPos = (scrollMaxLength / 100) * (-scrollDist * 100)
+    if (scrollPos > -slider:GetValueStep()) then scrollPos = 0 end
+    chart:SetPoint(point, relativeTo, relativePoint, scrollPos, offsetY)
+  elseif (slider:GetOrientation() == "VERTICAL") then
     local scrollMaxLength = chart:GetHeight()  - single:GetHeight()
-    local scrollPos = (scrollMaxLength / 100) * (scrollDist * 100) - 40
-    if (scrollPos < vSlider:GetValueStep() - 34) then scrollPos = -40 end
-    print(scrollPos)
+    local scrollPos = (scrollMaxLength / 100) * (scrollDist * 100)
+    if (scrollPos < slider:GetValueStep() - 6) then scrollPos = 0 end
     chart:SetPoint(point, relativeTo, relativePoint, offsetX, scrollPos)
   end
+end
+
+function XPC:HideSingleToonChart()
+  local main = XPC_GUI.main
+  local single = main.single
+
+  single.vSlider:Hide()
+  single.hSlider:Hide()
+  single.toonsBtn:Hide()
+  single:Hide()
 end
 
 function XPC:BuildSingleToon()
   XPC_GUI.main.single = CreateFrame("Frame", single, XPC_GUI.main)
   local single = XPC_GUI.main.single
-  single:SetSize(1175, 634)
-  single:SetPoint("TOPLEFT")
+  single:SetSize(1170, 569)
+  single:SetPoint("TOPLEFT", 0, -60)
   single:SetClipsChildren(true)
   single:SetScript("OnMouseWheel", Single_OnMouseWheel)
   
   -- switch toons button
-  single.toonsBtn = CreateFrame("Button", nil, single, "UIPanelButtonTemplate")
+  single.toonsBtn = CreateFrame("Button", nil, XPC_GUI.main, "UIPanelButtonTemplate")
   local toonsBtn = single.toonsBtn
   toonsBtn:SetSize(120, 25)
-  toonsBtn:SetPoint("TOPRIGHT", -80, -12)
+  toonsBtn:SetPoint("TOPRIGHT", -80, -14)
   toonsBtn:SetText("Choose Toon")
   toonsBtn:SetScript("OnClick", function() 
     local chooseToon = XPC_GUI.main.single.chooseToon
@@ -95,6 +113,10 @@ function XPC:BuildSingleToon()
   hSlider:SetOrientation("HORIZONTAL")
   hSlider.High:Hide()
   hSlider.Low:Hide()
+  hSlider:SetScript("OnValueChanged", function(self, value)
+    local minVal, maxVal = self:GetMinMaxValues()
+    XPC:ChartScroller(self, maxVal)
+  end)
   
   -- Chart vSlider
   XPC_GUI.main.single.vSlider = CreateFrame("Slider", nil, XPC_GUI.main, "OptionsSliderTemplate")
@@ -108,22 +130,26 @@ function XPC:BuildSingleToon()
   vSlider:SetOrientation("VERTICAL")
   vSlider.High:Hide()
   vSlider.Low:Hide()
+  vSlider:SetScript("OnValueChanged", function(self, value)
+    local minVal, maxVal = self:GetMinMaxValues()
+    XPC:ChartScroller(self, maxVal)
+  end)
 
   -- Chart
   single.chart = CreateFrame("Frame", chart, single)
   local chart = single.chart
   chart:SetSize(1500, 905)
   -- slider:SetScrollChild(chart)
-  chart:SetPoint("TOPLEFT", 0, -40)
+  chart:SetPoint("TOPLEFT", 0, 0)
 
   -- H-Line
   chart.hLine = chart:CreateLine()
-  chart.hLine:SetColorTexture(0.7,0.7,0.7,.5)
+  chart.hLine:SetColorTexture(0.7,0.7,0.7,1)
   chart.hLine:SetStartPoint("TOPLEFT", 60, -40)
   chart.hLine:SetEndPoint("TOPRIGHT", 0, -40)
   -- V-Line
   chart.vLine = chart:CreateLine()
-  chart.vLine:SetColorTexture(0.7,0.7,0.7,.5)
+  chart.vLine:SetColorTexture(0.7,0.7,0.7,1)
   chart.vLine:SetStartPoint("TOPLEFT", 60, -40)
   chart.vLine:SetEndPoint("BOTTOMLEFT", 60, 0)
   
@@ -141,8 +167,12 @@ function XPC:BuildSingleToon()
 end
 
 function XPC:ShowSingleToonChart()
+  local single = XPC_GUI.main.single
   local chart = XPC_GUI.main.single.chart
   XPC_GUI.main.single:Show()
+  single.vSlider:Show()
+  single.hSlider:Show()
+  single.toonsBtn:Show()
 
   -- Hide content that changes
   chart:Hide()
@@ -177,7 +207,7 @@ end
 
 function XPC:BuildChooseToon()
   -- choose toon window
-  XPC_GUI.main.single.chooseToon = CreateFrame("Frame", chooseToon, XPC_GUI.main.single, "InsetFrameTemplate")
+  XPC_GUI.main.single.chooseToon = CreateFrame("Frame", chooseToon, XPC_GUI.main, "InsetFrameTemplate")
   local chooseToon = XPC_GUI.main.single.chooseToon
   chooseToon:SetSize(290, 280)
   chooseToon:SetPoint("TOPRIGHT", -60, -60)
