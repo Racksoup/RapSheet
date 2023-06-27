@@ -81,8 +81,8 @@ end
 function XPC:BuildSingleToon()
   XPC_GUI.main.single = CreateFrame("Frame", single, XPC_GUI.main)
   local single = XPC_GUI.main.single
-  single:SetSize(1170, 569)
-  single:SetPoint("TOPLEFT", 0, -60)
+  single:SetSize(1166, 584)
+  single:SetPoint("TOPLEFT", 4, -45)
   single:SetClipsChildren(true)
   single:SetScript("OnMouseWheel", Single_OnMouseWheel)
   
@@ -184,15 +184,16 @@ function XPC:ShowSingleToonChart()
   -- V-values
   local levelData = XPC.db.global.toons[XPC.currSingleToon].levelData
   local level = levelData[#levelData].level
-  for i = 0, level do 
+  for i = level+1, 1, -1 do 
     local value = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
     value:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    if (i == 0) then 
-      value:SetPoint("TOPLEFT", 12, -60 + (i * -30) )
+    if (i == level + 1) then 
+      value:SetPoint("TOPLEFT", 12, -60 + (((level +1) - i) * -30) )
       value:SetText('Total') 
     else 
-      value:SetPoint("TOPLEFT", 24, -60 + (i * -30) )
-      value:SetText(i) end
+      value:SetPoint("TOPLEFT", 20, -60 + (((level +1) - i) * -30) )
+      value:SetText(i) 
+    end
     table.insert(chart.vValues, value)
   end
 
@@ -290,6 +291,7 @@ end
 -- % of time in combat
 -- % of xp gained from quests
 -- % of xp gained from mobs
+-- xp per hour
 -- time played at level
 -- overall time played when leveled
 -- # of dungeons entered

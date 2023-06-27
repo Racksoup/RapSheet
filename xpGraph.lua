@@ -32,7 +32,7 @@ function XPC:GetGraphData()
 
   -- frame values
   local frameWidth = 1150
-  local frameHeight = 595
+  local frameHeight = 590
   local frameWidthInterval = frameWidth / mostTimePlayed 
   local frameHeightInterval = frameHeight / totalXPOfHighestLevelToon
   local mostDaysPlayed = math.floor(XPC:StoD(mostTimePlayed))
