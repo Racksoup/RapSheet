@@ -301,10 +301,17 @@ function XPC:StatsTracker()
     } 
   end
 
+  tracker:RegisterEvent("PLAYER_LEVEL_UP")
   tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
   -- damage dealt tracker
   tracker:SetScript("OnEvent", function(self, event, ...) 
+    if (event == "PLAYER_LEVEL_UP") then     
+      toon.statsData[tostring(UnitLevel('player'))] = {
+        damageDealt = 0
+      } 
+    end
+
     if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
       local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = CombatLogGetCurrentEventInfo()
       if (sourceName == GetUnitName("player")) then

@@ -145,7 +145,7 @@ function XPC:BuildSingleToon()
   -- create chart content 
   chart.content = CreateFrame("Frame", content, chart)
   local content = chart.content
-  content:SetSize(1140, 575)
+  content:SetSize(1437, 872)
   content:SetPoint("TOPLEFT", 63 , -43)
 
   -- Horizonatl Border Line
