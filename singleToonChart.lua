@@ -162,14 +162,50 @@ function XPC:BuildSingleToon()
   -- Horizontal Values
   chart.dmgDone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.dmgDone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.dmgDone:SetPoint("TOPLEFT", 80, -20)
+  chart.dmgDone:SetPoint("TOPLEFT", 68, -20)
   chart.dmgDone:SetText('Dmg Done')
+  chart.KillsSolo = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.KillsSolo:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.KillsSolo:SetPoint("TOPLEFT", 148, -20)
+  chart.KillsSolo:SetText('Kills Solo')
+  chart.KillsGroup = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.KillsGroup:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.KillsGroup:SetPoint("TOPLEFT", 228, -20)
+  chart.KillsGroup:SetText('Kills Group')
+  chart.Kills = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.Kills:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.Kills:SetPoint("TOPLEFT", 308, -20)
+  chart.Kills:SetText('Kills')
 
   -- Vertical Value table init
   chart.vValues = {}
   -- Vertical Content Values table init
   content.values = {
-    damageDealt = {}
+    damageDealt = {},
+    damageTaken = {},
+    monstersKilledSolo = {},
+    monstersKilledInGroup = {},
+    monstersKilled = {},
+    questsCompleted = {},
+    food = {},
+    drink = {},
+    bandages = {},
+    potions = {},
+    healsGiven = {},
+    healsRecieved = {},
+    deaths = {},
+    pvpDeaths = {},
+    duelsWon = {},
+    duelsLost = {},
+    honorKills = {},
+    flightPaths = {},
+    timeAFK = {},
+    timeInCombat = {},
+    timePlayedAtLevel = {},
+    totalTimePlayedWhenLeveled = {},
+    xpFromQuests = {},
+    xpFromMobs = {},
+    dungeonsEntered = {}
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
@@ -180,8 +216,8 @@ function XPC:BuildSingleToon()
   for k,v in pairs(content.values) do
     local line = content:CreateLine()
     line:SetColorTexture(0.7, 0.7, 0.7, .1)
-    line:SetStartPoint("TOPLEFT", 100 * i, 0)
-    line:SetEndPoint("BOTTOMLEFT", 100 * i, 0)
+    line:SetStartPoint("TOPLEFT", 80 * i, 0)
+    line:SetEndPoint("BOTTOMLEFT", 80 * i, 0)
 
     table.insert(content.vLines, line)
 
@@ -251,6 +287,7 @@ function XPC:ShowSingleToonChart()
   -- levels
   local i = 1
   for k,v in pairs(toon.statsData) do
+    -- Damage Dealt
     local damageDealtFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
     damageDealtFS:SetPoint("TOPLEFT", 20, i * -30 - 12)
     damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
@@ -261,9 +298,29 @@ function XPC:ShowSingleToonChart()
     else
       damageDealtFS:SetText(tostring(v.damageDealt))
     end
-
     table.insert(content.values.damageDealt, damageDealtFS)
     
+    -- Kills Solo
+    local monstersKilledSoloFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    monstersKilledSoloFS:SetPoint("TOPLEFT", 100, i * -30 - 12)
+    monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    monstersKilledSoloFS:SetText(v.monstersKilledSolo) 
+    table.insert(content.values.monstersKilledSolo, monstersKilledSoloFS)
+
+    -- Kills Group
+    local monstersKilledInGroupFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    monstersKilledInGroupFS:SetPoint("TOPLEFT", 180, i * -30 - 12)
+    monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    monstersKilledInGroupFS:SetText(v.monstersKilledInGroup) 
+    table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFS)
+
+    -- Kills
+    local monstersKilledFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    monstersKilledFS:SetPoint("TOPLEFT", 260, i * -30 - 12)
+    monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    monstersKilledFS:SetText(v.monstersKilledInGroup + v.monstersKilledSolo) 
+    table.insert(content.values.monstersKilled, monstersKilledFS)
+
     i = i + 1
   end
   
@@ -271,12 +328,43 @@ function XPC:ShowSingleToonChart()
   local damageDealtFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
   damageDealtFS:SetPoint("TOPLEFT", 20, - 12)
   damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  local total = 0
+  local totalDamageDealt = 0
+  local totalMonstersKilledSolo = 0
+  local totalMonstersKilledInGroup = 0
   for k,v in pairs(toon.statsData) do
-    total = total + v.damageDealt
+    totalDamageDealt = totalDamageDealt + v.damageDealt
+    totalMonstersKilledSolo = totalMonstersKilledSolo + v.monstersKilledSolo
+    totalMonstersKilledInGroup = totalMonstersKilledInGroup + v.monstersKilledInGroup
   end
-  damageDealtFS:SetText(tostring(total))
+  if (totalDamageDealt >= 1000000) then 
+    damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
+  elseif (totalDamageDealt >= 1000) then 
+    damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 100) / 10) .. 'K')
+  else
+    damageDealtFS:SetText(tostring(totalDamageDealt))
+  end
   table.insert(content.values.damageDealt, damageDealtFS)
+
+  -- Kills Solo
+  local monstersKilledSoloFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  monstersKilledSoloFS:SetPoint("TOPLEFT", 100, -12)
+  monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  monstersKilledSoloFS:SetText(totalMonstersKilledSolo) 
+  table.insert(content.values.monstersKilledSolo, monstersKilledSoloFS)
+
+  -- Kills Group
+  local monstersKilledInGroupFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  monstersKilledInGroupFS:SetPoint("TOPLEFT", 180, -12)
+  monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  monstersKilledInGroupFS:SetText(totalMonstersKilledInGroup) 
+  table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFS)
+
+  -- Killed
+  local monstersKilledFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  monstersKilledFS:SetPoint("TOPLEFT", 260, - 12)
+  monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  monstersKilledFS:SetText(totalMonstersKilledInGroup + totalMonstersKilledSolo) 
+  table.insert(content.values.monstersKilled, monstersKilledFS)
 
   chart:Show()
 end
@@ -339,12 +427,88 @@ function XPC:BuildChooseToon()
   chooseToon:Hide()
 end
 
--- button to see list of quests completed per level
--- button to see list of monsters killed by name.  per level. solo and total
+function XPC:StatsTracker()
+  XPC_GUI.statsTracker = CreateFrame("Frame", statsTracker)
+  local toon = XPC.db.global.toons[XPC.currToonName]
+  local stats = toon.statsData[tostring(UnitLevel('player'))]
+  local tracker = XPC_GUI.statsTracker
+  local statList = {
+    damageDealt = 0,
+    damageTaken = 0,
+    monstersKilledSolo = 0,
+    monstersKilledInGroup = 0,
+    questsCompleted = 0,
+    food = 0,
+    drink = 0,
+    bandages = 0,
+    potions = 0,
+    healsGiven = 0,
+    healsRecieved = 0,
+    deaths = 0,
+    pvpDeaths = 0,
+    duelsWon = 0,
+    duelsLost = 0,
+    honorKills = 0,
+    flightPaths = 0,
+    timeAFK = 0,
+    timeInCombat = 0,
+    timePlayedAtLevel = 0,
+    totalTimePlayedWhenLeveled = 0,
+    xpFromQuests = 0,
+    xpFromMobs = 0,
+    dungeonsEntered = 0
+  }
 
--- # of monsters killed. 
--- # of monsters killed in a group 
--- # of monsters killed total
+  
+  -- init statsData and its level objects
+  if (toon.statsData == nil) then toon.statsData = {} end
+  if (stats == nil) then 
+    stats = statList
+  end
+
+  tracker:RegisterEvent("PLAYER_LEVEL_UP")
+  tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+  tracker:SetScript("OnEvent", function(self, event, ...) 
+    -- level up tracker
+    if (event == "PLAYER_LEVEL_UP") then     
+      stats = statList
+    end
+    
+    
+    if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
+      local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, a, b, c, d, e, f, g, h, i, j, k = CombatLogGetCurrentEventInfo()
+      -- damage dealt tracker
+      if (sourceName == GetUnitName("player")) then
+        if (subevent == "SWING_DAMAGE" or subevent == "SPELL_DAMAGE" or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
+          local spellId, spellName, spellSchool
+          local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand
+
+          if subevent == "SWING_DAMAGE" then
+            amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          elseif (subevent == "SPELL_DAMAGE"  or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
+            spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          end
+
+          stats.damageDealt = stats.damageDealt + amount 
+        end
+      end
+
+      -- kill tracker
+      if (subevent == "PARTY_KILL") then
+        if (IsInGroup() or IsInRaid()) then
+          stats.monstersKilledInGroup = stats.monstersKilledInGroup + 1
+        else
+          stats.monstersKilledSolo = stats.monstersKilledSolo + 1
+          print(stats.monstersKilledSolo)
+        end 
+      end
+    end
+    -- 
+  end)
+end
+
+
 -- # of quests comleted
 -- # of food eaten
 -- # of drink drank

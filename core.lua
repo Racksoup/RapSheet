@@ -287,52 +287,6 @@ function XPC:OnTimePlayedEvent(self, event, ...)
   end
 end
 
-function XPC:StatsTracker()
-  XPC_GUI.statsTracker = CreateFrame("Frame", statsTracker)
-  local tracker = XPC_GUI.statsTracker
-
-  
-  -- init statsData and its level objects
-  local toon = XPC.db.global.toons[XPC.currToonName]
-  if (toon.statsData == nil) then toon.statsData = {} end
-  if (toon.statsData[tostring(UnitLevel('player'))] == nil) then 
-    toon.statsData[tostring(UnitLevel('player'))] = {
-      damageDealt = 0
-    } 
-  end
-
-  tracker:RegisterEvent("PLAYER_LEVEL_UP")
-  tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-
-  -- damage dealt tracker
-  tracker:SetScript("OnEvent", function(self, event, ...) 
-    if (event == "PLAYER_LEVEL_UP") then     
-      toon.statsData[tostring(UnitLevel('player'))] = {
-        damageDealt = 0
-      } 
-    end
-
-    if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
-      local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = CombatLogGetCurrentEventInfo()
-      if (sourceName == GetUnitName("player")) then
-        if (subevent == "SWING_DAMAGE" or subevent == "SPELL_DAMAGE" or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
-          local spellId, spellName, spellSchool
-          local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand
-
-          if subevent == "SWING_DAMAGE" then
-            amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
-          elseif (subevent == "SPELL_DAMAGE"  or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
-            spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
-          end
-
-          -- local currDamageDealt = toon.statsData[tostring(UnitLevel('player'))].damageDealt
-          toon.statsData[tostring(UnitLevel('player'))].damageDealt = toon.statsData[tostring(UnitLevel('player'))].damageDealt + amount 
-        end
-      end
-    end
-  end)
-end
-
 function XPC:StoD(val)
     return val / 60 / 60 / 24
 end
