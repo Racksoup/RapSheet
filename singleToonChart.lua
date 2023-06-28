@@ -171,10 +171,11 @@ function XPC:BuildSingleToon()
   content.values = {
     damageDealt = {}
   }
-  -- Vertical Line Seperator table init
+  -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
+  content.hLines = {}
 
-  -- Horizontal Seperator Lines
+  -- Vertical Seperator Lines
   local i = 1
   for k,v in pairs(content.values) do
     local line = content:CreateLine()
@@ -198,6 +199,8 @@ function XPC:ShowSingleToonChart()
   local chart = XPC_GUI.main.single.chart
   local content = chart.content
   local toon = XPC.db.global.toons[XPC.currSingleToon]
+  local levelData = toon.levelData
+  local level = levelData[#levelData].level
   XPC_GUI.main.single:Show()
   single.vSlider:Show()
   single.hSlider:Show()
@@ -216,17 +219,26 @@ function XPC:ShowSingleToonChart()
     end
   end
 
+  -- Horizontal Seperator Lines
+  for j=1, level+1 do
+    local line = content:CreateLine()
+    line:SetColorTexture(0.7, 0.7, 0.7, .05)
+    line:SetStartPoint("TOPLEFT", 0, j * -30 + 2)
+    line:SetEndPoint("TOPRIGHT", 0, j * -30 + 2)
+
+    table.insert(content.hLines, line)
+
+  end
+
   -- V-values
-  local levelData = toon.levelData
-  local level = levelData[#levelData].level
   for i = level+1, 1, -1 do 
     local value = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
     value:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
     if (i == level + 1) then 
-      value:SetPoint("TOPLEFT", 12, -60 + (((level +1) - i) * -30))
+      value:SetPoint("TOPLEFT", 12, -60 + (((level +1) - i) * -30) +8)
       value:SetText('Total') 
     else 
-      value:SetPoint("TOPLEFT", 20, -60 + (((level +1) - i) * -30))
+      value:SetPoint("TOPLEFT", 20, -60 + (((level +1) - i) * -30) +8)
       value:SetText(i) 
     end
     table.insert(chart.vValues, value)
@@ -235,32 +247,32 @@ function XPC:ShowSingleToonChart()
   -- levels
   local i = 1
   for k,v in pairs(toon.statsData) do
-    local fs = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    fs:SetPoint("TOPLEFT", 30, i * -30 - 20)
-    fs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    local damageDealtFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    damageDealtFS:SetPoint("TOPLEFT", 20, i * -30 - 12)
+    damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
     if (v.damageDealt >= 1000000) then 
-      fs:SetText(tostring(math.floor(v.damageDealt / 10000) / 100) .. 'M')
+      damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 10000) / 100) .. 'M')
     elseif (v.damageDealt >= 1000) then 
-      fs:SetText(tostring(math.floor(v.damageDealt / 100) / 10) .. 'K')
+      damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 100) / 10) .. 'K')
     else
-      fs:SetText(tostring(v.damageDealt))
+      damageDealtFS:SetText(tostring(v.damageDealt))
     end
 
-    table.insert(content.values.damageDealt, fs)
+    table.insert(content.values.damageDealt, damageDealtFS)
     
     i = i + 1
   end
   
   -- total
-  local fs = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  fs:SetPoint("TOPLEFT", 30, -20)
-  fs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  local damageDealtFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  damageDealtFS:SetPoint("TOPLEFT", 20, - 12)
+  damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   local total = 0
   for k,v in pairs(toon.statsData) do
     total = total + v.damageDealt
   end
-  fs:SetText(tostring(total))
-  table.insert(content.values.damageDealt, fs)
+  damageDealtFS:SetText(tostring(total))
+  table.insert(content.values.damageDealt, damageDealtFS)
 
   chart:Show()
 end
