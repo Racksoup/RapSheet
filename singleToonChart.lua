@@ -164,18 +164,22 @@ function XPC:BuildSingleToon()
   chart.dmgDone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.dmgDone:SetPoint("TOPLEFT", 68, -20)
   chart.dmgDone:SetText('Dmg Done')
-  chart.KillsSolo = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
-  chart.KillsSolo:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.KillsSolo:SetPoint("TOPLEFT", 148, -20)
-  chart.KillsSolo:SetText('Kills Solo')
-  chart.KillsGroup = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
-  chart.KillsGroup:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.KillsGroup:SetPoint("TOPLEFT", 228, -20)
-  chart.KillsGroup:SetText('Kills Group')
-  chart.Kills = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
-  chart.Kills:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.Kills:SetPoint("TOPLEFT", 308, -20)
-  chart.Kills:SetText('Kills')
+  chart.killsSolo = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.killsSolo:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.killsSolo:SetPoint("TOPLEFT", 148, -20)
+  chart.killsSolo:SetText('Kills Solo')
+  chart.killsGroup = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.killsGroup:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.killsGroup:SetPoint("TOPLEFT", 228, -20)
+  chart.killsGroup:SetText('Kills Group')
+  chart.kills = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.kills:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.kills:SetPoint("TOPLEFT", 308, -20)
+  chart.kills:SetText('Kills')
+  chart.questsCompleted = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.questsCompleted:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.questsCompleted:SetPoint("TOPLEFT", 388, -20)
+  chart.questsCompleted:SetText('Quests')
 
   -- Vertical Value table init
   chart.vValues = {}
@@ -321,6 +325,13 @@ function XPC:ShowSingleToonChart()
     monstersKilledFS:SetText(v.monstersKilledInGroup + v.monstersKilledSolo) 
     table.insert(content.values.monstersKilled, monstersKilledFS)
 
+    -- Quests Completed
+    local questsCompletedFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    questsCompletedFS:SetPoint("TOPLEFT", 340, i * -30 - 12)
+    questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    questsCompletedFS:SetText(v.questsCompleted) 
+    table.insert(content.values.questsCompleted, questsCompletedFS)
+
     i = i + 1
   end
   
@@ -331,10 +342,12 @@ function XPC:ShowSingleToonChart()
   local totalDamageDealt = 0
   local totalMonstersKilledSolo = 0
   local totalMonstersKilledInGroup = 0
+  local totalQuestsCompleted = 0
   for k,v in pairs(toon.statsData) do
     totalDamageDealt = totalDamageDealt + v.damageDealt
     totalMonstersKilledSolo = totalMonstersKilledSolo + v.monstersKilledSolo
     totalMonstersKilledInGroup = totalMonstersKilledInGroup + v.monstersKilledInGroup
+    totalQuestsCompleted = totalQuestsCompleted + v.questsCompleted
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -365,6 +378,13 @@ function XPC:ShowSingleToonChart()
   monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   monstersKilledFS:SetText(totalMonstersKilledInGroup + totalMonstersKilledSolo) 
   table.insert(content.values.monstersKilled, monstersKilledFS)
+
+  -- Quests Completed
+  local questsCompletedFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  questsCompletedFS:SetPoint("TOPLEFT", 340, - 12)
+  questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  questsCompletedFS:SetText(totalQuestsCompleted) 
+  table.insert(content.values.questsCompleted, questsCompletedFS)
 
   chart:Show()
 end
@@ -468,6 +488,7 @@ function XPC:StatsTracker()
 
   tracker:RegisterEvent("PLAYER_LEVEL_UP")
   tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+  tracker:RegisterEvent("QUEST_COMPLETE")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
     -- level up tracker
@@ -504,7 +525,11 @@ function XPC:StatsTracker()
         end 
       end
     end
-    -- 
+
+    -- quest complete
+    if (event == "QUEST_COMPLETE") then
+      stats.questsCompleted = stats.questsCompleted + 1
+    end
   end)
 end
 
