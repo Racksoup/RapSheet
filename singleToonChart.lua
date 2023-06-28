@@ -142,24 +142,51 @@ function XPC:BuildSingleToon()
   -- slider:SetScrollChild(chart)
   chart:SetPoint("TOPLEFT", 0, 0)
 
-  -- H-Line
+  -- create chart content 
+  chart.content = CreateFrame("Frame", content, chart)
+  local content = chart.content
+  content:SetSize(1140, 575)
+  content:SetPoint("TOPLEFT", 63 , -43)
+
+  -- Horizonatl Border Line
   chart.hLine = chart:CreateLine()
   chart.hLine:SetColorTexture(0.7,0.7,0.7,1)
   chart.hLine:SetStartPoint("TOPLEFT", 60, -40)
   chart.hLine:SetEndPoint("TOPRIGHT", 0, -40)
-  -- V-Line
+  -- Vertical Border Line
   chart.vLine = chart:CreateLine()
   chart.vLine:SetColorTexture(0.7,0.7,0.7,1)
   chart.vLine:SetStartPoint("TOPLEFT", 60, -40)
   chart.vLine:SetEndPoint("BOTTOMLEFT", 60, 0)
   
-  -- H-Values
+  -- Horizontal Values
   chart.dmgDone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.dmgDone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.dmgDone:SetPoint("TOPLEFT", 80, -20)
   chart.dmgDone:SetText('Dmg Done')
-  -- V-Value table init
+
+  -- Vertical Value table init
   chart.vValues = {}
+  -- Vertical Content Values table init
+  content.values = {
+    damageDealt = {}
+  }
+  -- Vertical Line Seperator table init
+  content.vLines = {}
+
+  -- Horizontal Seperator Lines
+  local i = 1
+  for k,v in pairs(content.values) do
+    local line = content:CreateLine()
+    line:SetColorTexture(0.7, 0.7, 0.7, .1)
+    line:SetStartPoint("TOPLEFT", 100 * i, 0)
+    line:SetEndPoint("BOTTOMLEFT", 100 * i, 0)
+
+    table.insert(content.vLines, line)
+
+    i = i + 1
+  end
+
 
   XPC:BuildChooseToon()
 
@@ -169,39 +196,71 @@ end
 function XPC:ShowSingleToonChart()
   local single = XPC_GUI.main.single
   local chart = XPC_GUI.main.single.chart
+  local content = chart.content
+  local toon = XPC.db.global.toons[XPC.currSingleToon]
   XPC_GUI.main.single:Show()
   single.vSlider:Show()
   single.hSlider:Show()
   single.toonsBtn:Show()
-
+  
   -- Hide content that changes
   chart:Hide()
   for i, v in ipairs(chart.vValues) do
     v:Hide()
   end
   chart.vValues = {}
+  -- hide values
+  for k, v in pairs(content.values) do
+    for i, p in ipairs(v) do
+      p:Hide()
+    end
+  end
 
   -- V-values
-  local levelData = XPC.db.global.toons[XPC.currSingleToon].levelData
+  local levelData = toon.levelData
   local level = levelData[#levelData].level
   for i = level+1, 1, -1 do 
     local value = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
     value:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
     if (i == level + 1) then 
-      value:SetPoint("TOPLEFT", 12, -60 + (((level +1) - i) * -30) )
+      value:SetPoint("TOPLEFT", 12, -60 + (((level +1) - i) * -30))
       value:SetText('Total') 
     else 
-      value:SetPoint("TOPLEFT", 20, -60 + (((level +1) - i) * -30) )
+      value:SetPoint("TOPLEFT", 20, -60 + (((level +1) - i) * -30))
       value:SetText(i) 
     end
     table.insert(chart.vValues, value)
   end
+  
+  -- levels
+  local i = 1
+  for k,v in pairs(toon.statsData) do
+    local fs = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    fs:SetPoint("TOPLEFT", 30, i * -30 - 20)
+    fs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    if (v.damageDealt >= 1000000) then 
+      fs:SetText(tostring(math.floor(v.damageDealt / 10000) / 100) .. 'M')
+    elseif (v.damageDealt >= 1000) then 
+      fs:SetText(tostring(math.floor(v.damageDealt / 100) / 10) .. 'K')
+    else
+      fs:SetText(tostring(v.damageDealt))
+    end
 
-  -- create chart content 
-  chart.content = CreateFrame("Frame", content, chart)
-  local content = chart.content
-  content:SetSize(1140, 575)
-  content:SetPoint("TOPLEFT")
+    table.insert(content.values.damageDealt, fs)
+    
+    i = i + 1
+  end
+  
+  -- total
+  local fs = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  fs:SetPoint("TOPLEFT", 30, -20)
+  fs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  local total = 0
+  for k,v in pairs(toon.statsData) do
+    total = total + v.damageDealt
+  end
+  fs:SetText(tostring(total))
+  table.insert(content.values.damageDealt, fs)
 
   chart:Show()
 end

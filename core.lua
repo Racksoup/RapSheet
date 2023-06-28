@@ -71,7 +71,6 @@ function XPC:OnInitialize()
   self.db = LibStub("AceDB-3.0"):New("XPChartDB", defaults, true)
   icon:Register("XPChart", XPC_LDB, self.db.realm.minimap)
   -- self.db:ResetDB()
-
   
   XPC:CreateUI()
 
@@ -115,6 +114,13 @@ function XPC:CreateUI()
   if (tocversion > 40000) then 
     XPC.levelChart = XPC.db.global.levelCharts.dragonlands
   end
+
+  --
+  -- init bad data
+  if (XPC.db.global.toons[XPC.currToonName].statsData == nil) then
+    XPC.db.global.toons[XPC.currToonName].statsData = {}
+  end
+  --
 
   -- build
   XPC:BuildMainWindow()
