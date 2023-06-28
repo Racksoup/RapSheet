@@ -218,11 +218,15 @@ function XPC:ShowSingleToonChart()
       p:Hide()
     end
   end
+  -- hide horizontal seprator lines
+  for k,v in pairs(content.hLines) do
+    v:Hide()
+  end
 
   -- Horizontal Seperator Lines
   for j=1, level+1 do
     local line = content:CreateLine()
-    line:SetColorTexture(0.7, 0.7, 0.7, .05)
+    line:SetColorTexture(0.7, 0.7, 0.7, .1)
     line:SetStartPoint("TOPLEFT", 0, j * -30 + 2)
     line:SetEndPoint("TOPRIGHT", 0, j * -30 + 2)
 
