@@ -449,46 +449,13 @@ end
 
 function XPC:StatsTracker()
   XPC_GUI.statsTracker = CreateFrame("Frame", statsTracker)
-  local toon = XPC.db.global.toons[XPC.currToonName]
-  local stats = toon.statsData[tostring(UnitLevel('player'))]
   local tracker = XPC_GUI.statsTracker
-  local statList = {
-    damageDealt = 0,
-    damageTaken = 0,
-    monstersKilledSolo = 0,
-    monstersKilledInGroup = 0,
-    questsCompleted = 0,
-    food = 0,
-    drink = 0,
-    bandages = 0,
-    potions = 0,
-    healsGiven = 0,
-    healsRecieved = 0,
-    deaths = 0,
-    pvpDeaths = 0,
-    duelsWon = 0,
-    duelsLost = 0,
-    honorKills = 0,
-    flightPaths = 0,
-    timeAFK = 0,
-    timeInCombat = 0,
-    timePlayedAtLevel = 0,
-    totalTimePlayedWhenLeveled = 0,
-    xpFromQuests = 0,
-    xpFromMobs = 0,
-    dungeonsEntered = 0
-  }
-
-  
-  -- init statsData and its level objects
-  if (toon.statsData == nil) then toon.statsData = {} end
-  if (stats == nil) then 
-    stats = statList
-  end
+  local stats = XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player'))]
 
   tracker:RegisterEvent("PLAYER_LEVEL_UP")
   tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
   tracker:RegisterEvent("QUEST_COMPLETE")
+  tracker:RegisterEvent("UNIT_AURA")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
     -- level up tracker
@@ -521,7 +488,6 @@ function XPC:StatsTracker()
           stats.monstersKilledInGroup = stats.monstersKilledInGroup + 1
         else
           stats.monstersKilledSolo = stats.monstersKilledSolo + 1
-          print(stats.monstersKilledSolo)
         end 
       end
     end
@@ -530,18 +496,28 @@ function XPC:StatsTracker()
     if (event == "QUEST_COMPLETE") then
       stats.questsCompleted = stats.questsCompleted + 1
     end
+
+    -- food eaten
+    if (event == "UNIT_AURA" and ... == 'player') then
+      local food = AuraUtil.FindAuraByName("Food", "player")
+      if (food == 'Food') then
+        print('Eating!')
+      end
+      local drink = AuraUtil.FindAuraByName("Drink", "player")
+      if (drink == 'Drink') then
+        print('Drinks!')
+      end
+    end
   end)
 end
 
 
--- # of quests comleted
 -- # of food eaten
 -- # of drink drank
 -- # of bandaids bandaged
 -- # of potions used
 -- # of heals given
 -- # of heals received
--- # of damage dealt
 -- # of damage taken
 -- # of deaths
 -- # of pvp deaths

@@ -71,11 +71,13 @@ function XPC:OnInitialize()
   self.db = LibStub("AceDB-3.0"):New("XPChartDB", defaults, true)
   icon:Register("XPChart", XPC_LDB, self.db.realm.minimap)
   -- self.db:ResetDB()
-  
-  XPC:CreateUI()
 
+  XPC:CreateVars()
+  
   XPC:StartTimePlayedLoop()
   XPC:StatsTracker()
+
+  XPC:BuildMainWindow()
 end
 
 function ScrollFrame_OnMouseWheel(self, delta)
@@ -90,10 +92,10 @@ function ScrollFrame_OnMouseWheel(self, delta)
   self:SetVerticalScroll(newValue);
 end
 
-function XPC:CreateUI()
-  -- variables
+function XPC:CreateVars()
   local name = UnitName('player')
   local server = GetRealmName()
+  -- variables
   XPC.currToonName = name .. "-" .. server
   XPC.currSingleToon = XPC.currToonName
   XPC_GUI.XAxis = {}
@@ -121,9 +123,6 @@ function XPC:CreateUI()
     XPC.db.global.toons[XPC.currToonName].statsData = {}
   end
   --
-
-  -- build
-  XPC:BuildMainWindow()
 end
 
 function XPC:BuildMainWindow()
@@ -208,6 +207,7 @@ end
 
 function XPC:InitToonData()
   local toons = XPC.db.global.toons
+  local toon = toons[XPC.currToonName]
   -- if toon data doesn't exist create it
   if (toons[XPC.currToonName] == nil) then 
     toons[XPC.currToonName] = {
@@ -219,6 +219,37 @@ function XPC:InitToonData()
     -- call time played to init levelData
     RequestTimePlayed()
   end
+
+  local statList = {
+    damageDealt = 0,
+    damageTaken = 0,
+    monstersKilledSolo = 0,
+    monstersKilledInGroup = 0,
+    questsCompleted = 0,
+    food = 0,
+    drink = 0,
+    bandages = 0,
+    potions = 0,
+    healsGiven = 0,
+    healsRecieved = 0,
+    deaths = 0,
+    pvpDeaths = 0,
+    duelsWon = 0,
+    duelsLost = 0,
+    honorKills = 0,
+    flightPaths = 0,
+    timeAFK = 0,
+    timeInCombat = 0,
+    timePlayedAtLevel = 0,
+    totalTimePlayedWhenLeveled = 0,
+    xpFromQuests = 0,
+    xpFromMobs = 0,
+    dungeonsEntered = 0
+  }
+  
+  -- init statsData and its level objects
+  if (toon.statsData == nil) then toon.statsData = {} end
+  if (toon.statsData[tostring(UnitLevel('player'))] == nil) then toon.statsData[tostring(UnitLevel('player'))] = statList end
 end
 
 function XPC:ShowView()
@@ -307,6 +338,9 @@ function XPC:ShowColorPicker(color, changedCallback)
 end
 
 -- reset all data button
--- delete character data
+-- delete single character data
 
 -- change addon name to 'Level Stats'??? maybe
+
+-- list of quests completed per level
+-- list of monsters killed by name.  per level. solo and total
