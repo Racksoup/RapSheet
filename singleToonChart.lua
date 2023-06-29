@@ -227,6 +227,14 @@ function XPC:BuildSingleToon()
   chart.questsCompleted:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.questsCompleted:SetPoint("TOPLEFT", 399, -20)
   chart.questsCompleted:SetText('Quests')
+  chart.food = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.food:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.food:SetPoint("TOPLEFT", 479, -20)
+  chart.food:SetText('Food')
+  chart.drink = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.drink:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.drink:SetPoint("TOPLEFT", 559, -20)
+  chart.drink:SetText('Drink')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -372,6 +380,26 @@ function XPC:ShowSingleToonChart()
     questsCompletedFS:SetText(v.questsCompleted) 
     table.insert(content.values.questsCompleted, questsCompletedFrame)
 
+    -- Food
+    local foodFrame = CreateFrame("Frame", nil, content)
+    foodFrame:SetPoint("TOPLEFT", 440, i * -30 - 15)
+    foodFrame:SetSize(1,1)
+    local foodFS = foodFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    foodFS:SetPoint("CENTER")
+    foodFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    foodFS:SetText(v.food) 
+    table.insert(content.values.food, foodFrame)
+
+    -- Drink
+    local drinkFrame = CreateFrame("Frame", nil, content)
+    drinkFrame:SetPoint("TOPLEFT", 520, i * -30 - 15)
+    drinkFrame:SetSize(1,1)
+    local drinkFS = drinkFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    drinkFS:SetPoint("CENTER")
+    drinkFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    drinkFS:SetText(v.drink) 
+    table.insert(content.values.drink, drinkFrame)
+
     i = i + 1
   end
   
@@ -380,6 +408,8 @@ function XPC:ShowSingleToonChart()
   local totalMonstersKilledSolo = 0
   local totalMonstersKilledInGroup = 0
   local totalQuestsCompleted = 0
+  local totalFood = 0
+  local totalDrink = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -391,6 +421,8 @@ function XPC:ShowSingleToonChart()
     totalMonstersKilledSolo = totalMonstersKilledSolo + v.monstersKilledSolo
     totalMonstersKilledInGroup = totalMonstersKilledInGroup + v.monstersKilledInGroup
     totalQuestsCompleted = totalQuestsCompleted + v.questsCompleted
+    totalFood = totalFood + v.food
+    totalDrink = totalDrink + v.drink
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -440,6 +472,26 @@ function XPC:ShowSingleToonChart()
   questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   questsCompletedFS:SetText(totalQuestsCompleted) 
   table.insert(content.values.questsCompleted, questsCompletedFrame)
+
+  -- Food
+  local foodFrame = CreateFrame("Frame", nil, content)
+  foodFrame:SetPoint("TOPLEFT", 440, -15)
+  foodFrame:SetSize(1,1)
+  local foodFS = foodFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  foodFS:SetPoint("CENTER")
+  foodFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  foodFS:SetText(totalFood) 
+  table.insert(content.values.food, foodFrame)
+
+  -- Drink
+  local drinkFrame = CreateFrame("Frame", nil, content)
+  drinkFrame:SetPoint("TOPLEFT", 520, -15)
+  drinkFrame:SetSize(1,1)
+  local drinkFS = drinkFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  drinkFS:SetPoint("CENTER")
+  drinkFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  drinkFS:SetText(totalDrink) 
+  table.insert(content.values.drink, drinkFrame)
 
   chart:Show()
 end
@@ -506,11 +558,13 @@ function XPC:StatsTracker()
   XPC_GUI.statsTracker = CreateFrame("Frame", statsTracker)
   local tracker = XPC_GUI.statsTracker
   local stats = XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player'))]
+  local foods = {25691, 25690, 25692, 25693, 24707, 29029, 434, 18229, 10257, 22731, 25695, 25700, 26401, 26260, 26472, 29008, 1131, 435, 18231, 18232, 18234, 24869, 6410, 28616, 25886, 433, 7737, 2639, 10256, 24800, 1127, 1129, 25660, 5006, 5005, 5007, 18233, 24005, 5004, 18230, 29073}
+  local drinks = {25691, 25690, 25692, 25693, 24707, 29029, 430, 24355, 1135, 26475, 22734, 1133, 432, 1137, 26473, 10250, 25696, 26261, 29007}
 
   tracker:RegisterEvent("PLAYER_LEVEL_UP")
   tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
   tracker:RegisterEvent("QUEST_COMPLETE")
-  tracker:RegisterEvent("UNIT_AURA")
+  tracker:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
     -- level up tracker
@@ -552,15 +606,22 @@ function XPC:StatsTracker()
       stats.questsCompleted = stats.questsCompleted + 1
     end
 
-    -- food eaten
-    if (event == "UNIT_AURA" and ... == 'player') then
-      local food = AuraUtil.FindAuraByName("Food", "player")
-      if (food == 'Food') then
-        print('Eating!')
-      end
-      local drink = AuraUtil.FindAuraByName("Drink", "player")
-      if (drink == 'Drink') then
-        print('Drinks!')
+    if (event == "UNIT_SPELLCAST_SUCCEEDED") then
+      local unit, castGUID, spellID = ...
+      if (unit == 'player') then
+        -- eating
+        for i,v in ipairs(foods) do
+          if (spellID == v) then
+            stats.food = stats.food + 1
+          end
+        end
+        -- drink
+        for i,v in ipairs(drinks) do
+          if (spellID == v) then
+            stats.drink = stats.drink + 1
+            print(stats.drink)
+          end
+        end
       end
     end
   end)
@@ -589,3 +650,4 @@ end
 -- time played at level
 -- overall time played when leveled
 -- # of dungeons entered
+-- hearthstone
