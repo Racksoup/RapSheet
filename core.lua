@@ -116,13 +116,6 @@ function XPC:CreateVars()
   if (tocversion > 40000) then 
     XPC.levelChart = XPC.db.global.levelCharts.dragonlands
   end
-
-  --
-  -- init bad data
-  if (XPC.db.global.toons[XPC.currToonName].statsData == nil) then
-    XPC.db.global.toons[XPC.currToonName].statsData = {}
-  end
-  --
 end
 
 function XPC:BuildMainWindow()
@@ -200,14 +193,13 @@ function XPC:BuildMainWindow()
   XPC:BuildXPGraphOptions()
   XPC:BuildSingleToon()
   -- show chart or graph
-  XPC:ShowView()
+  -- XPC:ShowView()
   
   main:Hide()
 end
 
 function XPC:InitToonData()
   local toons = XPC.db.global.toons
-  local toon = toons[XPC.currToonName]
   -- if toon data doesn't exist create it
   if (toons[XPC.currToonName] == nil) then 
     toons[XPC.currToonName] = {
@@ -219,7 +211,8 @@ function XPC:InitToonData()
     -- call time played to init levelData
     RequestTimePlayed()
   end
-
+  
+  local toon = toons[XPC.currToonName]
   local statList = {
     damageDealt = 0,
     damageTaken = 0,
@@ -248,7 +241,6 @@ function XPC:InitToonData()
   }
   
   -- init statsData and its level objects
-  if (toon.statsData == nil) then toon.statsData = {} end
   if (toon.statsData[tostring(UnitLevel('player'))] == nil) then toon.statsData[tostring(UnitLevel('player'))] = statList end
 end
 
@@ -309,12 +301,14 @@ function XPC:OnTimePlayedEvent(self, event, ...)
     end
     totalXP = totalXP + currXP
 
-    table.insert(XPC.db.global.toons[XPC.currToonName].levelData, {
+    local levelData = {
       timePlayed = arg1, 
       level = currLvl, 
       XPGainedThisLevel = currXP, 
       totalXP = totalXP
-    })
+    }
+
+    table.insert(XPC.db.global.toons[XPC.currToonName].levelData, levelData)
   end
 end
 

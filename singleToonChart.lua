@@ -240,7 +240,14 @@ function XPC:ShowSingleToonChart()
   local content = chart.content
   local toon = XPC.db.global.toons[XPC.currSingleToon]
   local levelData = toon.levelData
-  local level = levelData[#levelData].level
+  local level = 1
+  -- remove if not having error on first time loging on to character
+  -- if (#levelData == 0) then
+  --   level = UnitLevel('player')
+  -- else
+  --   level = levelData[#levelData].level
+  -- end
+  level = levelData[#levelData].level
   XPC_GUI.main.single:Show()
   single.vSlider:Show()
   single.hSlider:Show()
@@ -421,7 +428,7 @@ function XPC:BuildChooseToon()
   scroll.content = CreateFrame("Frame", content)
   local content = scroll.content
   content:SetPoint("TOPLEFT")
-  content:SetSize(250, XPC.numOfToons * 30 + 5)
+  content:SetSize(250, XPC.numOfToons * 30 + 30)
   content:SetClipsChildren(true)
   scroll:SetScrollChild(content)
 
