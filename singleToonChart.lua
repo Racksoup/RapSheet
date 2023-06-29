@@ -300,12 +300,15 @@ function XPC:ShowSingleToonChart()
     end
   end
   
-  -- levels
+  -- chart values for levels. goes through each level and create a value for each data on the chart
   local i = 1
   for k,v in pairs(toon.statsData) do
     -- Damage Dealt
-    local damageDealtFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    damageDealtFS:SetPoint("TOPLEFT", 20, i * -30 - 12)
+    local damageDealtFrame = CreateFrame("Frame", nil, content)
+    damageDealtFrame:SetPoint("TOPLEFT", 40, i * -30 - 15)
+    damageDealtFrame:SetSize(1,1)
+    local damageDealtFS = damageDealtFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    damageDealtFS:SetPoint("CENTER")
     damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
     if (v.damageDealt >= 1000000) then 
       damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 10000) / 100) .. 'M')
@@ -314,47 +317,62 @@ function XPC:ShowSingleToonChart()
     else
       damageDealtFS:SetText(tostring(v.damageDealt))
     end
-    table.insert(content.values.damageDealt, damageDealtFS)
+    table.insert(content.values.damageDealt, damageDealtFrame)
     
     -- Kills Solo
-    local monstersKilledSoloFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    monstersKilledSoloFS:SetPoint("TOPLEFT", 100, i * -30 - 12)
+    local monstersKilledSoloFrame = CreateFrame("Frame", nil, content)
+    monstersKilledSoloFrame:SetPoint("TOPLEFT", 120, i * -30 - 15)
+    monstersKilledSoloFrame:SetSize(1,1)
+    local monstersKilledSoloFS = monstersKilledSoloFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    monstersKilledSoloFS:SetPoint("CENTER")
     monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
     monstersKilledSoloFS:SetText(v.monstersKilledSolo) 
-    table.insert(content.values.monstersKilledSolo, monstersKilledSoloFS)
+    table.insert(content.values.monstersKilledSolo, monstersKilledSoloFrame)
 
     -- Kills Group
-    local monstersKilledInGroupFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    monstersKilledInGroupFS:SetPoint("TOPLEFT", 180, i * -30 - 12)
+    local monstersKilledInGroupFrame = CreateFrame("Frame", nil, content)
+    monstersKilledInGroupFrame:SetPoint("TOPLEFT", 200, i * -30 - 15)
+    monstersKilledInGroupFrame:SetSize(1,1)
+    local monstersKilledInGroupFS = monstersKilledInGroupFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    monstersKilledInGroupFS:SetPoint("CENTER")
     monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
     monstersKilledInGroupFS:SetText(v.monstersKilledInGroup) 
-    table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFS)
+    table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFrame)
 
     -- Kills
-    local monstersKilledFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    monstersKilledFS:SetPoint("TOPLEFT", 260, i * -30 - 12)
+    local monstersKilledFrame = CreateFrame("Frame", nil, content)
+    monstersKilledFrame:SetPoint("TOPLEFT", 280, i * -30 - 15)
+    monstersKilledFrame:SetSize(1,1)
+    local monstersKilledFS = monstersKilledFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    monstersKilledFS:SetPoint("CENTER")
     monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
     monstersKilledFS:SetText(v.monstersKilledInGroup + v.monstersKilledSolo) 
-    table.insert(content.values.monstersKilled, monstersKilledFS)
+    table.insert(content.values.monstersKilled, monstersKilledFrame)
 
     -- Quests Completed
-    local questsCompletedFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    questsCompletedFS:SetPoint("TOPLEFT", 340, i * -30 - 12)
+    local questsCompletedFrame = CreateFrame("Frame", nil, content)
+    questsCompletedFrame:SetPoint("TOPLEFT", 360, i * -30 - 15)
+    questsCompletedFrame:SetSize(1,1)
+    local questsCompletedFS = questsCompletedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    questsCompletedFS:SetPoint("CENTER")
     questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
     questsCompletedFS:SetText(v.questsCompleted) 
-    table.insert(content.values.questsCompleted, questsCompletedFS)
+    table.insert(content.values.questsCompleted, questsCompletedFrame)
 
     i = i + 1
   end
   
-  -- total
-  local damageDealtFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  damageDealtFS:SetPoint("TOPLEFT", 20, - 12)
-  damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  -- chart values for total
   local totalDamageDealt = 0
   local totalMonstersKilledSolo = 0
   local totalMonstersKilledInGroup = 0
   local totalQuestsCompleted = 0
+  local damageDealtFrame = CreateFrame("Frame", nil, content)
+  damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
+  damageDealtFrame:SetSize(1,1)
+  local damageDealtFS = damageDealtFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  damageDealtFS:SetPoint("CENTER")
+  damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   for k,v in pairs(toon.statsData) do
     totalDamageDealt = totalDamageDealt + v.damageDealt
     totalMonstersKilledSolo = totalMonstersKilledSolo + v.monstersKilledSolo
@@ -368,35 +386,47 @@ function XPC:ShowSingleToonChart()
   else
     damageDealtFS:SetText(tostring(totalDamageDealt))
   end
-  table.insert(content.values.damageDealt, damageDealtFS)
+  table.insert(content.values.damageDealt, damageDealtFrame)
 
   -- Kills Solo
-  local monstersKilledSoloFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  monstersKilledSoloFS:SetPoint("TOPLEFT", 100, -12)
+  local monstersKilledSoloFrame = CreateFrame("Frame", nil, content)
+  monstersKilledSoloFrame:SetPoint("TOPLEFT", 120, -15)
+  monstersKilledSoloFrame:SetSize(1,1)
+  local monstersKilledSoloFS = monstersKilledSoloFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  monstersKilledSoloFS:SetPoint("CENTER")
   monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   monstersKilledSoloFS:SetText(totalMonstersKilledSolo) 
-  table.insert(content.values.monstersKilledSolo, monstersKilledSoloFS)
+  table.insert(content.values.monstersKilledSolo, monstersKilledSoloFrame)
 
   -- Kills Group
-  local monstersKilledInGroupFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  monstersKilledInGroupFS:SetPoint("TOPLEFT", 180, -12)
+  local monstersKilledInGroupFrame = CreateFrame("Frame", nil, content)
+  monstersKilledInGroupFrame:SetPoint("TOPLEFT", 200, -15)
+  monstersKilledInGroupFrame:SetSize(1,1)
+  local monstersKilledInGroupFS = monstersKilledInGroupFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  monstersKilledInGroupFS:SetPoint("CENTER")
   monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   monstersKilledInGroupFS:SetText(totalMonstersKilledInGroup) 
-  table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFS)
+  table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFrame)
 
   -- Killed
-  local monstersKilledFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  monstersKilledFS:SetPoint("TOPLEFT", 260, - 12)
+  local monstersKilledFrame = CreateFrame("Frame", nil, content)
+  monstersKilledFrame:SetPoint("TOPLEFT", 280, -15)
+  monstersKilledFrame:SetSize(1,1)
+  local monstersKilledFS = monstersKilledFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  monstersKilledFS:SetPoint("CENTER")
   monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   monstersKilledFS:SetText(totalMonstersKilledInGroup + totalMonstersKilledSolo) 
-  table.insert(content.values.monstersKilled, monstersKilledFS)
+  table.insert(content.values.monstersKilled, monstersKilledFrame)
 
   -- Quests Completed
-  local questsCompletedFS = content:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  questsCompletedFS:SetPoint("TOPLEFT", 340, - 12)
+  local questsCompletedFrame = CreateFrame("Frame", nil, content)
+  questsCompletedFrame:SetPoint("TOPLEFT", 360, -15)
+  questsCompletedFrame:SetSize(1,1)
+  local questsCompletedFS = questsCompletedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  questsCompletedFS:SetPoint("CENTER")
   questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   questsCompletedFS:SetText(totalQuestsCompleted) 
-  table.insert(content.values.questsCompleted, questsCompletedFS)
+  table.insert(content.values.questsCompleted, questsCompletedFrame)
 
   chart:Show()
 end
@@ -524,8 +554,7 @@ function XPC:StatsTracker()
 end
 
 -- center point frame for each value to center on
--- hide levels without data
--- grow chart to right size
+
 
 -- # of food eaten
 -- # of drink drank
@@ -550,3 +579,5 @@ end
 -- time played at level
 -- overall time played when leveled
 -- # of dungeons entered
+
+-- grow chart to right size
