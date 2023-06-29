@@ -271,28 +271,33 @@ function XPC:ShowSingleToonChart()
   end
 
   -- Horizontal Seperator Lines
-  for j=1, level+1 do
-    local line = content:CreateLine()
-    line:SetColorTexture(0.7, 0.7, 0.7, .1)
-    line:SetStartPoint("TOPLEFT", 0, j * -30 + 2)
-    line:SetEndPoint("TOPRIGHT", 0, j * -30 + 2)
+  for j = level+1, 1, -1 do
+    -- check if level is in statsData, not on first loop for total
+    if (j == level+1 or toon.statsData[tostring(j)] ~= nil) then
+      local line = content:CreateLine()
+      line:SetColorTexture(0.7, 0.7, 0.7, .1)
+      line:SetStartPoint("TOPLEFT", 0, ((level +1) - j +1) * -30 + 2)
+      line:SetEndPoint("TOPRIGHT", 0, ((level +1) - j +1) * -30 + 2)
 
-    table.insert(content.hLines, line)
-
+      table.insert(content.hLines, line)
+    end
   end
 
   -- V-values
   for i = level+1, 1, -1 do 
-    local value = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
-    value:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    if (i == level + 1) then 
-      value:SetPoint("TOPLEFT", 12, -60 + (((level +1) - i) * -30) +8)
-      value:SetText('Total') 
-    else 
-      value:SetPoint("TOPLEFT", 20, -60 + (((level +1) - i) * -30) +8)
-      value:SetText(i) 
+    -- check if level is in statsData, not on first loop for total
+    if (i == level+1 or toon.statsData[tostring(i)] ~= nil) then
+      local value = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+      value:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      if (i == level + 1) then 
+        value:SetPoint("TOPLEFT", 12, -60 + (((level +1) - i) * -30) +8)
+        value:SetText('Total') 
+      else 
+        value:SetPoint("TOPLEFT", 20, -60 + (((level +1) - i) * -30) +8)
+        value:SetText(i) 
+      end
+      table.insert(chart.vValues, value)
     end
-    table.insert(chart.vValues, value)
   end
   
   -- levels
@@ -518,6 +523,9 @@ function XPC:StatsTracker()
   end)
 end
 
+-- center point frame for each value to center on
+-- hide levels without data
+-- grow chart to right size
 
 -- # of food eaten
 -- # of drink drank
