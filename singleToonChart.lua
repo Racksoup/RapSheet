@@ -138,49 +138,11 @@ function XPC:BuildSingleToon()
   -- Chart
   single.chart = CreateFrame("Frame", chart, single)
   local chart = single.chart
-  chart:SetSize(1500, 905)
-  -- slider:SetScrollChild(chart)
-  chart:SetPoint("TOPLEFT", 0, 0)
-
+  
   -- create chart content 
   chart.content = CreateFrame("Frame", content, chart)
   local content = chart.content
-  content:SetSize(1437, 872)
-  content:SetPoint("TOPLEFT", 63 , -43)
-
-  -- Horizonatl Border Line
-  chart.hLine = chart:CreateLine()
-  chart.hLine:SetColorTexture(0.7,0.7,0.7,1)
-  chart.hLine:SetStartPoint("TOPLEFT", 60, -40)
-  chart.hLine:SetEndPoint("TOPRIGHT", 0, -40)
-  -- Vertical Border Line
-  chart.vLine = chart:CreateLine()
-  chart.vLine:SetColorTexture(0.7,0.7,0.7,1)
-  chart.vLine:SetStartPoint("TOPLEFT", 60, -40)
-  chart.vLine:SetEndPoint("BOTTOMLEFT", 60, 0)
   
-  -- Horizontal Values
-  chart.dmgDone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
-  chart.dmgDone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.dmgDone:SetPoint("TOPLEFT", 68, -20)
-  chart.dmgDone:SetText('Dmg Done')
-  chart.killsSolo = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
-  chart.killsSolo:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.killsSolo:SetPoint("TOPLEFT", 148, -20)
-  chart.killsSolo:SetText('Kills Solo')
-  chart.killsGroup = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
-  chart.killsGroup:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.killsGroup:SetPoint("TOPLEFT", 228, -20)
-  chart.killsGroup:SetText('Kills Group')
-  chart.kills = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
-  chart.kills:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.kills:SetPoint("TOPLEFT", 308, -20)
-  chart.kills:SetText('Kills')
-  chart.questsCompleted = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
-  chart.questsCompleted:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.questsCompleted:SetPoint("TOPLEFT", 388, -20)
-  chart.questsCompleted:SetText('Quests')
-
   -- Vertical Value table init
   chart.vValues = {}
   -- Vertical Content Values table init
@@ -214,6 +176,57 @@ function XPC:BuildSingleToon()
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
   content.hLines = {}
+  
+  -- set size after content.values object init
+  local j = 0 
+  for k,v in pairs(content.values) do
+    j = j + 1
+  end
+  local l = 1
+  for k,v in pairs(XPC.db.global.toons[XPC.currSingleToon].statsData) do
+    l = l + 1
+  end
+  if (l * 30 + 35 < single:GetHeight()) then 
+    chart:SetSize(j * 80, single:GetHeight())
+  else
+    chart:SetSize(j * 80, l * 30 + 35)
+  end
+  chart:SetPoint("TOPLEFT", 0, 0)
+  content:SetSize(chart:GetWidth() - 63, chart:GetHeight() - 33)
+  content:SetPoint("TOPLEFT", 63 , -43)
+
+  -- Horizonatl Border Line
+  chart.hLine = chart:CreateLine()
+  chart.hLine:SetColorTexture(0.7,0.7,0.7,1)
+  chart.hLine:SetStartPoint("TOPLEFT", 60, -40)
+  chart.hLine:SetEndPoint("TOPRIGHT", 0, -40)
+  -- Vertical Border Line
+  chart.vLine = chart:CreateLine()
+  chart.vLine:SetColorTexture(0.7,0.7,0.7,1)
+  chart.vLine:SetStartPoint("TOPLEFT", 60, -40)
+  chart.vLine:SetEndPoint("BOTTOMLEFT", 60, 0)
+  
+  -- Horizontal Values
+  chart.dmgDone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.dmgDone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.dmgDone:SetPoint("TOPLEFT", 68, -20)
+  chart.dmgDone:SetText('Dmg Done')
+  chart.killsSolo = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.killsSolo:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.killsSolo:SetPoint("TOPLEFT", 152, -20)
+  chart.killsSolo:SetText('Kills Solo')
+  chart.killsGroup = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.killsGroup:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.killsGroup:SetPoint("TOPLEFT", 227, -20)
+  chart.killsGroup:SetText('Kills Group')
+  chart.kills = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.kills:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.kills:SetPoint("TOPLEFT", 327, -20)
+  chart.kills:SetText('Kills')
+  chart.questsCompleted = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.questsCompleted:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.questsCompleted:SetPoint("TOPLEFT", 399, -20)
+  chart.questsCompleted:SetText('Quests')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -553,9 +566,6 @@ function XPC:StatsTracker()
   end)
 end
 
--- center point frame for each value to center on
-
-
 -- # of food eaten
 -- # of drink drank
 -- # of bandaids bandaged
@@ -579,5 +589,3 @@ end
 -- time played at level
 -- overall time played when leveled
 -- # of dungeons entered
-
--- grow chart to right size
