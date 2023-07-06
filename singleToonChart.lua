@@ -235,6 +235,10 @@ function XPC:BuildSingleToon()
   chart.drink:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.drink:SetPoint("TOPLEFT", 559, -20)
   chart.drink:SetText('Drink')
+  chart.timePlayedAtLevel = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.timePlayedAtLevel:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.timePlayedAtLevel:SetPoint("TOPLEFT", 623, -20)
+  chart.timePlayedAtLevel:SetText('Time Played')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -292,19 +296,23 @@ function XPC:ShowSingleToonChart()
   end
 
   -- Horizontal Seperator Lines
+  local missedLevels = 0
   for j = level+1, 1, -1 do
     -- check if level is in statsData, not on first loop for total
     if (j == level+1 or toon.statsData[tostring(j)] ~= nil) then
       local line = content:CreateLine()
       line:SetColorTexture(0.7, 0.7, 0.7, .1)
-      line:SetStartPoint("TOPLEFT", 0, ((level +1) - j +1) * -30 + 2)
-      line:SetEndPoint("TOPRIGHT", 0, ((level +1) - j +1) * -30 + 2)
+      line:SetStartPoint("TOPLEFT", 0, ((level +1) - j +1 -missedLevels) * -30 + 2)
+      line:SetEndPoint("TOPRIGHT", 0, ((level +1) - j +1 -missedLevels) * -30 + 2)
 
       table.insert(content.hLines, line)
+    else
+      missedLevels = missedLevels + 1
     end
   end
 
   -- V-values
+  missedLevels = 0
   for i = level+1, 1, -1 do 
     -- check if level is in statsData, not on first loop for total
     if (i == level+1 or toon.statsData[tostring(i)] ~= nil) then
@@ -314,91 +322,115 @@ function XPC:ShowSingleToonChart()
         value:SetPoint("TOPLEFT", 12, -60 + (((level +1) - i) * -30) +8)
         value:SetText('Total') 
       else 
-        value:SetPoint("TOPLEFT", 20, -60 + (((level +1) - i) * -30) +8)
+        value:SetPoint("TOPLEFT", 20, -60 + (((level +1) - i - missedLevels) * -30) +8)
         value:SetText(i) 
       end
       table.insert(chart.vValues, value)
+    else
+      missedLevels = missedLevels + 1
     end
   end
   
   -- chart values for levels. goes through each level and create a value for each data on the chart
-  local i = 1
-  for k,v in pairs(toon.statsData) do
-    -- Damage Dealt
-    local damageDealtFrame = CreateFrame("Frame", nil, content)
-    damageDealtFrame:SetPoint("TOPLEFT", 40, i * -30 - 15)
-    damageDealtFrame:SetSize(1,1)
-    local damageDealtFS = damageDealtFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    damageDealtFS:SetPoint("CENTER")
-    damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    if (v.damageDealt >= 1000000) then 
-      damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 10000) / 100) .. 'M')
-    elseif (v.damageDealt >= 1000) then 
-      damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 100) / 10) .. 'K')
+  missedLevels = 0
+  for i=level, 1, -1 do
+    if (toon.statsData[tostring(i)] ~= nil) then 
+      local v = toon.statsData[tostring(i)]
+      local posY = ((level + 1) - i - missedLevels) * -30 -15
+
+      -- Damage Dealt
+      local damageDealtFrame = CreateFrame("Frame", nil, content)
+      damageDealtFrame:SetPoint("TOPLEFT", 40, posY)
+      damageDealtFrame:SetSize(1,1)
+      local damageDealtFS = damageDealtFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      damageDealtFS:SetPoint("CENTER")
+      damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      if (v.damageDealt >= 1000000) then 
+        damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 10000) / 100) .. 'M')
+      elseif (v.damageDealt >= 1000) then 
+        damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 100) / 10) .. 'K')
+      else
+        damageDealtFS:SetText(tostring(v.damageDealt))
+      end
+      table.insert(content.values.damageDealt, damageDealtFrame)
+      
+      -- Kills Solo
+      local monstersKilledSoloFrame = CreateFrame("Frame", nil, content)
+      monstersKilledSoloFrame:SetPoint("TOPLEFT", 120, posY)
+      monstersKilledSoloFrame:SetSize(1,1)
+      local monstersKilledSoloFS = monstersKilledSoloFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      monstersKilledSoloFS:SetPoint("CENTER")
+      monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      monstersKilledSoloFS:SetText(v.monstersKilledSolo) 
+      table.insert(content.values.monstersKilledSolo, monstersKilledSoloFrame)
+
+      -- Kills Group
+      local monstersKilledInGroupFrame = CreateFrame("Frame", nil, content)
+      monstersKilledInGroupFrame:SetPoint("TOPLEFT", 200, posY)
+      monstersKilledInGroupFrame:SetSize(1,1)
+      local monstersKilledInGroupFS = monstersKilledInGroupFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      monstersKilledInGroupFS:SetPoint("CENTER")
+      monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      monstersKilledInGroupFS:SetText(v.monstersKilledInGroup) 
+      table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFrame)
+
+      -- Kills
+      local monstersKilledFrame = CreateFrame("Frame", nil, content)
+      monstersKilledFrame:SetPoint("TOPLEFT", 280, posY)
+      monstersKilledFrame:SetSize(1,1)
+      local monstersKilledFS = monstersKilledFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      monstersKilledFS:SetPoint("CENTER")
+      monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      monstersKilledFS:SetText(v.monstersKilledInGroup + v.monstersKilledSolo) 
+      table.insert(content.values.monstersKilled, monstersKilledFrame)
+
+      -- Quests Completed
+      local questsCompletedFrame = CreateFrame("Frame", nil, content)
+      questsCompletedFrame:SetPoint("TOPLEFT", 360, posY)
+      questsCompletedFrame:SetSize(1,1)
+      local questsCompletedFS = questsCompletedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      questsCompletedFS:SetPoint("CENTER")
+      questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      questsCompletedFS:SetText(v.questsCompleted) 
+      table.insert(content.values.questsCompleted, questsCompletedFrame)
+
+      -- Food
+      local foodFrame = CreateFrame("Frame", nil, content)
+      foodFrame:SetPoint("TOPLEFT", 440, posY)
+      foodFrame:SetSize(1,1)
+      local foodFS = foodFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      foodFS:SetPoint("CENTER")
+      foodFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      foodFS:SetText(v.food) 
+      table.insert(content.values.food, foodFrame)
+
+      -- Drink
+      local drinkFrame = CreateFrame("Frame", nil, content)
+      drinkFrame:SetPoint("TOPLEFT", 520, posY)
+      drinkFrame:SetSize(1,1)
+      local drinkFS = drinkFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      drinkFS:SetPoint("CENTER")
+      drinkFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      drinkFS:SetText(v.drink) 
+      table.insert(content.values.drink, drinkFrame)
+
+      -- Time Played
+      local timePlayedFrame = CreateFrame("Frame", nil, content)
+      timePlayedFrame:SetPoint("TOPLEFT", 600, posY)
+      timePlayedFrame:SetSize(1,1)
+      local timePlayedFS = timePlayedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      timePlayedFS:SetPoint("CENTER")
+      timePlayedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      if (v.timePlayedAtLevel ~= 0) then
+        timePlayedFS:SetText(v.timePlayedAtLevel) 
+      else
+        timePlayedFS:SetText(toon.levelData[#toon.levelData].timePlayed) 
+      end
+      table.insert(content.values.timePlayedAtLevel, timePlayedFrame)
+
     else
-      damageDealtFS:SetText(tostring(v.damageDealt))
+      missedLevels = missedLevels + 1
     end
-    table.insert(content.values.damageDealt, damageDealtFrame)
-    
-    -- Kills Solo
-    local monstersKilledSoloFrame = CreateFrame("Frame", nil, content)
-    monstersKilledSoloFrame:SetPoint("TOPLEFT", 120, i * -30 - 15)
-    monstersKilledSoloFrame:SetSize(1,1)
-    local monstersKilledSoloFS = monstersKilledSoloFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    monstersKilledSoloFS:SetPoint("CENTER")
-    monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    monstersKilledSoloFS:SetText(v.monstersKilledSolo) 
-    table.insert(content.values.monstersKilledSolo, monstersKilledSoloFrame)
-
-    -- Kills Group
-    local monstersKilledInGroupFrame = CreateFrame("Frame", nil, content)
-    monstersKilledInGroupFrame:SetPoint("TOPLEFT", 200, i * -30 - 15)
-    monstersKilledInGroupFrame:SetSize(1,1)
-    local monstersKilledInGroupFS = monstersKilledInGroupFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    monstersKilledInGroupFS:SetPoint("CENTER")
-    monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    monstersKilledInGroupFS:SetText(v.monstersKilledInGroup) 
-    table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFrame)
-
-    -- Kills
-    local monstersKilledFrame = CreateFrame("Frame", nil, content)
-    monstersKilledFrame:SetPoint("TOPLEFT", 280, i * -30 - 15)
-    monstersKilledFrame:SetSize(1,1)
-    local monstersKilledFS = monstersKilledFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    monstersKilledFS:SetPoint("CENTER")
-    monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    monstersKilledFS:SetText(v.monstersKilledInGroup + v.monstersKilledSolo) 
-    table.insert(content.values.monstersKilled, monstersKilledFrame)
-
-    -- Quests Completed
-    local questsCompletedFrame = CreateFrame("Frame", nil, content)
-    questsCompletedFrame:SetPoint("TOPLEFT", 360, i * -30 - 15)
-    questsCompletedFrame:SetSize(1,1)
-    local questsCompletedFS = questsCompletedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    questsCompletedFS:SetPoint("CENTER")
-    questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    questsCompletedFS:SetText(v.questsCompleted) 
-    table.insert(content.values.questsCompleted, questsCompletedFrame)
-
-    -- Food
-    local foodFrame = CreateFrame("Frame", nil, content)
-    foodFrame:SetPoint("TOPLEFT", 440, i * -30 - 15)
-    foodFrame:SetSize(1,1)
-    local foodFS = foodFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    foodFS:SetPoint("CENTER")
-    foodFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    foodFS:SetText(v.food) 
-    table.insert(content.values.food, foodFrame)
-
-    -- Drink
-    local drinkFrame = CreateFrame("Frame", nil, content)
-    drinkFrame:SetPoint("TOPLEFT", 520, i * -30 - 15)
-    drinkFrame:SetSize(1,1)
-    local drinkFS = drinkFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    drinkFS:SetPoint("CENTER")
-    drinkFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    drinkFS:SetText(v.drink) 
-    table.insert(content.values.drink, drinkFrame)
 
     i = i + 1
   end
@@ -493,6 +525,16 @@ function XPC:ShowSingleToonChart()
   drinkFS:SetText(totalDrink) 
   table.insert(content.values.drink, drinkFrame)
 
+  -- Time Played
+  local timePlayedFrame = CreateFrame("Frame", nil, content)
+  timePlayedFrame:SetPoint("TOPLEFT", 600, -15)
+  timePlayedFrame:SetSize(1,1)
+  local timePlayedFS = timePlayedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  timePlayedFS:SetPoint("CENTER")
+  timePlayedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  timePlayedFS:SetText(toon.levelData[#toon.levelData].timePlayed) 
+  table.insert(content.values.timePlayedAtLevel, timePlayedFrame)
+
   chart:Show()
 end
 
@@ -567,11 +609,15 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
-    -- level up tracker
-    if (event == "PLAYER_LEVEL_UP") then     
-      stats = statList
-    end
     
+    -- level up tracker
+    if (event == "PLAYER_LEVEL_UP") then 
+      local level, healthDelta, powerDelta, numNewTalents, numNewPvpTalentSlots, strengthDelta, agilityDelta, staminaDelta, intellectDelta = ...
+      XPC.justLeveled = true
+      XPC:CreateStatsData(level)    
+      stats = XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(level)]
+      RequestTimePlayed()
+    end
     
     if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
       local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, a, b, c, d, e, f, g, h, i, j, k = CombatLogGetCurrentEventInfo()
@@ -619,7 +665,6 @@ function XPC:StatsTracker()
         for i,v in ipairs(drinks) do
           if (spellID == v) then
             stats.drink = stats.drink + 1
-            print(stats.drink)
           end
         end
       end
@@ -627,8 +672,10 @@ function XPC:StatsTracker()
   end)
 end
 
--- # of food eaten
--- # of drink drank
+-- xp per hour
+-- time played at level
+-- total time played 
+-- number of monsters killed per hour
 -- # of bandaids bandaged
 -- # of potions used
 -- # of heals given
@@ -646,8 +693,5 @@ end
 -- % of time in combat
 -- % of xp gained from quests
 -- % of xp gained from mobs
--- xp per hour
--- time played at level
--- overall time played when leveled
 -- # of dungeons entered
 -- hearthstone

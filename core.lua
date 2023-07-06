@@ -72,7 +72,17 @@ function XPC:OnInitialize()
   icon:Register("XPChart", XPC_LDB, self.db.realm.minimap)
   -- self.db:ResetDB()
 
+  
   XPC:CreateVars()
+
+  -- for k,v in pairs(XPC.db.global.toons[XPC.currToonName].statsData) do
+  --   print('Level', k)
+  --   for q,w in pairs(v) do
+  --     if (q == 'damageDealt' or q == 'monstersKilledSolo' or q == 'questsCompleted') then
+  --       print(q,w)
+  --     end
+  --   end
+  -- end
   
   XPC:StartTimePlayedLoop()
   XPC:StatsTracker()
@@ -102,6 +112,7 @@ function XPC:CreateVars()
   XPC_GUI.YAxis = {}
   XPC_GUI.Lines = {}
   XPC.numOfToons = 0
+  XPC.justLeveled = false
   for k,v in pairs(XPC.db.global.toons) do
     XPC.numOfToons = XPC.numOfToons + 1
   end
@@ -212,7 +223,11 @@ function XPC:InitToonData()
     RequestTimePlayed()
   end
   
-  local toon = toons[XPC.currToonName]
+ XPC:CreateStatsData(0)
+end
+
+function XPC:CreateStatsData(level) 
+  local toon = XPC.db.global.toons[XPC.currToonName]
   local statList = {
     damageDealt = 0,
     damageTaken = 0,
@@ -241,7 +256,15 @@ function XPC:InitToonData()
   }
   
   -- init statsData and its level objects
-  if (toon.statsData[tostring(UnitLevel('player'))] == nil) then toon.statsData[tostring(UnitLevel('player'))] = statList end
+  if (XPC.justLeveled) then 
+    if (toon.statsData[tostring(level)] == nil) then
+      toon.statsData[tostring(level)] = statList
+    end
+  else
+    if (toon.statsData[tostring(UnitLevel('player'))] == nil) then
+      toon.statsData[tostring(UnitLevel('player'))] = statList
+    end
+  end
 end
 
 function XPC:ShowView()
@@ -309,6 +332,12 @@ function XPC:OnTimePlayedEvent(self, event, ...)
     }
 
     table.insert(XPC.db.global.toons[XPC.currToonName].levelData, levelData)
+
+    if (XPC.justLeveled == true) then
+      XPC.justLeveled = false
+      local stats = XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player') -1)]
+      stats.timePlayedAtLevel = arg1
+    end
   end
 end
 
