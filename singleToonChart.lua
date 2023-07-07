@@ -274,7 +274,10 @@ function XPC:BuildSingleToon()
   chart.HealsReceived:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.HealsReceived:SetPoint("TOPLEFT", 1276, -20)
   chart.HealsReceived:SetText('Heals In')
-
+  chart.TimeAFK = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.TimeAFK:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.TimeAFK:SetPoint("TOPLEFT", 1356, -20)
+  chart.TimeAFK:SetText('Time AFK')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -638,6 +641,25 @@ function XPC:ShowSingleToonChart()
       healsReceivedFS:SetText(v.healsReceived) 
       table.insert(content.values.healsReceived, healsReceivedFrame)
 
+      -- Time AFK
+      local timeAFKFrame = CreateFrame("Frame", nil, content)
+      timeAFKFrame:SetPoint("TOPLEFT", 1320, posY)
+      timeAFKFrame:SetSize(1,1)
+      local timeAFKFS = timeAFKFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      timeAFKFS:SetPoint("CENTER")
+      timeAFKFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      timex = v.timeAFK
+      days = math.floor(timex / 60 / 60 / 24) 
+      hours = math.floor(timex / 60 / 60) % 24
+      minutes = math.floor(timex / 60) % 60
+      seconds = timex % 60
+      if (days >= 1) then 
+        timeAFKFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+      else
+        timeAFKFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+      end
+      table.insert(content.values.timeAFK, timeAFKFrame)
+
     else
       missedLevels = missedLevels + 1
     end
@@ -657,6 +679,7 @@ function XPC:ShowSingleToonChart()
   local totalDamageTaken = 0
   local totalHealsGiven = 0
   local totalHealsReceived = 0
+  local totalTimeAFK = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -675,6 +698,7 @@ function XPC:ShowSingleToonChart()
     totalDamageTaken = totalDamageTaken + v.damageTaken
     totalHealsGiven = totalHealsGiven + v.healsGiven
     totalHealsReceived = totalHealsReceived + v.healsReceived
+    totalTimeAFK = totalTimeAFK + v.timeAFK
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -839,6 +863,25 @@ function XPC:ShowSingleToonChart()
   healsReceivedFS:SetText(totalHealsReceived) 
   table.insert(content.values.healsReceived, healsReceivedFrame)
 
+  -- Time AFK
+  local timeAFKFrame = CreateFrame("Frame", nil, content)
+  timeAFKFrame:SetPoint("TOPLEFT", 1320, -15)
+  timeAFKFrame:SetSize(1,1)
+  local timeAFKFS = timeAFKFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  timeAFKFS:SetPoint("CENTER")
+  timeAFKFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  timex = totalTimeAFK
+  days = math.floor(timex / 60 / 60 / 24) 
+  hours = math.floor(timex / 60 / 60) % 24
+  minutes = math.floor(timex / 60) % 60
+  seconds = timex % 60
+  if (days >= 1) then 
+    timeAFKFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+  else
+    timeAFKFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+  end
+  table.insert(content.values.timeAFK, timeAFKFrame)
+
   chart:Show()
 end
 
@@ -906,14 +949,38 @@ function XPC:StatsTracker()
   local stats = XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player'))]
   local foods = {25691, 25690, 25692, 25693, 24707, 29029, 434, 18229, 10257, 22731, 25695, 25700, 26401, 26260, 26472, 29008, 1131, 435, 18231, 18232, 18234, 24869, 6410, 28616, 25886, 433, 7737, 2639, 10256, 24800, 1127, 1129, 25660, 5006, 5005, 5007, 18233, 24005, 5004, 18230, 29073}
   local drinks = {25691, 25690, 25692, 25693, 24707, 29029, 430, 24355, 1135, 26475, 22734, 1133, 432, 1137, 26473, 10250, 25696, 26261, 29007}
+  local timeAFK = 0
 
   tracker:RegisterEvent("PLAYER_LEVEL_UP")
   tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
   tracker:RegisterEvent("QUEST_COMPLETE")
   tracker:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
   tracker:RegisterEvent("TAXIMAP_CLOSED")
+  tracker:RegisterEvent("CHAT_MSG_SYSTEM")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
+
+    -- AFK tracker
+    if (event == "CHAT_MSG_SYSTEM") then
+      local msg = ...
+      if (msg == 'You are now AFK: Away from Keyboard') then
+        XPC.isAFK = true
+        local function counter() 
+          C_Timer.After(1, function() 
+            if (XPC.isAFK == true) then
+              timeAFK = timeAFK + 1
+              counter()
+            end
+          end)
+        end
+        counter()
+      end
+      if (msg == 'You are no longer AFK.') then
+        stats.timeAFK = stats.timeAFK + timeAFK
+        XPC.isAFK = false
+        timeAFK = 0
+      end
+    end
     
     -- taxi tracker
     if (event == "TAXIMAP_CLOSED" and XPC.justStartedFlightPath == false) then

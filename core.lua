@@ -105,6 +105,7 @@ function XPC:CreateVars()
   XPC.numOfToons = 0
   XPC.justLeveled = false
   XPC.justStartedFlightPath = false
+  XPC.isAFK = false
   for k,v in pairs(XPC.db.global.toons) do
     XPC.numOfToons = XPC.numOfToons + 1
   end
