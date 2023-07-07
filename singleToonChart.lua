@@ -276,7 +276,7 @@ function XPC:BuildSingleToon()
   chart.HealsReceived:SetText('Heals In')
   chart.TimeAFK = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.TimeAFK:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.TimeAFK:SetPoint("TOPLEFT", 1356, -20)
+  chart.TimeAFK:SetPoint("TOPLEFT", 1353, -20)
   chart.TimeAFK:SetText('Time AFK')
 
   -- Vertical Seperator Lines
@@ -1119,7 +1119,6 @@ end
 -- # of duels lost
 -- # of hk's
 -- time on flight paths
--- time afk
 -- time in combat
 -- % of time in combat
 -- xp gained from quests

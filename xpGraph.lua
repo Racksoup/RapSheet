@@ -291,7 +291,7 @@ function XPC:BuildXPGraphOptions()
     self:StopMovingOrSizing()
   end)
   options:SetPoint("TOPRIGHT", -60, -60);
-  options:SetWidth(360)
+  options:SetWidth(390)
   options:SetHeight(341) 
   
   -- scroll frame
@@ -299,12 +299,12 @@ function XPC:BuildXPGraphOptions()
   local scrollFrame = options.scrollFrame
   scrollFrame:SetScript('OnMouseWheel', ScrollFrame_OnMouseWheel)
   scrollFrame:SetPoint("TOPRIGHT", -31, -30)
-  scrollFrame:SetSize(310, 302)
+  scrollFrame:SetSize(345, 302)
 
   -- side frame content
   options.content = CreateFrame("Frame", nil, scrollFrame)
   local content = options.content
-  content:SetSize(310, XPC.numOfToons * 30 + 5)
+  content:SetSize(345, XPC.numOfToons * 30 + 35)
   content:SetClipsChildren(true)
   scrollFrame:SetScrollChild(content)
 
@@ -325,10 +325,27 @@ function XPC:BuildXPGraphOptions()
       XPC:ShowColorPicker(toon.lineColor, myColorCallback) 
     end)
 
+    local deleteBtn = CreateFrame("Button", toon, content, "UIPanelButtonTemplate")
+    deleteBtn:SetPoint("TOPLEFT", 65, i * -30)
+    deleteBtn:SetSize(25, 25)
+    deleteBtn:SetText("X")
+    deleteBtn:SetScript("OnClick", function() 
+      local del = XPC_GUI.main.del
+      del.l2:SetText(k)
+      XPC.currDeleteToon = nil
+      XPC.currDeleteToon = k
+      del:Hide()
+      del:Show()
+      XPC.delTimer = C_Timer.NewTicker(5, function() 
+        XPC.currDeleteToon = nil
+        del:Hide() 
+      end, 1)
+    end)
+
     -- toon name
     local label = content:CreateFontString(nil, "OVERLAY", "GameToolTipText")
     label:SetFont("Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE")
-    label:SetPoint("TOPLEFT", 70, (i * -30) -5)
+    label:SetPoint("TOPLEFT", 100, (i * -30) -5)
     label:SetText(k)
 
     -- show toon checkbox
@@ -344,7 +361,55 @@ function XPC:BuildXPGraphOptions()
     i = i + 1
   end 
 
+  XPC:BuildDeleteWindow()
+
   options:Hide()
+end
+
+function XPC:BuildDeleteWindow()
+  local main = XPC_GUI.main
+
+  main.delPosFrame = CreateFrame("Frame", nil, UIParent)
+  main.delPosFrame:SetPoint("CENTER")
+  main.delPosFrame:SetSize(300,120)
+  main.delPosFrame:SetFrameStrata("TOOLTIP")
+  main.del = CreateFrame("Frame", del, main.delPosFrame, "DialogBorderDarkTemplate")
+  local del = main.del
+  del:SetPoint("CENTER")
+
+  del.l1 = del:CreateFontString()
+  del.l1:SetFont("Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE")
+  del.l1:SetPoint("TOP", 0, -20)
+  del.l1:SetText('Delete Character Data?')
+  del.l2 = del:CreateFontString()
+  del.l2:SetFont("Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE")
+  del.l2:SetPoint("TOP", 0, -45)
+
+  del.deleteBtn = CreateFrame("Button", nil, del, "UIPanelButtonTemplate")
+  local deleteBtn = del.deleteBtn
+  deleteBtn:SetSize(100, 25)
+  deleteBtn:SetPoint("BOTTOMLEFT", 40, 20)
+  deleteBtn:SetText('Delete')
+  deleteBtn:SetScript("OnClick", function()
+    XPC.db.global.toons[XPC.currDeleteToon] = nil
+    print(XPC.currDeleteToon .. 'has been deleted')
+    XPC.currDeleteToon = nil
+    XPC.delTimer:Cancel()
+    del:Hide() 
+  end)
+
+  del.cancelBtn = CreateFrame("Button", nil, del, "UIPanelButtonTemplate")
+  local cancelBtn = del.cancelBtn
+  cancelBtn:SetSize(100, 25)
+  cancelBtn:SetPoint("BOTTOMRIGHT", -40, 20)
+  cancelBtn:SetText('Cancel')
+  cancelBtn:SetScript("OnClick", function()
+    XPC.currDeleteToon = nil
+    XPC.delTimer:Cancel()
+    del:Hide() 
+  end)
+
+  del:Hide()
 end
 
 -- max levels checkbox. perspective with max xp as height for the chart (shows progress out of full level 60 xp amount, 6,079,800)

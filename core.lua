@@ -72,7 +72,6 @@ function XPC:OnInitialize()
   icon:Register("XPChart", XPC_LDB, self.db.realm.minimap)
   -- self.db:ResetDB()
 
-  
   XPC:CreateVars()
 
   XPC:StartTimePlayedLoop()
@@ -106,6 +105,7 @@ function XPC:CreateVars()
   XPC.justLeveled = false
   XPC.justStartedFlightPath = false
   XPC.isAFK = false
+  XPC.currDeleteToon = nil
   for k,v in pairs(XPC.db.global.toons) do
     XPC.numOfToons = XPC.numOfToons + 1
   end
@@ -359,9 +359,6 @@ function XPC:ShowColorPicker(color, changedCallback)
   ColorPickerFrame:Hide(); -- Need to run the OnShow handler.
   ColorPickerFrame:Show();
 end
-
--- reset all data button
--- delete single character data
 
 -- change addon name to 'Level Stats'??? maybe
 
