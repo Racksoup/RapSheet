@@ -247,16 +247,11 @@ function XPC:CreateStatsData(level)
     timeAFK = 0,
     timeInCombat = 0,
     timePlayedAtLevel = 0,
-    xpFromQuests = 0,
-    xpFromMobs = 0,
+    XPFromQuests = 0,
+    XPFromMobs = 0,
     dungeonsEntered = 0,
     hearthstone = 0,
   }
-
-  -- creates not existent hearthstone data
-  -- if (toon.statsData[tostring(UnitLevel('player'))].hearthstone == nil) then
-  --   toon.statsData[tostring(UnitLevel('player'))].hearthstone = 0
-  -- end
   
   -- init statsData and its level objects
   if (XPC.justLeveled) then 

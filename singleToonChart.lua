@@ -173,8 +173,8 @@ function XPC:BuildSingleToon()
     timePlayedAtLevel = {},
     levelTime = {},
     xpPerHour = {},
-    xpFromQuests = {},
-    xpFromMobs = {},
+    XPFromQuests = {},
+    XPFromMobs = {},
     dungeons = {},
     killsPerHour = {},
     hearthstone = {},
@@ -235,7 +235,7 @@ function XPC:BuildSingleToon()
   chart.questsCompleted:SetText('Quests')
   chart.food = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.food:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.food:SetPoint("TOPLEFT", 487, -20)
+  chart.food:SetPoint("TOPLEFT", 486, -20)
   chart.food:SetText('Food')
   chart.drink = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.drink:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
@@ -259,7 +259,7 @@ function XPC:BuildSingleToon()
   chart.killsPerHour:SetText('Kills/Hour')
   chart.flightPaths = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.flightPaths:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.flightPaths:SetPoint("TOPLEFT", 964, -20)
+  chart.flightPaths:SetPoint("TOPLEFT", 962, -20)
   chart.flightPaths:SetText('Taxis')
   chart.hearthstone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.hearthstone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
@@ -267,11 +267,11 @@ function XPC:BuildSingleToon()
   chart.hearthstone:SetText('Hearthstones')
   chart.damageTaken = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.damageTaken:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.damageTaken:SetPoint("TOPLEFT", 1116, -20)
+  chart.damageTaken:SetPoint("TOPLEFT", 1117, -20)
   chart.damageTaken:SetText('Dmg In')
   chart.HealsGiven = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.HealsGiven:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.HealsGiven:SetPoint("TOPLEFT", 1190, -20)
+  chart.HealsGiven:SetPoint("TOPLEFT", 1188, -20)
   chart.HealsGiven:SetText('Heals Out')
   chart.HealsReceived = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.HealsReceived:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
@@ -279,29 +279,33 @@ function XPC:BuildSingleToon()
   chart.HealsReceived:SetText('Heals In')
   chart.TimeAFK = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.TimeAFK:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.TimeAFK:SetPoint("TOPLEFT", 1353, -20)
+  chart.TimeAFK:SetPoint("TOPLEFT", 1352, -20)
   chart.TimeAFK:SetText('Time AFK')
   chart.dungeons = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.dungeons:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.dungeons:SetPoint("TOPLEFT", 1433, -20)
+  chart.dungeons:SetPoint("TOPLEFT", 1429, -20)
   chart.dungeons:SetText('Dungeons')
   chart.potions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.potions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.potions:SetPoint("TOPLEFT", 1513, -20)
+  chart.potions:SetPoint("TOPLEFT", 1510, -20)
   chart.potions:SetText('Misc Pots')
   chart.healingPotions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.healingPotions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.healingPotions:SetPoint("TOPLEFT", 1593, -20)
+  chart.healingPotions:SetPoint("TOPLEFT", 1585, -20)
   chart.healingPotions:SetText('Health Pots')
   chart.manaPotions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.manaPotions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.manaPotions:SetPoint("TOPLEFT", 1673, -20)
+  chart.manaPotions:SetPoint("TOPLEFT", 1669, -20)
   chart.manaPotions:SetText('Mana Pots')
   chart.healingPotions:SetText('Health Pots')
   chart.MHPotions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.MHPotions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.MHPotions:SetPoint("TOPLEFT", 1753, -20)
+  chart.MHPotions:SetPoint("TOPLEFT", 1751, -20)
   chart.MHPotions:SetText('H/M Pots')
+  chart.XPFromMobs = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.XPFromMobs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.XPFromMobs:SetPoint("TOPLEFT", 1836, -20)
+  chart.XPFromMobs:SetText('Mob XP')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -733,6 +737,16 @@ function XPC:ShowSingleToonChart()
       MHPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
       MHPotionsFS:SetText(v.MHPotions) 
       table.insert(content.values.MHPotions, MHPotionsFrame)
+
+      -- Healing / Mana Potions
+      local XPFromMobsFrame = CreateFrame("Frame", nil, content)
+      XPFromMobsFrame:SetPoint("TOPLEFT", 1800, posY)
+      XPFromMobsFrame:SetSize(1,1)
+      local XPFromMobsFS = XPFromMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      XPFromMobsFS:SetPoint("CENTER")
+      XPFromMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      XPFromMobsFS:SetText(v.XPFromMobs) 
+      table.insert(content.values.XPFromMobs, XPFromMobsFrame)
       
 
     else
@@ -760,6 +774,7 @@ function XPC:ShowSingleToonChart()
   local totalHealingPotions = 0
   local totalManaPotions = 0
   local totalMHPotions = 0
+  local totalXPFromMobs = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -784,6 +799,7 @@ function XPC:ShowSingleToonChart()
     totalHealingPotions = totalHealingPotions + v.healingPotions
     totalManaPotions = totalManaPotions + v.manaPotions
     totalMHPotions = totalMHPotions + v.MHPotions
+    totalXPFromMobs = totalXPFromMobs + v.XPFromMobs
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -1016,6 +1032,16 @@ function XPC:ShowSingleToonChart()
   MHPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   MHPotionsFS:SetText(totalMHPotions) 
   table.insert(content.values.MHPotions, MHPotionsFrame)
+
+  -- Mob XP
+  local XPFromMobsFrame = CreateFrame("Frame", nil, content)
+  XPFromMobsFrame:SetPoint("TOPLEFT", 1800, -15)
+  XPFromMobsFrame:SetSize(1,1)
+  local XPFromMobsFS = XPFromMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  XPFromMobsFS:SetPoint("CENTER")
+  XPFromMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  XPFromMobsFS:SetText(totalXPFromMobs) 
+  table.insert(content.values.XPFromMobs, XPFromMobsFrame)
   
 
   chart:Show()
@@ -1177,8 +1203,16 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("TAXIMAP_CLOSED")
   tracker:RegisterEvent("CHAT_MSG_SYSTEM")
   tracker:RegisterEvent("PLAYER_ENTERING_WORLD")
+  tracker:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
+
+    -- Mob XP Tracker 
+    if (event == "CHAT_MSG_COMBAT_XP_GAIN") then
+      local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons = ...
+      local xp = string.match(text, "%d+")
+      stats.XPFromMobs = stats.XPFromMobs + xp
+    end
 
     -- Instance Tracker
     if (event == "PLAYER_ENTERING_WORLD") then
@@ -1238,7 +1272,6 @@ function XPC:StatsTracker()
 
       -- potions/elixirs/flasks
       if (sourceName == GetUnitName('player')) then
-        print(subevent, b)
         if (subevent == "SPELL_CAST_SUCCESS") then
           if (b == 'Restore Mana') then
             stats.manaPotions = stats.manaPotions + 1
@@ -1273,10 +1306,8 @@ function XPC:StatsTracker()
             end
           end
           if (isPot == true) then
-            print('Misc Potion Added!')
             stats.potions = stats.potions + 1
           end
-
         end
       end
 
