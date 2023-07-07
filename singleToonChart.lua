@@ -262,6 +262,10 @@ function XPC:BuildSingleToon()
   chart.hearthstone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.hearthstone:SetPoint("TOPLEFT", 1020, -20)
   chart.hearthstone:SetText('Hearthstones')
+  chart.damageTaken = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.damageTaken:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.damageTaken:SetPoint("TOPLEFT", 1106, -20)
+  chart.damageTaken:SetText('Dmg Taken')
 
 
   -- Vertical Seperator Lines
@@ -596,6 +600,16 @@ function XPC:ShowSingleToonChart()
       hearthstoneFS:SetText(v.hearthstone) 
       table.insert(content.values.hearthstone, hearthstoneFrame)
 
+      -- Damage Taken
+      local damageTakenFrame = CreateFrame("Frame", nil, content)
+      damageTakenFrame:SetPoint("TOPLEFT", 1080, posY)
+      damageTakenFrame:SetSize(1,1)
+      local damageTakenFS = damageTakenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      damageTakenFS:SetPoint("CENTER")
+      damageTakenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      damageTakenFS:SetText(v.damageTaken) 
+      table.insert(content.values.damageTaken, damageTakenFrame)
+
     else
       missedLevels = missedLevels + 1
     end
@@ -612,6 +626,7 @@ function XPC:ShowSingleToonChart()
   local totalDrink = 0
   local totalFlightPaths = 0
   local totalHearthstone = 0
+  local totalDamageTaken = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -627,6 +642,7 @@ function XPC:ShowSingleToonChart()
     totalDrink = totalDrink + v.drink
     totalFlightPaths = totalFlightPaths + v.flightPaths
     totalHearthstone = totalHearthstone + v.hearthstone
+    totalDamageTaken = totalDamageTaken + v.damageTaken
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -761,6 +777,16 @@ function XPC:ShowSingleToonChart()
   hearthstoneFS:SetText(totalHearthstone) 
   table.insert(content.values.hearthstone, hearthstoneFrame)
 
+  -- Damage Taken
+  local damageTakenFrame = CreateFrame("Frame", nil, content)
+  damageTakenFrame:SetPoint("TOPLEFT", 1080, -15)
+  damageTakenFrame:SetSize(1,1)
+  local damageTakenFS = damageTakenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  damageTakenFS:SetPoint("CENTER")
+  damageTakenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  damageTakenFS:SetText(totalDamageTaken) 
+  table.insert(content.values.damageTaken, damageTakenFrame)
+
   chart:Show()
 end
 
@@ -875,6 +901,22 @@ function XPC:StatsTracker()
         end
       end
 
+      -- damage taken tracker
+      if (destName == GetUnitName("player")) then
+        if (subevent == "SWING_DAMAGE" or subevent == "SPELL_DAMAGE" or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
+          local spellId, spellName, spellSchool
+          local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand
+
+          if subevent == "SWING_DAMAGE" then
+            amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          elseif (subevent == "SPELL_DAMAGE"  or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
+            spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          end
+
+          stats.damageTaken = stats.damageTaken + amount 
+        end
+      end
+
       -- kill tracker
       if (subevent == "PARTY_KILL") then
         if (IsInGroup() or IsInRaid()) then
@@ -918,7 +960,6 @@ end
 -- # of potions used
 -- # of heals given
 -- # of heals received
--- # of damage taken
 -- # of deaths
 -- # of pvp deaths
 -- # of duels won
@@ -931,3 +972,6 @@ end
 -- % of xp gained from quests
 -- % of xp gained from mobs
 -- # of dungeons entered
+-- raw gold looted
+-- gold vendored
+-- gold gained
