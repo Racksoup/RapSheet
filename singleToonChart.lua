@@ -420,11 +420,31 @@ function XPC:ShowSingleToonChart()
       timePlayedFrame:SetSize(1,1)
       local timePlayedFS = timePlayedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
       timePlayedFS:SetPoint("CENTER")
-      timePlayedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      timePlayedFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
       if (v.timePlayedAtLevel ~= 0) then
-        timePlayedFS:SetText(v.timePlayedAtLevel) 
+        local timex = v.timePlayedAtLevel
+        local days = math.floor(timex / 60 / 60 / 24) 
+        local hours = math.floor(timex / 60 / 60) % 24
+        local minutes = math.floor(timex / 60) % 60
+        local seconds = timex % 60
+        
+        if (days >= 1) then 
+          timePlayedFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+        else
+          timePlayedFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+        end
       else
-        timePlayedFS:SetText(toon.levelData[#toon.levelData].timePlayed) 
+        local timex = toon.levelData[#toon.levelData].timePlayed
+        local days = math.floor(timex / 60 / 60 / 24) 
+        local hours = math.floor(timex / 60 / 60) % 24
+        local minutes = math.floor(timex / 60) % 60
+        local seconds = timex % 60
+      
+        if (days >= 1) then 
+          timePlayedFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+        else
+          timePlayedFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+        end
       end
       table.insert(content.values.timePlayedAtLevel, timePlayedFrame)
 
@@ -531,8 +551,18 @@ function XPC:ShowSingleToonChart()
   timePlayedFrame:SetSize(1,1)
   local timePlayedFS = timePlayedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
   timePlayedFS:SetPoint("CENTER")
-  timePlayedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  timePlayedFS:SetText(toon.levelData[#toon.levelData].timePlayed) 
+  timePlayedFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+  local timex = toon.levelData[#toon.levelData].timePlayed
+  local days = math.floor(timex / 60 / 60 / 24) 
+  local hours = math.floor(timex / 60 / 60) % 24
+  local minutes = math.floor(timex / 60) % 60
+  local seconds = timex % 60
+
+  if (days >= 1) then 
+    timePlayedFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+  else
+    timePlayedFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+  end
   table.insert(content.values.timePlayedAtLevel, timePlayedFrame)
 
   chart:Show()
@@ -672,9 +702,9 @@ function XPC:StatsTracker()
   end)
 end
 
--- xp per hour
 -- time played at level
 -- total time played 
+-- xp per hour
 -- number of monsters killed per hour
 -- # of bandaids bandaged
 -- # of potions used
