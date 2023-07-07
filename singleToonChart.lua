@@ -174,6 +174,7 @@ function XPC:BuildSingleToon()
     xpFromMobs = {},
     dungeonsEntered = {},
     killsPerHour = {},
+    hearthstone = {},
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
@@ -257,6 +258,11 @@ function XPC:BuildSingleToon()
   chart.flightPaths:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.flightPaths:SetPoint("TOPLEFT", 964, -20)
   chart.flightPaths:SetText('Taxis')
+  chart.hearthstone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.hearthstone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.hearthstone:SetPoint("TOPLEFT", 1020, -20)
+  chart.hearthstone:SetText('Hearthstones')
+
 
   -- Vertical Seperator Lines
   local i = 1
@@ -580,6 +586,15 @@ function XPC:ShowSingleToonChart()
       flightPathsFS:SetText(v.flightPaths) 
       table.insert(content.values.flightPaths, flightPathsFrame)
 
+      -- Hearthstones
+      local hearthstoneFrame = CreateFrame("Frame", nil, content)
+      hearthstoneFrame:SetPoint("TOPLEFT", 1000, posY)
+      hearthstoneFrame:SetSize(1,1)
+      local hearthstoneFS = hearthstoneFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      hearthstoneFS:SetPoint("CENTER")
+      hearthstoneFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      hearthstoneFS:SetText(v.hearthstone) 
+      table.insert(content.values.hearthstone, hearthstoneFrame)
 
     else
       missedLevels = missedLevels + 1
@@ -596,6 +611,7 @@ function XPC:ShowSingleToonChart()
   local totalFood = 0
   local totalDrink = 0
   local totalFlightPaths = 0
+  local totalHearthstone = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -610,6 +626,7 @@ function XPC:ShowSingleToonChart()
     totalFood = totalFood + v.food
     totalDrink = totalDrink + v.drink
     totalFlightPaths = totalFlightPaths + v.flightPaths
+    totalHearthstone = totalHearthstone + v.hearthstone
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -733,6 +750,16 @@ function XPC:ShowSingleToonChart()
   flightPathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   flightPathsFS:SetText(totalFlightPaths) 
   table.insert(content.values.flightPaths, flightPathsFrame)
+
+  -- Hearthstones
+  local hearthstoneFrame = CreateFrame("Frame", nil, content)
+  hearthstoneFrame:SetPoint("TOPLEFT", 1000, -15)
+  hearthstoneFrame:SetSize(1,1)
+  local hearthstoneFS = hearthstoneFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  hearthstoneFS:SetPoint("CENTER")
+  hearthstoneFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  hearthstoneFS:SetText(totalHearthstone) 
+  table.insert(content.values.hearthstone, hearthstoneFrame)
 
   chart:Show()
 end
@@ -878,6 +905,10 @@ function XPC:StatsTracker()
             stats.drink = stats.drink + 1
           end
         end
+        -- hearthstone
+        if (spellID == 8690) then
+          stats.hearthstone = stats.hearthstone + 1
+        end
       end
     end
   end)
@@ -900,4 +931,3 @@ end
 -- % of xp gained from quests
 -- % of xp gained from mobs
 -- # of dungeons entered
--- hearthstone
