@@ -168,10 +168,10 @@ function XPC:BuildSingleToon()
     timeAFK = {},
     timeInCombat = {},
     timePlayedAtLevel = {},
-    totalTimePlayedWhenLeveled = {},
+    levelTime = {},
     xpFromQuests = {},
     xpFromMobs = {},
-    dungeonsEntered = {}
+    dungeonsEntered = {},
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
@@ -237,8 +237,12 @@ function XPC:BuildSingleToon()
   chart.drink:SetText('Drink')
   chart.timePlayedAtLevel = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.timePlayedAtLevel:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.timePlayedAtLevel:SetPoint("TOPLEFT", 623, -20)
+  chart.timePlayedAtLevel:SetPoint("TOPLEFT", 622, -20)
   chart.timePlayedAtLevel:SetText('Time Played')
+  chart.levelTime = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.levelTime:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.levelTime:SetPoint("TOPLEFT", 708, -20)
+  chart.levelTime:SetText('Level Time')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -266,12 +270,7 @@ function XPC:ShowSingleToonChart()
   local toon = XPC.db.global.toons[XPC.currSingleToon]
   local levelData = toon.levelData
   local level = 1
-  -- remove if not having error on first time loging on to character
-  -- if (#levelData == 0) then
-  --   level = UnitLevel('player')
-  -- else
-  --   level = levelData[#levelData].level
-  -- end
+
   level = levelData[#levelData].level
   XPC_GUI.main.single:Show()
   single.vSlider:Show()
@@ -447,6 +446,49 @@ function XPC:ShowSingleToonChart()
         end
       end
       table.insert(content.values.timePlayedAtLevel, timePlayedFrame)
+
+      -- Level Time
+      local levelTimeFrame = CreateFrame("Frame", nil, content)
+      levelTimeFrame:SetPoint("TOPLEFT", 680, posY)
+      levelTimeFrame:SetSize(1,1)
+      local levelTimeFS = levelTimeFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      levelTimeFS:SetPoint("CENTER")
+      levelTimeFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      if (
+      v.timePlayedAtLevel ~= 0 and 
+      toon.statsData[tostring(i -1)] ~= nil and 
+      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= nil and 
+      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= 0) then
+        local t1 = v.timePlayedAtLevel
+        local t2 = toon.statsData[tostring(i -1)].timePlayedAtLevel
+        local timex = t1 - t2
+        local days = math.floor(timex / 60 / 60 / 24) 
+        local hours = math.floor(timex / 60 / 60) % 24
+        local minutes = math.floor(timex / 60) % 60
+        local seconds = timex % 60
+        if (days >= 1) then 
+          levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+        else
+          levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+        end
+      elseif (
+      toon.statsData[tostring(i -1)] ~= nil and 
+      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= nil and 
+      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= 0) then
+        local t2 = toon.statsData[tostring(i -1)].timePlayedAtLevel
+        local t3 = toon.levelData[#toon.levelData].timePlayed
+        local timex = t3 - t2
+        local days = math.floor(timex / 60 / 60 / 24) 
+        local hours = math.floor(timex / 60 / 60) % 24
+        local minutes = math.floor(timex / 60) % 60
+        local seconds = timex % 60
+        if (days >= 1) then 
+          levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+        else
+          levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+        end
+      end
+      table.insert(content.values.levelTime, levelTimeFrame)
 
     else
       missedLevels = missedLevels + 1
@@ -702,8 +744,6 @@ function XPC:StatsTracker()
   end)
 end
 
--- time played at level
--- total time played 
 -- xp per hour
 -- number of monsters killed per hour
 -- # of bandaids bandaged

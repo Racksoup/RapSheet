@@ -75,15 +75,6 @@ function XPC:OnInitialize()
   
   XPC:CreateVars()
 
-  -- for k,v in pairs(XPC.db.global.toons[XPC.currToonName].statsData) do
-  --   print('Level', k)
-  --   for q,w in pairs(v) do
-  --     if (q == 'damageDealt' or q == 'monstersKilledSolo' or q == 'questsCompleted') then
-  --       print(q,w)
-  --     end
-  --   end
-  -- end
-  
   XPC:StartTimePlayedLoop()
   XPC:StatsTracker()
 
@@ -249,7 +240,6 @@ function XPC:CreateStatsData(level)
     timeAFK = 0,
     timeInCombat = 0,
     timePlayedAtLevel = 0,
-    totalTimePlayedWhenLeveled = 0,
     xpFromQuests = 0,
     xpFromMobs = 0,
     dungeonsEntered = 0
