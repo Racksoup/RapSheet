@@ -157,6 +157,9 @@ function XPC:BuildSingleToon()
     drink = {},
     bandages = {},
     potions = {},
+    healingPotions = {},
+    manaPotions = {},
+    MHPotions = {},
     healsGiven = {},
     healsReceived = {},
     deaths = {},
@@ -282,6 +285,23 @@ function XPC:BuildSingleToon()
   chart.dungeons:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.dungeons:SetPoint("TOPLEFT", 1433, -20)
   chart.dungeons:SetText('Dungeons')
+  chart.potions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.potions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.potions:SetPoint("TOPLEFT", 1513, -20)
+  chart.potions:SetText('Misc Pots')
+  chart.healingPotions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.healingPotions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.healingPotions:SetPoint("TOPLEFT", 1593, -20)
+  chart.healingPotions:SetText('Health Pots')
+  chart.manaPotions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.manaPotions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.manaPotions:SetPoint("TOPLEFT", 1673, -20)
+  chart.manaPotions:SetText('Mana Pots')
+  chart.healingPotions:SetText('Health Pots')
+  chart.MHPotions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.MHPotions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.MHPotions:SetPoint("TOPLEFT", 1753, -20)
+  chart.MHPotions:SetText('H/M Pots')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -673,6 +693,46 @@ function XPC:ShowSingleToonChart()
       dungeonsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
       dungeonsFS:SetText(v.dungeonsEntered) 
       table.insert(content.values.dungeons, dungeonsFrame)
+
+      -- Potions
+      local potionsFrame = CreateFrame("Frame", nil, content)
+      potionsFrame:SetPoint("TOPLEFT", 1480, posY)
+      potionsFrame:SetSize(1,1)
+      local potionsFS = potionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      potionsFS:SetPoint("CENTER")
+      potionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      potionsFS:SetText(v.potions) 
+      table.insert(content.values.potions, potionsFrame)
+
+      -- Healing Potions
+      local healingPotionsFrame = CreateFrame("Frame", nil, content)
+      healingPotionsFrame:SetPoint("TOPLEFT", 1560, posY)
+      healingPotionsFrame:SetSize(1,1)
+      local healingPotionsFS = healingPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      healingPotionsFS:SetPoint("CENTER")
+      healingPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      healingPotionsFS:SetText(v.healingPotions) 
+      table.insert(content.values.healingPotions, healingPotionsFrame)
+
+      -- Mana Potions
+      local manaPotionsFrame = CreateFrame("Frame", nil, content)
+      manaPotionsFrame:SetPoint("TOPLEFT", 1640, posY)
+      manaPotionsFrame:SetSize(1,1)
+      local manaPotionsFS = manaPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      manaPotionsFS:SetPoint("CENTER")
+      manaPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      manaPotionsFS:SetText(v.manaPotions) 
+      table.insert(content.values.manaPotions, manaPotionsFrame)
+
+      -- Healing / Mana Potions
+      local MHPotionsFrame = CreateFrame("Frame", nil, content)
+      MHPotionsFrame:SetPoint("TOPLEFT", 1720, posY)
+      MHPotionsFrame:SetSize(1,1)
+      local MHPotionsFS = MHPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      MHPotionsFS:SetPoint("CENTER")
+      MHPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      MHPotionsFS:SetText(v.MHPotions) 
+      table.insert(content.values.MHPotions, MHPotionsFrame)
       
 
     else
@@ -696,6 +756,10 @@ function XPC:ShowSingleToonChart()
   local totalHealsReceived = 0
   local totalTimeAFK = 0
   local totalDungeons = 0
+  local totalPotions = 0
+  local totalHealingPotions = 0
+  local totalManaPotions = 0
+  local totalMHPotions = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -716,6 +780,10 @@ function XPC:ShowSingleToonChart()
     totalHealsReceived = totalHealsReceived + v.healsReceived
     totalTimeAFK = totalTimeAFK + v.timeAFK
     totalDungeons = totalDungeons + v.dungeonsEntered
+    totalPotions = totalPotions + v.potions
+    totalHealingPotions = totalHealingPotions + v.healingPotions
+    totalManaPotions = totalManaPotions + v.manaPotions
+    totalMHPotions = totalMHPotions + v.MHPotions
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -908,6 +976,46 @@ function XPC:ShowSingleToonChart()
   dungeonsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   dungeonsFS:SetText(totalDungeons) 
   table.insert(content.values.dungeons, dungeonsFrame)
+
+  -- Potions
+  local potionsFrame = CreateFrame("Frame", nil, content)
+  potionsFrame:SetPoint("TOPLEFT", 1480, -15)
+  potionsFrame:SetSize(1,1)
+  local potionsFS = potionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  potionsFS:SetPoint("CENTER")
+  potionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  potionsFS:SetText(totalPotions) 
+  table.insert(content.values.potions, potionsFrame)
+
+  -- Healing Potions
+  local healingPotionsFrame = CreateFrame("Frame", nil, content)
+  healingPotionsFrame:SetPoint("TOPLEFT", 1560, -15)
+  healingPotionsFrame:SetSize(1,1)
+  local healingPotionsFS = healingPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  healingPotionsFS:SetPoint("CENTER")
+  healingPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  healingPotionsFS:SetText(totalHealingPotions) 
+  table.insert(content.values.healingPotions, healingPotionsFrame)
+
+  -- Mana Potions
+  local manaPotionsFrame = CreateFrame("Frame", nil, content)
+  manaPotionsFrame:SetPoint("TOPLEFT", 1640, -15)
+  manaPotionsFrame:SetSize(1,1)
+  local manaPotionsFS = manaPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  manaPotionsFS:SetPoint("CENTER")
+  manaPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  manaPotionsFS:SetText(totalManaPotions) 
+  table.insert(content.values.manaPotions, manaPotionsFrame)
+
+  -- Mana/Healing Potions
+  local MHPotionsFrame = CreateFrame("Frame", nil, content)
+  MHPotionsFrame:SetPoint("TOPLEFT", 1720, -15)
+  MHPotionsFrame:SetSize(1,1)
+  local MHPotionsFS = MHPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  MHPotionsFS:SetPoint("CENTER")
+  MHPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  MHPotionsFS:SetText(totalMHPotions) 
+  table.insert(content.values.MHPotions, MHPotionsFrame)
   
 
   chart:Show()
@@ -977,6 +1085,89 @@ function XPC:StatsTracker()
   local stats = XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player'))]
   local foods = {25691, 25690, 25692, 25693, 24707, 29029, 434, 18229, 10257, 22731, 25695, 25700, 26401, 26260, 26472, 29008, 1131, 435, 18231, 18232, 18234, 24869, 6410, 28616, 25886, 433, 7737, 2639, 10256, 24800, 1127, 1129, 25660, 5006, 5005, 5007, 18233, 24005, 5004, 18230, 29073}
   local drinks = {25691, 25690, 25692, 25693, 24707, 29029, 430, 24355, 1135, 26475, 22734, 1133, 432, 1137, 26473, 10250, 25696, 26261, 29007}
+  local potions = {9030,5634,13444,13457,5816,929,13446,3823,13443,3387,2459,13442,9172,20008,6149,3928,1710,6049,3827,6372,5633,13461,13455,858,9144,13462,3385,13459,6048,5631,13458,118,2455,13506,12190,18253,23579,20002,13456,4623,6052,3386,2456,6051,5632,13460,6050,18841,4596,23578,18839,1450,17348,3087,17351,17349,23696,23698,17352}
+  local elixirs = {9155,10592,8949,13453,3389,9224,9233,3828,9154,9197,6373,3825,17708,6662,9206,9187,8951,21546,9179,18294,3390,2454,2457,5997,2458,3391,9264,13445,13452,13447,5996,8827,3383,9088,13454,20007,3826,20004,3388,3382}
+  local flasks = {13510,13512,13511,13506,13513}
+  local potionBuffNames = {
+    "Free Action",
+    "Noggenfogger Elixir",
+    "Fire Protection",
+    "Nature Protection",
+    "Shadow Protection",
+    "Frost Protection",
+    "Holy Protection",
+    "Arcane Protection",
+    "Restoration",
+    "Mana Regeneration",
+    "Speed",
+    "Swim Speed",
+    "Regeneration",
+    "Greater Stoneshield",
+    "Stoneshield",
+    "Invulnerability",
+    "Lesser Invisibility",
+    "Invisibility",
+    "Resistance",
+    "Living Free Action",
+    "Spirit of Boar",
+    "Rage of Ages",
+    "Strike of the Scorpok",
+    "Spiritual Domination",
+    "Infallible Mind",
+    "Greater Dreamless Sleep",
+    "Dreamless Sleep",
+    "Purification",
+  }
+  local scrollBuffNames = {
+    "Armor",
+    "Spirit",
+    "Intellect",
+    "Agility",
+    "Stamina",
+    "Strength",
+  }
+  local elixirBuffNames = {
+    "Arcane Elixir",
+    "Greater Arcane Elixir",
+    "Shadow Power",
+    "Fire Power",
+    "Greater Fire Power",
+    "Frost Power",
+    "Elixir of the Mongoose",
+    "Elixir of the Giants",
+    "Elixir of Brute Force",
+    "Elixir of the Sages",
+    "Elixir of Demonslaying",
+    "Agility",
+    "Minor Agility",
+    "Lesser Agility",
+    "Greater Agility",
+    "Health",
+    "Health II",
+    "Lesser Intellect",
+    "Greater Intellect",
+    "Enlarge",
+    "Strength",
+    "Lesser Strength",
+    "Armor",
+    "Lesser Armor",
+    "Greater Armor",
+    "Cure Poison",
+    "Water Breathing",
+    "Greater Water Breathing",
+    "Detect Undead",
+    "Posion Resistance",
+    "Detect Lesser Invisibility",
+    "Detect Demon",
+    "Stealth Detection"
+  }
+  local flaskBuffNames = {
+    "Supreme Power",
+    "Flask of the Titans",
+    "Flask of Chromatic Resistance",
+    "Distilled Wisdom",
+    "Petrification",
+  }
   local timeAFK = 0
 
   tracker:RegisterEvent("PLAYER_LEVEL_UP")
@@ -1044,6 +1235,51 @@ function XPC:StatsTracker()
     
     if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
       local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, a, b, c, d, e, f, g, h, i, j, k = CombatLogGetCurrentEventInfo()
+
+      -- potions/elixirs/flasks
+      if (sourceName == GetUnitName('player')) then
+        print(subevent, b)
+        if (subevent == "SPELL_CAST_SUCCESS") then
+          if (b == 'Restore Mana') then
+            stats.manaPotions = stats.manaPotions + 1
+          end
+          if (b == 'Healing Potion') then
+            stats.healingPotions = stats.healingPotions + 1
+          end
+          if (b == 'Wildvine Potion' or b == 'Rejuvenation Potion') then
+            stats.MHPotions = stats.MHPotions + 1
+          end
+        end
+        if (subevent == "SPELL_CAST_SUCCESS") then
+          local isPot = false
+          for i,v in ipairs(potionBuffNames) do
+            if (b == v) then
+              isPot = true
+            end
+          end
+          for i,v in ipairs(elixirBuffNames) do
+            if (b == v) then
+              isPot = true
+            end
+          end
+          for i,v in ipairs(flaskBuffNames) do
+            if (b == v) then
+              isPot = true
+            end
+          end
+          for i,v in ipairs(scrollBuffNames) do
+            if (b == v) then
+              isPot = true
+            end
+          end
+          if (isPot == true) then
+            print('Misc Potion Added!')
+            stats.potions = stats.potions + 1
+          end
+
+        end
+      end
+
       -- damage dealt tracker
       if (sourceName == GetUnitName("player")) then
         if (subevent == "SWING_DAMAGE" or subevent == "SPELL_DAMAGE" or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
@@ -1152,7 +1388,8 @@ end
 -- gold vendored
 -- gold gained
 -- # of bandaids bandaged
--- # of potions used
+-- buffs given
+-- buffs received
 -- # of deaths
 -- # of pvp deaths
 -- # of duels won

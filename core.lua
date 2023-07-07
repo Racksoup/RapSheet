@@ -233,6 +233,9 @@ function XPC:CreateStatsData(level)
     drink = 0,
     bandages = 0,
     potions = 0,
+    healingPotions = 0,
+    manaPotions = 0,
+    MHPotions = 0,
     healsGiven = 0,
     healsRecieved = 0,
     deaths = 0,
@@ -359,6 +362,8 @@ function XPC:ShowColorPicker(color, changedCallback)
   ColorPickerFrame:Hide(); -- Need to run the OnShow handler.
   ColorPickerFrame:Show();
 end
+
+-- make sure addon opens for level 60s 
 
 -- change addon name to 'Level Stats'??? maybe
 
