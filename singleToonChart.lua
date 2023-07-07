@@ -253,6 +253,10 @@ function XPC:BuildSingleToon()
   chart.killsPerHour:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.killsPerHour:SetPoint("TOPLEFT", 870, -20)
   chart.killsPerHour:SetText('Kills/Hour')
+  chart.flightPaths = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.flightPaths:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.flightPaths:SetPoint("TOPLEFT", 964, -20)
+  chart.flightPaths:SetText('Taxis')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -460,7 +464,7 @@ function XPC:ShowSingleToonChart()
       levelTimeFrame:SetSize(1,1)
       local levelTimeFS = levelTimeFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
       levelTimeFS:SetPoint("CENTER")
-      levelTimeFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      levelTimeFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
       local levelTime = 0
       if (
       v.timePlayedAtLevel ~= 0 and 
@@ -566,6 +570,17 @@ function XPC:ShowSingleToonChart()
         table.insert(content.values.killsPerHour, killsPerHourFrame) 
       end
 
+      -- Flight Paths 
+      local flightPathsFrame = CreateFrame("Frame", nil, content)
+      flightPathsFrame:SetPoint("TOPLEFT", 920, posY)
+      flightPathsFrame:SetSize(1,1)
+      local flightPathsFS = flightPathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      flightPathsFS:SetPoint("CENTER")
+      flightPathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      flightPathsFS:SetText(v.flightPaths) 
+      table.insert(content.values.flightPaths, flightPathsFrame)
+
+
     else
       missedLevels = missedLevels + 1
     end
@@ -580,6 +595,7 @@ function XPC:ShowSingleToonChart()
   local totalQuestsCompleted = 0
   local totalFood = 0
   local totalDrink = 0
+  local totalFlightPaths = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -593,6 +609,7 @@ function XPC:ShowSingleToonChart()
     totalQuestsCompleted = totalQuestsCompleted + v.questsCompleted
     totalFood = totalFood + v.food
     totalDrink = totalDrink + v.drink
+    totalFlightPaths = totalFlightPaths + v.flightPaths
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -695,7 +712,7 @@ function XPC:ShowSingleToonChart()
   xpPerHourFS:SetText(xpPerHour .. '/h') 
   table.insert(content.values.xpPerHour, xpPerHourFrame)
 
-  -- XP Per Hour
+  -- Kills Per Hour
   local killsPerHourFrame = CreateFrame("Frame", nil, content)
   killsPerHourFrame:SetPoint("TOPLEFT", 840, -15)
   killsPerHourFrame:SetSize(1,1)
@@ -706,6 +723,16 @@ function XPC:ShowSingleToonChart()
   local killsPerHour = math.floor((totalMonstersKilledInGroup + totalMonstersKilledSolo) / (timePlayed / 60 / 60) * 10) / 10
   killsPerHourFS:SetText(killsPerHour .. '/h') 
   table.insert(content.values.killsPerHour, killsPerHourFrame)
+
+  -- Flight Paths
+  local flightPathsFrame = CreateFrame("Frame", nil, content)
+  flightPathsFrame:SetPoint("TOPLEFT", 920, -15)
+  flightPathsFrame:SetSize(1,1)
+  local flightPathsFS = flightPathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  flightPathsFS:SetPoint("CENTER")
+  flightPathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  flightPathsFS:SetText(totalFlightPaths) 
+  table.insert(content.values.flightPaths, flightPathsFrame)
 
   chart:Show()
 end
@@ -779,9 +806,21 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
   tracker:RegisterEvent("QUEST_COMPLETE")
   tracker:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+  tracker:RegisterEvent("TAXIMAP_CLOSED")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
     
+    -- taxi tracker
+    if (event == "TAXIMAP_CLOSED" and XPC.justStartedFlightPath == false) then
+      XPC.justStartedFlightPath = true
+      C_Timer.After(5, function() XPC.justStartedFlightPath = false end)
+      C_Timer.After(1, function() 
+        if (UnitOnTaxi('player')) then
+          stats.flightPaths = stats.flightPaths + 1
+        end
+      end)
+    end
+
     -- level up tracker
     if (event == "PLAYER_LEVEL_UP") then 
       local level, healthDelta, powerDelta, numNewTalents, numNewPvpTalentSlots, strengthDelta, agilityDelta, staminaDelta, intellectDelta = ...
@@ -854,7 +893,6 @@ end
 -- # of duels won
 -- # of duels lost
 -- # of hk's
--- # of flight paths taken
 -- time on flight paths
 -- time afk
 -- time in combat
