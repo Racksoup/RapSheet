@@ -1040,10 +1040,12 @@ function XPC:StatsTracker()
   end)
 end
 
+-- # of dungeons entered
+-- raw gold looted
+-- gold vendored
+-- gold gained
 -- # of bandaids bandaged
 -- # of potions used
--- # of heals given
--- # of heals received
 -- # of deaths
 -- # of pvp deaths
 -- # of duels won
@@ -1053,9 +1055,7 @@ end
 -- time afk
 -- time in combat
 -- % of time in combat
+-- xp gained from quests
+-- xp gained from mobs
 -- % of xp gained from quests
 -- % of xp gained from mobs
--- # of dungeons entered
--- raw gold looted
--- gold vendored
--- gold gained
