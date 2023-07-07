@@ -173,6 +173,7 @@ function XPC:BuildSingleToon()
     xpFromQuests = {},
     xpFromMobs = {},
     dungeonsEntered = {},
+    killsPerHour = {},
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
@@ -230,11 +231,11 @@ function XPC:BuildSingleToon()
   chart.questsCompleted:SetText('Quests')
   chart.food = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.food:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.food:SetPoint("TOPLEFT", 479, -20)
+  chart.food:SetPoint("TOPLEFT", 487, -20)
   chart.food:SetText('Food')
   chart.drink = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.drink:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.drink:SetPoint("TOPLEFT", 559, -20)
+  chart.drink:SetPoint("TOPLEFT", 564, -20)
   chart.drink:SetText('Drink')
   chart.timePlayedAtLevel = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.timePlayedAtLevel:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
@@ -247,7 +248,11 @@ function XPC:BuildSingleToon()
   chart.xpPerHour = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.xpPerHour:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.xpPerHour:SetPoint("TOPLEFT", 796, -20)
-  chart.xpPerHour:SetText('XP Hour')
+  chart.xpPerHour:SetText('XP/Hour')
+  chart.killsPerHour = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.killsPerHour:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.killsPerHour:SetPoint("TOPLEFT", 870, -20)
+  chart.killsPerHour:SetText('Kills/Hour')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -261,7 +266,6 @@ function XPC:BuildSingleToon()
 
     i = i + 1
   end
-
 
   XPC:BuildChooseToon()
 
@@ -538,6 +542,30 @@ function XPC:ShowSingleToonChart()
         table.insert(content.values.xpPerHour, xpPerHourFrame)
       end
 
+      -- Kills Per Hour
+      if (levelTime ~= 0) then 
+        local killsPerHourFrame = CreateFrame("Frame", nil, content)
+        killsPerHourFrame:SetPoint("TOPLEFT", 840, posY)
+        killsPerHourFrame:SetSize(1,1)
+        local killsPerHourFS = killsPerHourFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        killsPerHourFS:SetPoint("CENTER")
+        killsPerHourFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        local killsPerHour = math.floor((v.monstersKilledInGroup + v.monstersKilledSolo) / (levelTime / 60 / 60) * 10) / 10
+        killsPerHourFS:SetText(killsPerHour .. '/h') 
+        table.insert(content.values.killsPerHour, killsPerHourFrame)
+      end
+      if (i == 1 and v.timePlayedAtLevel ~= 0) then 
+        local killsPerHourFrame = CreateFrame("Frame", nil, content)
+        killsPerHourFrame:SetPoint("TOPLEFT", 840, posY)
+        killsPerHourFrame:SetSize(1,1)
+        local killsPerHourFS = killsPerHourFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        killsPerHourFS:SetPoint("CENTER")
+        killsPerHourFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        local killsPerHour = math.floor((v.monstersKilledInGroup + v.monstersKilledSolo) / (v.timePlayedAtLevel / 60 / 60) * 10) / 10
+        killsPerHourFS:SetText(killsPerHour .. '/h') 
+        table.insert(content.values.killsPerHour, killsPerHourFrame) 
+      end
+
     else
       missedLevels = missedLevels + 1
     end
@@ -663,10 +691,21 @@ function XPC:ShowSingleToonChart()
   xpPerHourFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   local timePlayed = toon.levelData[#toon.levelData].timePlayed
   local totalXP = toon.levelData[#toon.levelData].totalXP
-  print(timePlayed, totalXP)
   local xpPerHour = math.floor(totalXP / (timePlayed / 60 / 60))
   xpPerHourFS:SetText(xpPerHour .. '/h') 
   table.insert(content.values.xpPerHour, xpPerHourFrame)
+
+  -- XP Per Hour
+  local killsPerHourFrame = CreateFrame("Frame", nil, content)
+  killsPerHourFrame:SetPoint("TOPLEFT", 840, -15)
+  killsPerHourFrame:SetSize(1,1)
+  local killsPerHourFS = killsPerHourFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  killsPerHourFS:SetPoint("CENTER")
+  killsPerHourFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  local timePlayed = toon.levelData[#toon.levelData].timePlayed
+  local killsPerHour = math.floor((totalMonstersKilledInGroup + totalMonstersKilledSolo) / (timePlayed / 60 / 60) * 10) / 10
+  killsPerHourFS:SetText(killsPerHour .. '/h') 
+  table.insert(content.values.killsPerHour, killsPerHourFrame)
 
   chart:Show()
 end
@@ -805,8 +844,6 @@ function XPC:StatsTracker()
   end)
 end
 
--- xp per hour
--- number of monsters killed per hour
 -- # of bandaids bandaged
 -- # of potions used
 -- # of heals given
