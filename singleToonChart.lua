@@ -169,6 +169,7 @@ function XPC:BuildSingleToon()
     timeInCombat = {},
     timePlayedAtLevel = {},
     levelTime = {},
+    xpPerHour = {},
     xpFromQuests = {},
     xpFromMobs = {},
     dungeonsEntered = {},
@@ -243,6 +244,10 @@ function XPC:BuildSingleToon()
   chart.levelTime:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.levelTime:SetPoint("TOPLEFT", 708, -20)
   chart.levelTime:SetText('Level Time')
+  chart.xpPerHour = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.xpPerHour:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.xpPerHour:SetPoint("TOPLEFT", 796, -20)
+  chart.xpPerHour:SetText('XP Hour')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -426,7 +431,6 @@ function XPC:ShowSingleToonChart()
         local hours = math.floor(timex / 60 / 60) % 24
         local minutes = math.floor(timex / 60) % 60
         local seconds = timex % 60
-        
         if (days >= 1) then 
           timePlayedFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
         else
@@ -438,7 +442,6 @@ function XPC:ShowSingleToonChart()
         local hours = math.floor(timex / 60 / 60) % 24
         local minutes = math.floor(timex / 60) % 60
         local seconds = timex % 60
-      
         if (days >= 1) then 
           timePlayedFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
         else
@@ -454,6 +457,7 @@ function XPC:ShowSingleToonChart()
       local levelTimeFS = levelTimeFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
       levelTimeFS:SetPoint("CENTER")
       levelTimeFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      local levelTime = 0
       if (
       v.timePlayedAtLevel ~= 0 and 
       toon.statsData[tostring(i -1)] ~= nil and 
@@ -462,6 +466,7 @@ function XPC:ShowSingleToonChart()
         local t1 = v.timePlayedAtLevel
         local t2 = toon.statsData[tostring(i -1)].timePlayedAtLevel
         local timex = t1 - t2
+        levelTime = timex
         local days = math.floor(timex / 60 / 60 / 24) 
         local hours = math.floor(timex / 60 / 60) % 24
         local minutes = math.floor(timex / 60) % 60
@@ -478,6 +483,7 @@ function XPC:ShowSingleToonChart()
         local t2 = toon.statsData[tostring(i -1)].timePlayedAtLevel
         local t3 = toon.levelData[#toon.levelData].timePlayed
         local timex = t3 - t2
+        levelTime = timex
         local days = math.floor(timex / 60 / 60 / 24) 
         local hours = math.floor(timex / 60 / 60) % 24
         local minutes = math.floor(timex / 60) % 60
@@ -487,8 +493,50 @@ function XPC:ShowSingleToonChart()
         else
           levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
         end
+      elseif (
+      i == 1 and
+      v.timePlayedAtLevel ~= 0) then
+        local timex = v.timePlayedAtLevel
+        local days = math.floor(timex / 60 / 60 / 24) 
+        local hours = math.floor(timex / 60 / 60) % 24
+        local minutes = math.floor(timex / 60) % 60
+        local seconds = timex % 60  
+        if (days >= 1) then 
+          levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+        else
+          levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+        end
       end
       table.insert(content.values.levelTime, levelTimeFrame)
+
+      -- XP per hour
+      if (levelTime ~= 0) then
+        local xpPerHourFrame = CreateFrame("Frame", nil, content)
+        xpPerHourFrame:SetPoint("TOPLEFT", 760, posY)
+        xpPerHourFrame:SetSize(1,1)
+        local xpPerHourFS = xpPerHourFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        xpPerHourFS:SetPoint("CENTER")
+        xpPerHourFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        local xpPerHour = 0
+        if (i == UnitLevel('player')) then
+          xpPerHour = math.floor(toon.levelData[#toon.levelData].XPGainedThisLevel / (levelTime / 60 / 60))
+        else
+          xpPerHour = math.floor(XPC.levelChart[i] / (levelTime / 60 / 60))
+        end
+        xpPerHourFS:SetText(xpPerHour .. '/h') 
+        table.insert(content.values.xpPerHour, xpPerHourFrame)
+      end
+      if (i == 1 and v.timePlayedAtLevel ~= 0) then
+        local xpPerHourFrame = CreateFrame("Frame", nil, content)
+        xpPerHourFrame:SetPoint("TOPLEFT", 760, posY)
+        xpPerHourFrame:SetSize(1,1)
+        local xpPerHourFS = xpPerHourFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        xpPerHourFS:SetPoint("CENTER")
+        xpPerHourFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        local xpPerHour = math.floor(XPC.levelChart[i] / (v.timePlayedAtLevel / 60 / 60))
+        xpPerHourFS:SetText(xpPerHour .. '/h') 
+        table.insert(content.values.xpPerHour, xpPerHourFrame)
+      end
 
     else
       missedLevels = missedLevels + 1
@@ -599,13 +647,26 @@ function XPC:ShowSingleToonChart()
   local hours = math.floor(timex / 60 / 60) % 24
   local minutes = math.floor(timex / 60) % 60
   local seconds = timex % 60
-
   if (days >= 1) then 
     timePlayedFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
   else
     timePlayedFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
   end
   table.insert(content.values.timePlayedAtLevel, timePlayedFrame)
+
+  -- XP Per Hour
+  local xpPerHourFrame = CreateFrame("Frame", nil, content)
+  xpPerHourFrame:SetPoint("TOPLEFT", 760, -15)
+  xpPerHourFrame:SetSize(1,1)
+  local xpPerHourFS = xpPerHourFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  xpPerHourFS:SetPoint("CENTER")
+  xpPerHourFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  local timePlayed = toon.levelData[#toon.levelData].timePlayed
+  local totalXP = toon.levelData[#toon.levelData].totalXP
+  print(timePlayed, totalXP)
+  local xpPerHour = math.floor(totalXP / (timePlayed / 60 / 60))
+  xpPerHourFS:SetText(xpPerHour .. '/h') 
+  table.insert(content.values.xpPerHour, xpPerHourFrame)
 
   chart:Show()
 end
