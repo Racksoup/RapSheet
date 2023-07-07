@@ -223,6 +223,8 @@ function XPC:CreateStatsData(level)
   local statList = {
     damageDealt = 0,
     damageTaken = 0,
+    healsGiven = 0,
+    healsReceived = 0,
     monstersKilledSolo = 0,
     monstersKilledInGroup = 0,
     questsCompleted = 0,

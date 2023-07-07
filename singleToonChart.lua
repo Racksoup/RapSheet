@@ -158,7 +158,7 @@ function XPC:BuildSingleToon()
     bandages = {},
     potions = {},
     healsGiven = {},
-    healsRecieved = {},
+    healsReceived = {},
     deaths = {},
     pvpDeaths = {},
     duelsWon = {},
@@ -264,8 +264,16 @@ function XPC:BuildSingleToon()
   chart.hearthstone:SetText('Hearthstones')
   chart.damageTaken = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.damageTaken:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.damageTaken:SetPoint("TOPLEFT", 1106, -20)
-  chart.damageTaken:SetText('Dmg Taken')
+  chart.damageTaken:SetPoint("TOPLEFT", 1116, -20)
+  chart.damageTaken:SetText('Dmg In')
+  chart.HealsGiven = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.HealsGiven:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.HealsGiven:SetPoint("TOPLEFT", 1190, -20)
+  chart.HealsGiven:SetText('Heals Out')
+  chart.HealsReceived = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.HealsReceived:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.HealsReceived:SetPoint("TOPLEFT", 1276, -20)
+  chart.HealsReceived:SetText('Heals In')
 
 
   -- Vertical Seperator Lines
@@ -610,6 +618,26 @@ function XPC:ShowSingleToonChart()
       damageTakenFS:SetText(v.damageTaken) 
       table.insert(content.values.damageTaken, damageTakenFrame)
 
+      -- Heals Given
+      local healsGivenFrame = CreateFrame("Frame", nil, content)
+      healsGivenFrame:SetPoint("TOPLEFT", 1160, posY)
+      healsGivenFrame:SetSize(1,1)
+      local healsGivenFS = healsGivenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      healsGivenFS:SetPoint("CENTER")
+      healsGivenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      healsGivenFS:SetText(v.healsGiven) 
+      table.insert(content.values.healsGiven, healsGivenFrame)
+
+      -- Heals Given
+      local healsReceivedFrame = CreateFrame("Frame", nil, content)
+      healsReceivedFrame:SetPoint("TOPLEFT", 1240, posY)
+      healsReceivedFrame:SetSize(1,1)
+      local healsReceivedFS = healsReceivedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      healsReceivedFS:SetPoint("CENTER")
+      healsReceivedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      healsReceivedFS:SetText(v.healsReceived) 
+      table.insert(content.values.healsReceived, healsReceivedFrame)
+
     else
       missedLevels = missedLevels + 1
     end
@@ -627,6 +655,8 @@ function XPC:ShowSingleToonChart()
   local totalFlightPaths = 0
   local totalHearthstone = 0
   local totalDamageTaken = 0
+  local totalHealsGiven = 0
+  local totalHealsReceived = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -643,6 +673,8 @@ function XPC:ShowSingleToonChart()
     totalFlightPaths = totalFlightPaths + v.flightPaths
     totalHearthstone = totalHearthstone + v.hearthstone
     totalDamageTaken = totalDamageTaken + v.damageTaken
+    totalHealsGiven = totalHealsGiven + v.healsGiven
+    totalHealsReceived = totalHealsReceived + v.healsReceived
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -787,6 +819,26 @@ function XPC:ShowSingleToonChart()
   damageTakenFS:SetText(totalDamageTaken) 
   table.insert(content.values.damageTaken, damageTakenFrame)
 
+  -- Heals Given
+  local healsGivenFrame = CreateFrame("Frame", nil, content)
+  healsGivenFrame:SetPoint("TOPLEFT", 1160, -15)
+  healsGivenFrame:SetSize(1,1)
+  local healsGivenFS = healsGivenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  healsGivenFS:SetPoint("CENTER")
+  healsGivenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  healsGivenFS:SetText(totalHealsGiven) 
+  table.insert(content.values.healsGiven, healsGivenFrame)
+
+  -- Heals Received
+  local healsReceivedFrame = CreateFrame("Frame", nil, content)
+  healsReceivedFrame:SetPoint("TOPLEFT", 1240, -15)
+  healsReceivedFrame:SetSize(1,1)
+  local healsReceivedFS = healsReceivedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  healsReceivedFS:SetPoint("CENTER")
+  healsReceivedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  healsReceivedFS:SetText(totalHealsReceived) 
+  table.insert(content.values.healsReceived, healsReceivedFrame)
+
   chart:Show()
 end
 
@@ -914,6 +966,38 @@ function XPC:StatsTracker()
           end
 
           stats.damageTaken = stats.damageTaken + amount 
+        end
+      end
+
+      -- heals given tracker
+      if (sourceName == GetUnitName("player")) then
+        if (subevent == "SWING_HEAL" or subevent == "SPELL_HEAL" or subevent == "RANGE_HEAL" or subevent == "SPELL_PERIODIC_HEAL" or subevent == "SPELL_BUILDING_HEAL" or subevent == "ENVIRONMENTAL_HEAL") then
+          local spellId, spellName, spellSchool
+          local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand
+
+          if subevent == "SWING_HEAL" then
+            amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          elseif (subevent == "SPELL_HEAL"  or subevent == "RANGE_HEAL" or subevent == "SPELL_PERIODIC_HEAL" or subevent == "SPELL_BUILDING_HEAL" or subevent == "ENVIRONMENTAL_HEAL") then
+            spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          end
+
+          stats.healsGiven = stats.healsGiven + amount 
+        end
+      end
+
+      -- heals given tracker
+      if (destName == GetUnitName("player")) then
+        if (subevent == "SWING_HEAL" or subevent == "SPELL_HEAL" or subevent == "RANGE_HEAL" or subevent == "SPELL_PERIODIC_HEAL" or subevent == "SPELL_BUILDING_HEAL" or subevent == "ENVIRONMENTAL_HEAL") then
+          local spellId, spellName, spellSchool
+          local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand
+
+          if subevent == "SWING_HEAL" then
+            amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          elseif (subevent == "SPELL_HEAL"  or subevent == "RANGE_HEAL" or subevent == "SPELL_PERIODIC_HEAL" or subevent == "SPELL_BUILDING_HEAL" or subevent == "ENVIRONMENTAL_HEAL") then
+            spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+          end
+
+          stats.healsReceived = stats.healsReceived + amount 
         end
       end
 
