@@ -172,7 +172,7 @@ function XPC:BuildSingleToon()
     xpPerHour = {},
     xpFromQuests = {},
     xpFromMobs = {},
-    dungeonsEntered = {},
+    dungeons = {},
     killsPerHour = {},
     hearthstone = {},
   }
@@ -278,6 +278,10 @@ function XPC:BuildSingleToon()
   chart.TimeAFK:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.TimeAFK:SetPoint("TOPLEFT", 1353, -20)
   chart.TimeAFK:SetText('Time AFK')
+  chart.dungeons = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.dungeons:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.dungeons:SetPoint("TOPLEFT", 1433, -20)
+  chart.dungeons:SetText('Dungeons')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -660,6 +664,17 @@ function XPC:ShowSingleToonChart()
       end
       table.insert(content.values.timeAFK, timeAFKFrame)
 
+      -- Dungeons
+      local dungeonsFrame = CreateFrame("Frame", nil, content)
+      dungeonsFrame:SetPoint("TOPLEFT", 1400, posY)
+      dungeonsFrame:SetSize(1,1)
+      local dungeonsFS = dungeonsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      dungeonsFS:SetPoint("CENTER")
+      dungeonsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      dungeonsFS:SetText(v.dungeonsEntered) 
+      table.insert(content.values.dungeons, dungeonsFrame)
+      
+
     else
       missedLevels = missedLevels + 1
     end
@@ -680,6 +695,7 @@ function XPC:ShowSingleToonChart()
   local totalHealsGiven = 0
   local totalHealsReceived = 0
   local totalTimeAFK = 0
+  local totalDungeons = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -699,6 +715,7 @@ function XPC:ShowSingleToonChart()
     totalHealsGiven = totalHealsGiven + v.healsGiven
     totalHealsReceived = totalHealsReceived + v.healsReceived
     totalTimeAFK = totalTimeAFK + v.timeAFK
+    totalDungeons = totalDungeons + v.dungeonsEntered
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -882,6 +899,17 @@ function XPC:ShowSingleToonChart()
   end
   table.insert(content.values.timeAFK, timeAFKFrame)
 
+  -- Dungeons
+  local dungeonsFrame = CreateFrame("Frame", nil, content)
+  dungeonsFrame:SetPoint("TOPLEFT", 1400, -15)
+  dungeonsFrame:SetSize(1,1)
+  local dungeonsFS = dungeonsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  dungeonsFS:SetPoint("CENTER")
+  dungeonsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  dungeonsFS:SetText(totalDungeons) 
+  table.insert(content.values.dungeons, dungeonsFrame)
+  
+
   chart:Show()
 end
 
@@ -957,8 +985,20 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
   tracker:RegisterEvent("TAXIMAP_CLOSED")
   tracker:RegisterEvent("CHAT_MSG_SYSTEM")
+  tracker:RegisterEvent("PLAYER_ENTERING_WORLD")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
+
+    -- Instance Tracker
+    if (event == "PLAYER_ENTERING_WORLD") then
+      local isInitialLogin, isReloadingUi = ...
+      local name, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize, LfgDungeonID = GetInstanceInfo()
+      if (isReloadingUi == false) then
+        if (instanceType == 'party' or instanceType == 'raid') then
+          stats.dungeonsEntered = stats.dungeonsEntered + 1
+        end
+      end
+    end
 
     -- AFK tracker
     if (event == "CHAT_MSG_SYSTEM") then
@@ -1107,7 +1147,7 @@ function XPC:StatsTracker()
   end)
 end
 
--- # of dungeons entered
+
 -- raw gold looted
 -- gold vendored
 -- gold gained
