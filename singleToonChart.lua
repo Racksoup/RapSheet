@@ -163,7 +163,6 @@ function XPC:BuildSingleToon()
     healsGiven = {},
     healsReceived = {},
     deaths = {},
-    pvpDeaths = {},
     duelsWon = {},
     duelsLost = {},
     honorKills = {},
@@ -185,13 +184,14 @@ function XPC:BuildSingleToon()
     goldGainedMerchant = {},
     goldLostMerchant = {},
     goldTotal = {},
+    percentInCombat = {},
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
   content.hLines = {}
   
   -- set size after content.values object init
-  local j = 0 
+  local j = 1 
   for k,v in pairs(content.values) do
     j = j + 1
   end
@@ -368,6 +368,10 @@ function XPC:BuildSingleToon()
   chart.timeInCombat:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.timeInCombat:SetPoint("TOPLEFT", (80 * 37) -20, -20)
   chart.timeInCombat:SetText('Combat Time')
+  chart.percentInCombat = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.percentInCombat:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.percentInCombat:SetPoint("TOPLEFT", (80 * 38) -15, -20)
+  chart.percentInCombat:SetText('% in Combat')
 
 
   -- Vertical Seperator Lines
@@ -954,6 +958,49 @@ function XPC:ShowSingleToonChart()
         timeInCombatFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
       end
       table.insert(content.values.timeInCombat, timeInCombatFrame)
+
+      -- Percent Time in Combat
+      if (
+      v.timePlayedAtLevel ~= 0 and 
+      toon.statsData[tostring(i -1)] ~= nil and 
+      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= nil and 
+      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= 0
+      ) then
+        local percentInCombatFrame = CreateFrame("Frame", nil, content)
+        percentInCombatFrame:SetPoint("TOPLEFT", 3000, posY)
+        percentInCombatFrame:SetSize(1,1)
+        local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        percentInCombatFS:SetPoint("CENTER")
+        percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        percentInCombatFS:SetText(math.floor((v.timeInCombat / (v.timePlayedAtLevel - toon.statsData[tostring(i -1)].timePlayedAtLevel)) * 100) .. "%") 
+        table.insert(content.values.percentInCombat, percentInCombatFrame)
+      elseif (
+      toon.statsData[tostring(i -1)] ~= nil and 
+      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= nil and 
+      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= 0
+      ) then
+        local t3 = toon.levelData[#toon.levelData].timePlayed
+        local percentInCombatFrame = CreateFrame("Frame", nil, content)
+        percentInCombatFrame:SetPoint("TOPLEFT", 3000, posY)
+        percentInCombatFrame:SetSize(1,1)
+        local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        percentInCombatFS:SetPoint("CENTER")
+        percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        percentInCombatFS:SetText(math.floor((v.timeInCombat / (t3 - toon.statsData[tostring(i -1)].timePlayedAtLevel)) * 100) .. "%") 
+        table.insert(content.values.percentInCombat, percentInCombatFrame)
+      elseif (
+      i == 1 and
+      v.timePlayedAtLevel ~= 0
+      ) then
+        local percentInCombatFrame = CreateFrame("Frame", nil, content)
+        percentInCombatFrame:SetPoint("TOPLEFT", 3000, posY)
+        percentInCombatFrame:SetSize(1,1)
+        local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        percentInCombatFS:SetPoint("CENTER")
+        percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        percentInCombatFS:SetText(math.floor((v.timeInCombat / v.timePlayedAtLevel )* 100) .. "%")
+        table.insert(content.values.percentInCombat, percentInCombatFrame)
+      end
       
     else
       missedLevels = missedLevels + 1
@@ -1416,7 +1463,7 @@ function XPC:ShowSingleToonChart()
   honorFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   honorFS:SetText(totalHonor) 
   table.insert(content.values.honor, honorFrame)
-
+  
   -- Time in Combat
   local timeInCombatFrame = CreateFrame("Frame", nil, content)
   timeInCombatFrame:SetPoint("TOPLEFT", 2920, -15)
@@ -1431,6 +1478,16 @@ function XPC:ShowSingleToonChart()
     timeInCombatFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
   end
   table.insert(content.values.timeInCombat, timeInCombatFrame)
+  
+  -- Percent Time In Combat
+  local percentInCombatFrame = CreateFrame("Frame", nil, content)
+  percentInCombatFrame:SetPoint("TOPLEFT", 3000, -15)
+  percentInCombatFrame:SetSize(1,1)
+  local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  percentInCombatFS:SetPoint("CENTER")
+  percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  percentInCombatFS:SetText(math.floor((totalTimeInCombat / toon.levelData[#toon.levelData].timePlayed) * 100) .. "%")
+  table.insert(content.values.percentInCombat, percentInCombatFrame)
 
   chart:Show()
 end
@@ -1613,7 +1670,6 @@ function XPC:StatsTracker()
     end
     if (event == "PLAYER_REGEN_ENABLED") then
       stats.timeInCombat = stats.timeInCombat + (GetTime() - XPC.combatTime)
-      print(stats.timeInCombat)
       XPC.combatTime = 0
     end
     
@@ -1634,12 +1690,10 @@ function XPC:StatsTracker()
       C_Timer.After(.1, function()
         if (UnitHealth('target') == 1) then
           stats.duelsWon = stats.duelsWon + 1
-          print("Duel Won")
         end
       end)
       C_Timer.After(.1, function()
         if (UnitHealth('player') == 1) then
-          print("Duel Lost")
           stats.duelsLost = stats.duelsLost + 1
         end
       end)
@@ -1914,6 +1968,5 @@ function XPC:TimeFormat(timex)
   return days, hours, minutes, seconds
 end
 
--- % of time in combat
 -- % of xp gained from quests
 -- % of xp gained from mobs
