@@ -319,6 +319,10 @@ function XPC:BuildSingleToon()
   chart.deaths:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.deaths:SetPoint("TOPLEFT", 2077, -20)
   chart.deaths:SetText('Deaths')
+  chart.bandages = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.bandages:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.bandages:SetPoint("TOPLEFT", 2151, -20)
+  chart.bandages:SetText('Bandages')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -793,6 +797,16 @@ function XPC:ShowSingleToonChart()
       deathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
       deathsFS:SetText(v.deaths) 
       table.insert(content.values.deaths, deathsFrame)
+
+      -- Bandages
+      local bandagesFrame = CreateFrame("Frame", nil, content)
+      bandagesFrame:SetPoint("TOPLEFT", 2120, posY)
+      bandagesFrame:SetSize(1,1)
+      local bandagesFS = bandagesFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      bandagesFS:SetPoint("CENTER")
+      bandagesFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      bandagesFS:SetText(v.bandages) 
+      table.insert(content.values.bandages, bandagesFrame)
       
 
     else
@@ -824,6 +838,7 @@ function XPC:ShowSingleToonChart()
   local totalXPFromQuests = 0
   local totalGoldFromQuests = 0
   local totalDeaths = 0
+  local totalBandages = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -852,6 +867,7 @@ function XPC:ShowSingleToonChart()
     totalXPFromQuests = totalXPFromQuests + v.XPFromQuests
     totalGoldFromQuests = totalGoldFromQuests + v.goldFromQuests
     totalDeaths = totalDeaths + v.deaths
+    totalBandages = totalBandages + v.bandages
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -1128,6 +1144,16 @@ function XPC:ShowSingleToonChart()
   deathsFS:SetText(totalDeaths) 
   table.insert(content.values.deaths, deathsFrame)
   
+  -- Bandages
+  local bandagesFrame = CreateFrame("Frame", nil, content)
+  bandagesFrame:SetPoint("TOPLEFT", 2120, -15)
+  bandagesFrame:SetSize(1,1)
+  local bandagesFS = bandagesFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  bandagesFS:SetPoint("CENTER")
+  bandagesFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  bandagesFS:SetText(totalBandages) 
+  table.insert(content.values.bandages, bandagesFrame)
+  
 
   chart:Show()
 end
@@ -1199,6 +1225,7 @@ function XPC:StatsTracker()
   local potions = {9030,5634,13444,13457,5816,929,13446,3823,13443,3387,2459,13442,9172,20008,6149,3928,1710,6049,3827,6372,5633,13461,13455,858,9144,13462,3385,13459,6048,5631,13458,118,2455,13506,12190,18253,23579,20002,13456,4623,6052,3386,2456,6051,5632,13460,6050,18841,4596,23578,18839,1450,17348,3087,17351,17349,23696,23698,17352}
   local elixirs = {9155,10592,8949,13453,3389,9224,9233,3828,9154,9197,6373,3825,17708,6662,9206,9187,8951,21546,9179,18294,3390,2454,2457,5997,2458,3391,9264,13445,13452,13447,5996,8827,3383,9088,13454,20007,3826,20004,3388,3382}
   local flasks = {13510,13512,13511,13506,13513}
+  local bandages = {10841, 7928, 3278, 18629, 18630, 3276, 3277, 10840, 7929, 3275, 30021, 746, 1159, 3267, 3268, 7926, 24412, 10838, 23568, 23696, 18608, 30020}
   local potionBuffNames = {
     "Free Action",
     "Noggenfogger Elixir",
@@ -1491,6 +1518,7 @@ function XPC:StatsTracker()
 
     if (event == "UNIT_SPELLCAST_SUCCEEDED") then
       local unit, castGUID, spellID = ...
+      print('here')
       if (unit == 'player') then
         -- eating
         for i,v in ipairs(foods) do
@@ -1508,6 +1536,12 @@ function XPC:StatsTracker()
         if (spellID == 8690) then
           stats.hearthstone = stats.hearthstone + 1
         end
+        -- bandages
+        for i,v in ipairs(bandages) do 
+          if (spellID == v) then
+            stats.bandages = stats.bandages + 1
+          end
+        end
       end
     end
   end)
@@ -1517,10 +1551,8 @@ end
 -- raw gold looted
 -- gold vendored
 -- gold gained
--- # of bandaids bandaged
 -- buffs given
 -- buffs received
--- # of deaths
 -- # of duels won
 -- # of duels lost
 -- # of hk's
