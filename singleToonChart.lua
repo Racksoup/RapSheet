@@ -167,6 +167,7 @@ function XPC:BuildSingleToon()
     duelsWon = {},
     duelsLost = {},
     honorKills = {},
+    honor = {},
     flightPaths = {},
     timeAFK = {},
     timeInCombat = {},
@@ -221,133 +222,148 @@ function XPC:BuildSingleToon()
   -- Horizontal Values
   chart.dmgDone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.dmgDone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.dmgDone:SetPoint("TOPLEFT", 68, -20)
+  chart.dmgDone:SetPoint("TOPLEFT", (80 * 1) - 11, -20)
   chart.dmgDone:SetText('Dmg Done')
   chart.killsSolo = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.killsSolo:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.killsSolo:SetPoint("TOPLEFT", 152, -20)
+  chart.killsSolo:SetPoint("TOPLEFT", (80 * 2) -7, -20)
   chart.killsSolo:SetText('Kills Solo')
   chart.killsGroup = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.killsGroup:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.killsGroup:SetPoint("TOPLEFT", 227, -20)
+  chart.killsGroup:SetPoint("TOPLEFT", (80 * 3) -11, -20)
   chart.killsGroup:SetText('Kills Group')
   chart.kills = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.kills:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.kills:SetPoint("TOPLEFT", 327, -20)
+  chart.kills:SetPoint("TOPLEFT", (80 * 4) +8, -20)
   chart.kills:SetText('Kills')
   chart.questsCompleted = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.questsCompleted:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.questsCompleted:SetPoint("TOPLEFT", 399, -20)
+  chart.questsCompleted:SetPoint("TOPLEFT", (80 * 5), -20)
   chart.questsCompleted:SetText('Quests')
   chart.food = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.food:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.food:SetPoint("TOPLEFT", 486, -20)
+  chart.food:SetPoint("TOPLEFT", (80 * 6) +8, -20)
   chart.food:SetText('Food')
   chart.drink = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.drink:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.drink:SetPoint("TOPLEFT", 564, -20)
+  chart.drink:SetPoint("TOPLEFT", (80 * 7) +5, -20)
   chart.drink:SetText('Drink')
   chart.timePlayedAtLevel = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.timePlayedAtLevel:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.timePlayedAtLevel:SetPoint("TOPLEFT", 622, -20)
+  chart.timePlayedAtLevel:SetPoint("TOPLEFT", (80 * 8) -16, -20)
   chart.timePlayedAtLevel:SetText('Time Played')
   chart.levelTime = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.levelTime:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.levelTime:SetPoint("TOPLEFT", 708, -20)
+  chart.levelTime:SetPoint("TOPLEFT", (80 * 9) -11, -20)
   chart.levelTime:SetText('Level Time')
   chart.xpPerHour = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.xpPerHour:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.xpPerHour:SetPoint("TOPLEFT", 796, -20)
+  chart.xpPerHour:SetPoint("TOPLEFT", (80 * 10) -4, -20)
   chart.xpPerHour:SetText('XP/Hour')
   chart.killsPerHour = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.killsPerHour:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.killsPerHour:SetPoint("TOPLEFT", 870, -20)
+  chart.killsPerHour:SetPoint("TOPLEFT", (80 * 11) -9, -20)
   chart.killsPerHour:SetText('Kills/Hour')
   chart.flightPaths = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.flightPaths:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.flightPaths:SetPoint("TOPLEFT", 962, -20)
+  chart.flightPaths:SetPoint("TOPLEFT", (80 * 12) +4, -20)
   chart.flightPaths:SetText('Taxis')
   chart.hearthstone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.hearthstone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.hearthstone:SetPoint("TOPLEFT", 1020, -20)
+  chart.hearthstone:SetPoint("TOPLEFT", (80 * 13) -19, -20)
   chart.hearthstone:SetText('Hearthstones')
   chart.damageTaken = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.damageTaken:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.damageTaken:SetPoint("TOPLEFT", 1117, -20)
+  chart.damageTaken:SetPoint("TOPLEFT", (80 * 14) -2, -20)
   chart.damageTaken:SetText('Dmg In')
   chart.HealsGiven = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.HealsGiven:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.HealsGiven:SetPoint("TOPLEFT", 1188, -20)
+  chart.HealsGiven:SetPoint("TOPLEFT", (80 * 15) -10, -20)
   chart.HealsGiven:SetText('Heals Out')
   chart.HealsReceived = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.HealsReceived:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.HealsReceived:SetPoint("TOPLEFT", 1276, -20)
+  chart.HealsReceived:SetPoint("TOPLEFT", (80 * 16) -4, -20)
   chart.HealsReceived:SetText('Heals In')
   chart.TimeAFK = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.TimeAFK:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.TimeAFK:SetPoint("TOPLEFT", 1352, -20)
+  chart.TimeAFK:SetPoint("TOPLEFT", (80 * 17) -7, -20)
   chart.TimeAFK:SetText('Time AFK')
   chart.dungeons = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.dungeons:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.dungeons:SetPoint("TOPLEFT", 1429, -20)
+  chart.dungeons:SetPoint("TOPLEFT", (80 * 18) -7, -20)
   chart.dungeons:SetText('Dungeons')
   chart.potions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.potions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.potions:SetPoint("TOPLEFT", 1510, -20)
+  chart.potions:SetPoint("TOPLEFT", (80 * 19) -6, -20)
   chart.potions:SetText('Misc Pots')
   chart.healingPotions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.healingPotions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.healingPotions:SetPoint("TOPLEFT", 1585, -20)
+  chart.healingPotions:SetPoint("TOPLEFT", (80 * 20) -13, -20)
   chart.healingPotions:SetText('Health Pots')
   chart.manaPotions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.manaPotions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.manaPotions:SetPoint("TOPLEFT", 1669, -20)
+  chart.manaPotions:SetPoint("TOPLEFT", (80 * 21) -11, -20)
   chart.manaPotions:SetText('Mana Pots')
-  chart.healingPotions:SetText('Health Pots')
   chart.MHPotions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.MHPotions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.MHPotions:SetPoint("TOPLEFT", 1751, -20)
+  chart.MHPotions:SetPoint("TOPLEFT", (80 * 22) -7, -20)
   chart.MHPotions:SetText('H/M Pots')
   chart.XPFromMobs = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.XPFromMobs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.XPFromMobs:SetPoint("TOPLEFT", 1836, -20)
+  chart.XPFromMobs:SetPoint("TOPLEFT", (80 * 23) -4, -20)
   chart.XPFromMobs:SetText('Mob XP')
   chart.XPFromQuests = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.XPFromQuests:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.XPFromQuests:SetPoint("TOPLEFT", 1912, -20)
+  chart.XPFromQuests:SetPoint("TOPLEFT", (80 * 24) -7, -20)
   chart.XPFromQuests:SetText('Quest XP')
   chart.goldFromQuests = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.goldFromQuests:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.goldFromQuests:SetPoint("TOPLEFT", 1986, -20)
+  chart.goldFromQuests:SetPoint("TOPLEFT", (80 * 25) -13, -20)
   chart.goldFromQuests:SetText('Quest Gold')
   chart.deaths = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.deaths:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.deaths:SetPoint("TOPLEFT", 2077, -20)
+  chart.deaths:SetPoint("TOPLEFT", (80 * 26), -20)
   chart.deaths:SetText('Deaths')
   chart.bandages = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.bandages:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.bandages:SetPoint("TOPLEFT", 2151, -20)
+  chart.bandages:SetPoint("TOPLEFT", (80 * 27) -9, -20)
   chart.bandages:SetText('Bandages')
   chart.goldFromLoot = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.goldFromLoot:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.goldFromLoot:SetPoint("TOPLEFT", 2231, -20)
+  chart.goldFromLoot:SetPoint("TOPLEFT", (80 * 28) -9, -20)
   chart.goldFromLoot:SetText('Loot Gold')
   chart.goldGainedMerchant = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.goldGainedMerchant:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.goldGainedMerchant:SetPoint("TOPLEFT", 2328, -20)
+  chart.goldGainedMerchant:SetPoint("TOPLEFT", (80 * 29) +8, -20)
   chart.goldGainedMerchant:SetText('Sold')
   chart.goldLostMerchant = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.goldLostMerchant:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.goldLostMerchant:SetPoint("TOPLEFT", 2396, -20)
+  chart.goldLostMerchant:SetPoint("TOPLEFT", (80 * 30) +3, -20)
   chart.goldLostMerchant:SetText('Spent')
   chart.goldTotal = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.goldTotal:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.goldTotal:SetPoint("TOPLEFT", 2464, -20)
+  chart.goldTotal:SetPoint("TOPLEFT", (80 * 31) -17, -20)
   chart.goldTotal:SetText('Gold Gained')
   chart.timeOnTaxi = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.timeOnTaxi:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.timeOnTaxi:SetPoint("TOPLEFT", 2554, -20)
+  chart.timeOnTaxi:SetPoint("TOPLEFT", (80 * 32) -7, -20)
   chart.timeOnTaxi:SetText('Taxi Time')
+  chart.honorKills = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.honorKills:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.honorKills:SetPoint("TOPLEFT", (80 * 33) +8, -20)
+  chart.honorKills:SetText('HKs')
+  chart.duelsWon = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.duelsWon:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.duelsWon:SetPoint("TOPLEFT", (80 * 34) -11, -20)
+  chart.duelsWon:SetText('Duels Won')
+  chart.duelsLost = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.duelsLost:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.duelsLost:SetPoint("TOPLEFT", (80 * 35) -10, -20)
+  chart.duelsLost:SetText('Duels Lost')
+  chart.honor = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.honor:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.honor:SetPoint("TOPLEFT", (80 * 36), -20)
+  chart.honor:SetText('Honor')
 
 
   -- Vertical Seperator Lines
@@ -814,7 +830,7 @@ function XPC:ShowSingleToonChart()
       goldFromQuestsFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
       table.insert(content.values.goldFromQuests, goldFromQuestsFrame)
 
-      -- Quest Gold
+      -- Deaths
       local deathsFrame = CreateFrame("Frame", nil, content)
       deathsFrame:SetPoint("TOPLEFT", 2040, posY)
       deathsFrame:SetSize(1,1)
@@ -904,6 +920,46 @@ function XPC:ShowSingleToonChart()
         timeOnTaxiFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
       end
       table.insert(content.values.timeOnTaxi, timeOnTaxiFrame)
+
+      -- Honor Kills
+      local honorKillsFrame = CreateFrame("Frame", nil, content)
+      honorKillsFrame:SetPoint("TOPLEFT", 2600, posY)
+      honorKillsFrame:SetSize(1,1)
+      local honorKillsFS = honorKillsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      honorKillsFS:SetPoint("CENTER")
+      honorKillsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      honorKillsFS:SetText(v.honorKills) 
+      table.insert(content.values.honorKills, honorKillsFrame)
+
+      -- Duels Won
+      local duelsWonFrame = CreateFrame("Frame", nil, content)
+      duelsWonFrame:SetPoint("TOPLEFT", 2680, posY)
+      duelsWonFrame:SetSize(1,1)
+      local duelsWonFS = duelsWonFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      duelsWonFS:SetPoint("CENTER")
+      duelsWonFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      duelsWonFS:SetText(v.duelsWon) 
+      table.insert(content.values.duelsWon, duelsWonFrame)
+
+      -- Duels Lost
+      local duelsLostFrame = CreateFrame("Frame", nil, content)
+      duelsLostFrame:SetPoint("TOPLEFT", 2760, posY)
+      duelsLostFrame:SetSize(1,1)
+      local duelsLostFS = duelsLostFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      duelsLostFS:SetPoint("CENTER")
+      duelsLostFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      duelsLostFS:SetText(v.duelsLost) 
+      table.insert(content.values.duelsLost, duelsLostFrame)
+
+      -- Honor
+      local honorFrame = CreateFrame("Frame", nil, content)
+      honorFrame:SetPoint("TOPLEFT", 2840, posY)
+      honorFrame:SetSize(1,1)
+      local honorFS = honorFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      honorFS:SetPoint("CENTER")
+      honorFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      honorFS:SetText(v.honor) 
+      table.insert(content.values.honor, honorFrame)
       
     else
       missedLevels = missedLevels + 1
@@ -939,6 +995,10 @@ function XPC:ShowSingleToonChart()
   local totalGoldGainedMerchant = 0
   local totalGoldLostMerchant = 0
   local totalTimeOnTaxi = 0
+  local totalHonorKills = 0
+  local totalDuelsWon = 0
+  local totalDuelsLost = 0
+  local totalHonor = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -972,6 +1032,10 @@ function XPC:ShowSingleToonChart()
     totalGoldGainedMerchant = totalGoldGainedMerchant + v.goldGainedMerchant
     totalGoldLostMerchant = totalGoldLostMerchant + v.goldLostMerchant
     totalTimeOnTaxi = totalTimeOnTaxi + v.timeOnTaxi
+    totalHonorKills = totalHonorKills + v.honorKills
+    totalDuelsWon = totalDuelsWon + v.duelsWon
+    totalDuelsLost = totalDuelsLost + v.duelsLost
+    totalHonor = totalHonor + v.honor
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -1328,7 +1392,46 @@ function XPC:ShowSingleToonChart()
     timeOnTaxiFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
   end
   table.insert(content.values.timeOnTaxi, timeOnTaxiFrame)
-  
+
+  -- Honor Kills
+  local honorKillsFrame = CreateFrame("Frame", nil, content)
+  honorKillsFrame:SetPoint("TOPLEFT", 2600, -15)
+  honorKillsFrame:SetSize(1,1)
+  local honorKillsFS = honorKillsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  honorKillsFS:SetPoint("CENTER")
+  honorKillsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  honorKillsFS:SetText(totalHonorKills) 
+  table.insert(content.values.honorKills, honorKillsFrame)
+
+  -- Duels Won
+  local duelsWonFrame = CreateFrame("Frame", nil, content)
+  duelsWonFrame:SetPoint("TOPLEFT", 2680, -15)
+  duelsWonFrame:SetSize(1,1)
+  local duelsWonFS = duelsWonFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  duelsWonFS:SetPoint("CENTER")
+  duelsWonFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  duelsWonFS:SetText(totalDuelsWon) 
+  table.insert(content.values.duelsWon, duelsWonFrame)
+
+  -- Duels Lost
+  local duelsLostFrame = CreateFrame("Frame", nil, content)
+  duelsLostFrame:SetPoint("TOPLEFT", 2760, -15)
+  duelsLostFrame:SetSize(1,1)
+  local duelsLostFS = duelsLostFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  duelsLostFS:SetPoint("CENTER")
+  duelsLostFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  duelsLostFS:SetText(totalDuelsLost) 
+  table.insert(content.values.duelsLost, duelsLostFrame)
+
+  -- Duels Lost
+  local honorFrame = CreateFrame("Frame", nil, content)
+  honorFrame:SetPoint("TOPLEFT", 2840, -15)
+  honorFrame:SetSize(1,1)
+  local honorFS = honorFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  honorFS:SetPoint("CENTER")
+  honorFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  honorFS:SetText(totalHonor) 
+  table.insert(content.values.honor, honorFrame)
 
   chart:Show()
 end
@@ -1497,8 +1600,39 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("PLAYER_MONEY")
   tracker:RegisterEvent("MERCHANT_CLOSED")
   tracker:RegisterEvent("MERCHANT_SHOW")
+  tracker:RegisterEvent("DUEL_FINISHED")
+  tracker:RegisterEvent("PLAYER_PVP_KILLS_CHANGED")
+  tracker:RegisterEvent("CHAT_MSG_COMBAT_HONOR_GAIN")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
+  
+    -- Honor Gained Tracker
+    if (event == "CHAT_MSG_COMBAT_HONOR_GAIN") then
+      local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons = ...
+      local l = string.match(text, "%d")
+      stats.honor = stats.honor + l
+    end
+
+    -- Honor Kill Tracker
+    if (event == "PLAYER_PVP_KILLS_CHANGED") then
+      stats.honorKills = stats.honorKills + 1
+    end
+
+    -- Duel Tracker
+    if (event == "DUEL_FINISHED") then
+      C_Timer.After(.1, function()
+        if (UnitHealth('target') == 1) then
+          stats.duelsWon = stats.duelsWon + 1
+          print("Duel Won")
+        end
+      end)
+      C_Timer.After(.1, function()
+        if (UnitHealth('player') == 1) then
+          print("Duel Lost")
+          stats.duelsLost = stats.duelsLost + 1
+        end
+      end)
+    end
 
     -- Gold Gained / Lost Merchant Tracker
     if (event == "MERCHANT_SHOW") then
@@ -1588,15 +1722,15 @@ function XPC:StatsTracker()
           stats.flightPaths = stats.flightPaths + 1
         end
       end)
-      local function loop()
+      local function loopx()
         C_Timer.After(1, function()
           if (UnitOnTaxi('player')) then
             stats.timeOnTaxi = stats.timeOnTaxi + 1
-            loop()
+            loopx()
           end
         end)
       end
-      loop()
+      loopx()
     end
 
     -- level up tracker
