@@ -178,6 +178,7 @@ function XPC:BuildSingleToon()
     dungeons = {},
     killsPerHour = {},
     hearthstone = {},
+    goldFromQuests = {},
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
@@ -306,6 +307,14 @@ function XPC:BuildSingleToon()
   chart.XPFromMobs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.XPFromMobs:SetPoint("TOPLEFT", 1836, -20)
   chart.XPFromMobs:SetText('Mob XP')
+  chart.XPFromQuests = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.XPFromQuests:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.XPFromQuests:SetPoint("TOPLEFT", 1912, -20)
+  chart.XPFromQuests:SetText('Quest XP')
+  chart.goldFromQuests = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.goldFromQuests:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.goldFromQuests:SetPoint("TOPLEFT", 1986, -20)
+  chart.goldFromQuests:SetText('Quest Gold')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -738,7 +747,7 @@ function XPC:ShowSingleToonChart()
       MHPotionsFS:SetText(v.MHPotions) 
       table.insert(content.values.MHPotions, MHPotionsFrame)
 
-      -- Healing / Mana Potions
+      -- Mob XP
       local XPFromMobsFrame = CreateFrame("Frame", nil, content)
       XPFromMobsFrame:SetPoint("TOPLEFT", 1800, posY)
       XPFromMobsFrame:SetSize(1,1)
@@ -747,6 +756,29 @@ function XPC:ShowSingleToonChart()
       XPFromMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
       XPFromMobsFS:SetText(v.XPFromMobs) 
       table.insert(content.values.XPFromMobs, XPFromMobsFrame)
+
+      -- Quest XP
+      local XPFromQuestsFrame = CreateFrame("Frame", nil, content)
+      XPFromQuestsFrame:SetPoint("TOPLEFT", 1880, posY)
+      XPFromQuestsFrame:SetSize(1,1)
+      local XPFromQuestsFS = XPFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      XPFromQuestsFS:SetPoint("CENTER")
+      XPFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      XPFromQuestsFS:SetText(v.XPFromQuests) 
+      table.insert(content.values.XPFromQuests, XPFromQuestsFrame)
+
+      -- Quest Gold
+      local goldFromQuestsFrame = CreateFrame("Frame", nil, content)
+      goldFromQuestsFrame:SetPoint("TOPLEFT", 1960, posY)
+      goldFromQuestsFrame:SetSize(1,1)
+      local goldFromQuestsFS = goldFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      goldFromQuestsFS:SetPoint("CENTER")
+      goldFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+      local gold = math.floor(v.goldFromQuests / 10000)
+      local silver = math.floor(v.goldFromQuests / 100 % 100)
+      local copper = math.floor(v.goldFromQuests % 100)
+      goldFromQuestsFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+      table.insert(content.values.goldFromQuests, goldFromQuestsFrame)
       
 
     else
@@ -775,6 +807,8 @@ function XPC:ShowSingleToonChart()
   local totalManaPotions = 0
   local totalMHPotions = 0
   local totalXPFromMobs = 0
+  local totalXPFromQuests = 0
+  local totalGoldFromQuests = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -800,6 +834,8 @@ function XPC:ShowSingleToonChart()
     totalManaPotions = totalManaPotions + v.manaPotions
     totalMHPotions = totalMHPotions + v.MHPotions
     totalXPFromMobs = totalXPFromMobs + v.XPFromMobs
+    totalXPFromQuests = totalXPFromQuests + v.XPFromQuests
+    totalGoldFromQuests = totalGoldFromQuests + v.goldFromQuests
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -1042,6 +1078,29 @@ function XPC:ShowSingleToonChart()
   XPFromMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   XPFromMobsFS:SetText(totalXPFromMobs) 
   table.insert(content.values.XPFromMobs, XPFromMobsFrame)
+
+  -- Quest XP
+  local XPFromQuestsFrame = CreateFrame("Frame", nil, content)
+  XPFromQuestsFrame:SetPoint("TOPLEFT", 1880, -15)
+  XPFromQuestsFrame:SetSize(1,1)
+  local XPFromQuestsFS = XPFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  XPFromQuestsFS:SetPoint("CENTER")
+  XPFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  XPFromQuestsFS:SetText(totalXPFromQuests) 
+  table.insert(content.values.XPFromQuests, XPFromQuestsFrame)
+
+  -- Quest Gold
+  local goldFromQuestsFrame = CreateFrame("Frame", nil, content)
+  goldFromQuestsFrame:SetPoint("TOPLEFT", 1960, -15)
+  goldFromQuestsFrame:SetSize(1,1)
+  local goldFromQuestsFS = goldFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  goldFromQuestsFS:SetPoint("CENTER")
+  goldFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+  local gold = math.floor(totalGoldFromQuests / 10000)
+  local silver = math.floor(totalGoldFromQuests / 100 % 100)
+  local copper = math.floor(totalGoldFromQuests % 100)
+  goldFromQuestsFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+  table.insert(content.values.goldFromQuests, goldFromQuestsFrame)
   
 
   chart:Show()
@@ -1204,6 +1263,7 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("CHAT_MSG_SYSTEM")
   tracker:RegisterEvent("PLAYER_ENTERING_WORLD")
   tracker:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
+  tracker:RegisterEvent("QUEST_TURNED_IN")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
 
@@ -1212,6 +1272,13 @@ function XPC:StatsTracker()
       local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons = ...
       local xp = string.match(text, "%d+")
       stats.XPFromMobs = stats.XPFromMobs + xp
+    end
+
+    -- Quest Tracker 
+    if (event == "QUEST_TURNED_IN") then
+      local questID, xpReward, moneyReward = ...
+      stats.XPFromQuests = stats.XPFromQuests + xpReward
+      stats.goldFromQuests = stats.goldFromQuests + moneyReward
     end
 
     -- Instance Tracker
@@ -1417,6 +1484,7 @@ end
 
 -- raw gold looted
 -- gold vendored
+-- quest gold gained
 -- gold gained
 -- # of bandaids bandaged
 -- buffs given
@@ -1430,6 +1498,5 @@ end
 -- time in combat
 -- % of time in combat
 -- xp gained from quests
--- xp gained from mobs
 -- % of xp gained from quests
 -- % of xp gained from mobs

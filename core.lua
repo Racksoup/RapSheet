@@ -251,6 +251,7 @@ function XPC:CreateStatsData(level)
     XPFromMobs = 0,
     dungeonsEntered = 0,
     hearthstone = 0,
+    goldFromQuests = 0,
   }
   
   -- init statsData and its level objects
