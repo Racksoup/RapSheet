@@ -179,6 +179,7 @@ function XPC:BuildSingleToon()
     killsPerHour = {},
     hearthstone = {},
     goldFromQuests = {},
+    goldFromLoot = {},
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
@@ -323,6 +324,10 @@ function XPC:BuildSingleToon()
   chart.bandages:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.bandages:SetPoint("TOPLEFT", 2151, -20)
   chart.bandages:SetText('Bandages')
+  chart.goldFromLoot = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.goldFromLoot:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.goldFromLoot:SetPoint("TOPLEFT", 2231, -20)
+  chart.goldFromLoot:SetText('Loot Gold')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -807,6 +812,19 @@ function XPC:ShowSingleToonChart()
       bandagesFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
       bandagesFS:SetText(v.bandages) 
       table.insert(content.values.bandages, bandagesFrame)
+
+      -- Gold From Loot
+      local goldFromLootFrame = CreateFrame("Frame", nil, content)
+      goldFromLootFrame:SetPoint("TOPLEFT", 2200, posY)
+      goldFromLootFrame:SetSize(1,1)
+      local goldFromLootFS = goldFromLootFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      goldFromLootFS:SetPoint("CENTER")
+      goldFromLootFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+      local gold = math.floor(v.goldFromLoot / 10000)
+      local silver = math.floor(v.goldFromLoot / 100 % 100)
+      local copper = math.floor(v.goldFromLoot % 100)
+      goldFromLootFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+      table.insert(content.values.goldFromLoot, goldFromLootFrame)
       
 
     else
@@ -839,6 +857,7 @@ function XPC:ShowSingleToonChart()
   local totalGoldFromQuests = 0
   local totalDeaths = 0
   local totalBandages = 0
+  local totalGoldFromLoot = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -868,6 +887,7 @@ function XPC:ShowSingleToonChart()
     totalGoldFromQuests = totalGoldFromQuests + v.goldFromQuests
     totalDeaths = totalDeaths + v.deaths
     totalBandages = totalBandages + v.bandages
+    totalGoldFromLoot = totalGoldFromLoot + v.goldFromLoot
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -1154,6 +1174,19 @@ function XPC:ShowSingleToonChart()
   bandagesFS:SetText(totalBandages) 
   table.insert(content.values.bandages, bandagesFrame)
   
+  -- Gold From Loot
+  local goldFromLootFrame = CreateFrame("Frame", nil, content)
+  goldFromLootFrame:SetPoint("TOPLEFT", 2200, -15)
+  goldFromLootFrame:SetSize(1,1)
+  local goldFromLootFS = goldFromLootFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  goldFromLootFS:SetPoint("CENTER")
+  goldFromLootFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+  local gold = math.floor(totalGoldFromLoot / 10000)
+  local silver = math.floor(totalGoldFromLoot / 100 % 100)
+  local copper = math.floor(totalGoldFromLoot % 100)
+  goldFromLootFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
+  table.insert(content.values.goldFromLoot, goldFromLootFrame)
+  
 
   chart:Show()
 end
@@ -1318,8 +1351,16 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
   tracker:RegisterEvent("QUEST_TURNED_IN")
   tracker:RegisterEvent("PLAYER_DEAD")
+  tracker:RegisterEvent("CHAT_MSG_MONEY")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
+
+    -- Gold Tracker
+    if (event == "CHAT_MSG_MONEY") then
+      local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons = ...
+      local gold = string.match(text, "%d+")
+      stats.goldFromLoot = stats.goldFromLoot + gold
+    end
 
     -- Deaths Tracker
     if (event == "PLAYER_DEAD") then
@@ -1518,7 +1559,6 @@ function XPC:StatsTracker()
 
     if (event == "UNIT_SPELLCAST_SUCCEEDED") then
       local unit, castGUID, spellID = ...
-      print('here')
       if (unit == 'player') then
         -- eating
         for i,v in ipairs(foods) do
@@ -1556,6 +1596,7 @@ end
 -- # of duels won
 -- # of duels lost
 -- # of hk's
+-- honor gained
 -- time on flight paths
 -- time in combat
 -- % of time in combat
