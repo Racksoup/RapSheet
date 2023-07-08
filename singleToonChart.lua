@@ -364,6 +364,10 @@ function XPC:BuildSingleToon()
   chart.honor:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.honor:SetPoint("TOPLEFT", (80 * 36), -20)
   chart.honor:SetText('Honor')
+  chart.timeInCombat = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.timeInCombat:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.timeInCombat:SetPoint("TOPLEFT", (80 * 37) -20, -20)
+  chart.timeInCombat:SetText('Combat Time')
 
 
   -- Vertical Seperator Lines
@@ -542,22 +546,15 @@ function XPC:ShowSingleToonChart()
       timePlayedFS:SetPoint("CENTER")
       timePlayedFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
       if (v.timePlayedAtLevel ~= 0) then
-        local timex = v.timePlayedAtLevel
-        local days = math.floor(timex / 60 / 60 / 24) 
-        local hours = math.floor(timex / 60 / 60) % 24
-        local minutes = math.floor(timex / 60) % 60
-        local seconds = timex % 60
+        local days, hours, minutes, seconds = XPC:TimeFormat(v.timePlayedAtLevel)
+
         if (days >= 1) then 
           timePlayedFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
         else
           timePlayedFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
         end
       else
-        local timex = toon.levelData[#toon.levelData].timePlayed
-        local days = math.floor(timex / 60 / 60 / 24) 
-        local hours = math.floor(timex / 60 / 60) % 24
-        local minutes = math.floor(timex / 60) % 60
-        local seconds = timex % 60
+        local days, hours, minutes, seconds = XPC:TimeFormat(toon.levelData[#toon.levelData].timePlayed)
         if (days >= 1) then 
           timePlayedFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
         else
@@ -583,10 +580,7 @@ function XPC:ShowSingleToonChart()
         local t2 = toon.statsData[tostring(i -1)].timePlayedAtLevel
         local timex = t1 - t2
         levelTime = timex
-        local days = math.floor(timex / 60 / 60 / 24) 
-        local hours = math.floor(timex / 60 / 60) % 24
-        local minutes = math.floor(timex / 60) % 60
-        local seconds = timex % 60
+        local days, hours, minutes, seconds = XPC:TimeFormat(timex)
         if (days >= 1) then 
           levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
         else
@@ -600,10 +594,7 @@ function XPC:ShowSingleToonChart()
         local t3 = toon.levelData[#toon.levelData].timePlayed
         local timex = t3 - t2
         levelTime = timex
-        local days = math.floor(timex / 60 / 60 / 24) 
-        local hours = math.floor(timex / 60 / 60) % 24
-        local minutes = math.floor(timex / 60) % 60
-        local seconds = timex % 60
+        local days, hours, minutes, seconds = XPC:TimeFormat(timex)
         if (days >= 1) then 
           levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
         else
@@ -612,11 +603,7 @@ function XPC:ShowSingleToonChart()
       elseif (
       i == 1 and
       v.timePlayedAtLevel ~= 0) then
-        local timex = v.timePlayedAtLevel
-        local days = math.floor(timex / 60 / 60 / 24) 
-        local hours = math.floor(timex / 60 / 60) % 24
-        local minutes = math.floor(timex / 60) % 60
-        local seconds = timex % 60  
+        local days, hours, minutes, seconds = XPC:TimeFormat(v.timePlayedAtLevel)
         if (days >= 1) then 
           levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
         else
@@ -735,11 +722,7 @@ function XPC:ShowSingleToonChart()
       local timeAFKFS = timeAFKFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
       timeAFKFS:SetPoint("CENTER")
       timeAFKFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      timex = v.timeAFK
-      days = math.floor(timex / 60 / 60 / 24) 
-      hours = math.floor(timex / 60 / 60) % 24
-      minutes = math.floor(timex / 60) % 60
-      seconds = timex % 60
+      local days, hours, minutes, seconds = XPC:TimeFormat(v.timeAFK)
       if (days >= 1) then 
         timeAFKFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
       else
@@ -909,11 +892,7 @@ function XPC:ShowSingleToonChart()
       local timeOnTaxiFS = timeOnTaxiFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
       timeOnTaxiFS:SetPoint("CENTER")
       timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      timex = v.timeOnTaxi
-      days = math.floor(timex / 60 / 60 / 24) 
-      hours = math.floor(timex / 60 / 60) % 24
-      minutes = math.floor(timex / 60) % 60
-      seconds = timex % 60
+      local days, hours, minutes, seconds = XPC:TimeFormat(v.timeOnTaxi)
       if (days >= 1) then 
         timeOnTaxiFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
       else
@@ -960,6 +939,21 @@ function XPC:ShowSingleToonChart()
       honorFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
       honorFS:SetText(v.honor) 
       table.insert(content.values.honor, honorFrame)
+
+      -- Time in Combat
+      local timeInCombatFrame = CreateFrame("Frame", nil, content)
+      timeInCombatFrame:SetPoint("TOPLEFT", 2920, posY)
+      timeInCombatFrame:SetSize(1,1)
+      local timeInCombatFS = timeInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      timeInCombatFS:SetPoint("CENTER")
+      timeInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+      local days, hours, minutes, seconds = XPC:TimeFormat(v.timeInCombat)
+      if (days >= 1) then 
+        timeInCombatFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+      else
+        timeInCombatFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+      end
+      table.insert(content.values.timeInCombat, timeInCombatFrame)
       
     else
       missedLevels = missedLevels + 1
@@ -999,6 +993,7 @@ function XPC:ShowSingleToonChart()
   local totalDuelsWon = 0
   local totalDuelsLost = 0
   local totalHonor = 0
+  local totalTimeInCombat = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -1036,6 +1031,7 @@ function XPC:ShowSingleToonChart()
     totalDuelsWon = totalDuelsWon + v.duelsWon
     totalDuelsLost = totalDuelsLost + v.duelsLost
     totalHonor = totalHonor + v.honor
+    totalTimeInCombat = totalTimeInCombat + v.timeInCombat
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -1113,11 +1109,7 @@ function XPC:ShowSingleToonChart()
   local timePlayedFS = timePlayedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
   timePlayedFS:SetPoint("CENTER")
   timePlayedFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-  local timex = toon.levelData[#toon.levelData].timePlayed
-  local days = math.floor(timex / 60 / 60 / 24) 
-  local hours = math.floor(timex / 60 / 60) % 24
-  local minutes = math.floor(timex / 60) % 60
-  local seconds = timex % 60
+  local days, hours, minutes, seconds = XPC:TimeFormat(toon.levelData[#toon.levelData].timePlayed)
   if (days >= 1) then 
     timePlayedFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
   else
@@ -1207,11 +1199,7 @@ function XPC:ShowSingleToonChart()
   local timeAFKFS = timeAFKFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
   timeAFKFS:SetPoint("CENTER")
   timeAFKFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  timex = totalTimeAFK
-  days = math.floor(timex / 60 / 60 / 24) 
-  hours = math.floor(timex / 60 / 60) % 24
-  minutes = math.floor(timex / 60) % 60
-  seconds = timex % 60
+  local days, hours, minutes, seconds = XPC:TimeFormat(totalTimeAFK)
   if (days >= 1) then 
     timeAFKFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
   else
@@ -1381,11 +1369,7 @@ function XPC:ShowSingleToonChart()
   local timeOnTaxiFS = timeOnTaxiFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
   timeOnTaxiFS:SetPoint("CENTER")
   timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-  timex = totalTimeOnTaxi
-  days = math.floor(timex / 60 / 60 / 24) 
-  hours = math.floor(timex / 60 / 60) % 24
-  minutes = math.floor(timex / 60) % 60
-  seconds = timex % 60
+  local days, hours, minutes, seconds = XPC:TimeFormat(totalTimeOnTaxi)
   if (days >= 1) then 
     timeOnTaxiFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
   else
@@ -1432,6 +1416,21 @@ function XPC:ShowSingleToonChart()
   honorFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   honorFS:SetText(totalHonor) 
   table.insert(content.values.honor, honorFrame)
+
+  -- Time in Combat
+  local timeInCombatFrame = CreateFrame("Frame", nil, content)
+  timeInCombatFrame:SetPoint("TOPLEFT", 2920, -15)
+  timeInCombatFrame:SetSize(1,1)
+  local timeInCombatFS = timeInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  timeInCombatFS:SetPoint("CENTER")
+  timeInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+  local days, hours, minutes, seconds = XPC:TimeFormat(totalTimeInCombat)
+  if (days >= 1) then 
+    timeInCombatFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+  else
+    timeInCombatFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+  end
+  table.insert(content.values.timeInCombat, timeInCombatFrame)
 
   chart:Show()
 end
@@ -1603,9 +1602,21 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("DUEL_FINISHED")
   tracker:RegisterEvent("PLAYER_PVP_KILLS_CHANGED")
   tracker:RegisterEvent("CHAT_MSG_COMBAT_HONOR_GAIN")
+  tracker:RegisterEvent("PLAYER_REGEN_DISABLED")
+  tracker:RegisterEvent("PLAYER_REGEN_ENABLED")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
   
+    -- Combat Time Tracker
+    if (event == "PLAYER_REGEN_DISABLED") then
+      XPC.combatTime = GetTime()
+    end
+    if (event == "PLAYER_REGEN_ENABLED") then
+      stats.timeInCombat = stats.timeInCombat + (GetTime() - XPC.combatTime)
+      print(stats.timeInCombat)
+      XPC.combatTime = 0
+    end
+    
     -- Honor Gained Tracker
     if (event == "CHAT_MSG_COMBAT_HONOR_GAIN") then
       local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons = ...
@@ -1895,12 +1906,14 @@ function XPC:StatsTracker()
   end)
 end
 
+function XPC:TimeFormat(timex)
+  local days = math.floor(timex / 60 / 60 / 24) 
+  local hours = math.floor(timex / 60 / 60) % 24
+  local minutes = math.floor(timex / 60) % 60
+  local seconds = math.floor(timex % 60)
+  return days, hours, minutes, seconds
+end
 
--- # of duels won
--- # of duels lost
--- # of hk's
--- honor gained
--- time in combat
 -- % of time in combat
 -- % of xp gained from quests
 -- % of xp gained from mobs

@@ -108,6 +108,7 @@ function XPC:CreateVars()
   XPC.currDeleteToon = nil
   XPC.prevMoney = 0
   XPC.merchantShow = false
+  XPC.combatTime = 0
   for k,v in pairs(XPC.db.global.toons) do
     XPC.numOfToons = XPC.numOfToons + 1
   end
