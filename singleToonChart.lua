@@ -315,6 +315,10 @@ function XPC:BuildSingleToon()
   chart.goldFromQuests:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.goldFromQuests:SetPoint("TOPLEFT", 1986, -20)
   chart.goldFromQuests:SetText('Quest Gold')
+  chart.deaths = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.deaths:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.deaths:SetPoint("TOPLEFT", 2077, -20)
+  chart.deaths:SetText('Deaths')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -779,6 +783,16 @@ function XPC:ShowSingleToonChart()
       local copper = math.floor(v.goldFromQuests % 100)
       goldFromQuestsFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
       table.insert(content.values.goldFromQuests, goldFromQuestsFrame)
+
+      -- Quest Gold
+      local deathsFrame = CreateFrame("Frame", nil, content)
+      deathsFrame:SetPoint("TOPLEFT", 2040, posY)
+      deathsFrame:SetSize(1,1)
+      local deathsFS = deathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      deathsFS:SetPoint("CENTER")
+      deathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      deathsFS:SetText(v.deaths) 
+      table.insert(content.values.deaths, deathsFrame)
       
 
     else
@@ -809,6 +823,7 @@ function XPC:ShowSingleToonChart()
   local totalXPFromMobs = 0
   local totalXPFromQuests = 0
   local totalGoldFromQuests = 0
+  local totalDeaths = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -836,6 +851,7 @@ function XPC:ShowSingleToonChart()
     totalXPFromMobs = totalXPFromMobs + v.XPFromMobs
     totalXPFromQuests = totalXPFromQuests + v.XPFromQuests
     totalGoldFromQuests = totalGoldFromQuests + v.goldFromQuests
+    totalDeaths = totalDeaths + v.deaths
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -1101,6 +1117,16 @@ function XPC:ShowSingleToonChart()
   local copper = math.floor(totalGoldFromQuests % 100)
   goldFromQuestsFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
   table.insert(content.values.goldFromQuests, goldFromQuestsFrame)
+
+  -- Deaths
+  local deathsFrame = CreateFrame("Frame", nil, content)
+  deathsFrame:SetPoint("TOPLEFT", 2040, -15)
+  deathsFrame:SetSize(1,1)
+  local deathsFS = deathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  deathsFS:SetPoint("CENTER")
+  deathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  deathsFS:SetText(totalDeaths) 
+  table.insert(content.values.deaths, deathsFrame)
   
 
   chart:Show()
@@ -1264,8 +1290,14 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("PLAYER_ENTERING_WORLD")
   tracker:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
   tracker:RegisterEvent("QUEST_TURNED_IN")
+  tracker:RegisterEvent("PLAYER_DEAD")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
+
+    -- Deaths Tracker
+    if (event == "PLAYER_DEAD") then
+      stats.deaths = stats.deaths + 1
+    end
 
     -- Mob XP Tracker 
     if (event == "CHAT_MSG_COMBAT_XP_GAIN") then
@@ -1484,19 +1516,16 @@ end
 
 -- raw gold looted
 -- gold vendored
--- quest gold gained
 -- gold gained
 -- # of bandaids bandaged
 -- buffs given
 -- buffs received
 -- # of deaths
--- # of pvp deaths
 -- # of duels won
 -- # of duels lost
 -- # of hk's
 -- time on flight paths
 -- time in combat
 -- % of time in combat
--- xp gained from quests
 -- % of xp gained from quests
 -- % of xp gained from mobs
