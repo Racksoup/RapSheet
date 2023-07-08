@@ -180,6 +180,8 @@ function XPC:BuildSingleToon()
     hearthstone = {},
     goldFromQuests = {},
     goldFromLoot = {},
+    goldGainedMerchant = {},
+    goldLostMerchant = {},
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
@@ -328,6 +330,14 @@ function XPC:BuildSingleToon()
   chart.goldFromLoot:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.goldFromLoot:SetPoint("TOPLEFT", 2231, -20)
   chart.goldFromLoot:SetText('Loot Gold')
+  chart.goldGainedMerchant = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.goldGainedMerchant:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.goldGainedMerchant:SetPoint("TOPLEFT", 2328, -20)
+  chart.goldGainedMerchant:SetText('Sold')
+  chart.goldLostMerchant = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.goldLostMerchant:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.goldLostMerchant:SetPoint("TOPLEFT", 2404, -20)
+  chart.goldLostMerchant:SetText('Spent')
 
   -- Vertical Seperator Lines
   local i = 1
@@ -826,6 +836,32 @@ function XPC:ShowSingleToonChart()
       goldFromLootFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
       table.insert(content.values.goldFromLoot, goldFromLootFrame)
       
+      -- Gold Gained Merchant
+      local goldGainedMerchantFrame = CreateFrame("Frame", nil, content)
+      goldGainedMerchantFrame:SetPoint("TOPLEFT", 2280, posY)
+      goldGainedMerchantFrame:SetSize(1,1)
+      local goldGainedMerchantFS = goldGainedMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      goldGainedMerchantFS:SetPoint("CENTER")
+      goldGainedMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+      local gold = math.floor(v.goldGainedMerchant / 10000)
+      local silver = math.floor(v.goldGainedMerchant / 100 % 100)
+      local copper = math.floor(v.goldGainedMerchant % 100)
+      goldGainedMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+      table.insert(content.values.goldGainedMerchant, goldGainedMerchantFrame)
+
+      -- Gold Lost Merchant
+      local goldLostMerchantFrame = CreateFrame("Frame", nil, content)
+      goldLostMerchantFrame:SetPoint("TOPLEFT", 2360, posY)
+      goldLostMerchantFrame:SetSize(1,1)
+      local goldLostMerchantFS = goldLostMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      goldLostMerchantFS:SetPoint("CENTER")
+      goldLostMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+      local gold = math.floor(v.goldLostMerchant / 10000)
+      local silver = math.floor(v.goldLostMerchant / 100 % 100)
+      local copper = math.floor(v.goldLostMerchant % 100)
+      goldLostMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+      table.insert(content.values.goldLostMerchant, goldLostMerchantFrame)
+      
 
     else
       missedLevels = missedLevels + 1
@@ -858,6 +894,8 @@ function XPC:ShowSingleToonChart()
   local totalDeaths = 0
   local totalBandages = 0
   local totalGoldFromLoot = 0
+  local totalGoldGainedMerchant = 0
+  local totalGoldLostMerchant = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -888,6 +926,8 @@ function XPC:ShowSingleToonChart()
     totalDeaths = totalDeaths + v.deaths
     totalBandages = totalBandages + v.bandages
     totalGoldFromLoot = totalGoldFromLoot + v.goldFromLoot
+    totalGoldGainedMerchant = totalGoldGainedMerchant + v.goldGainedMerchant
+    totalGoldLostMerchant = totalGoldLostMerchant + v.goldLostMerchant
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -1186,6 +1226,32 @@ function XPC:ShowSingleToonChart()
   local copper = math.floor(totalGoldFromLoot % 100)
   goldFromLootFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
   table.insert(content.values.goldFromLoot, goldFromLootFrame)
+
+  -- Gold Gained Merchant
+  local goldGainedMerchantFrame = CreateFrame("Frame", nil, content)
+  goldGainedMerchantFrame:SetPoint("TOPLEFT", 2280, -15)
+  goldGainedMerchantFrame:SetSize(1,1)
+  local goldGainedMerchantFS = goldGainedMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  goldGainedMerchantFS:SetPoint("CENTER")
+  goldGainedMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+  local gold = math.floor(totalGoldGainedMerchant / 10000)
+  local silver = math.floor(totalGoldGainedMerchant / 100 % 100)
+  local copper = math.floor(totalGoldGainedMerchant % 100)
+  goldGainedMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
+  table.insert(content.values.goldGainedMerchant, goldGainedMerchantFrame)
+
+  -- Gold Lost Merchant
+  local goldLostMerchantFrame = CreateFrame("Frame", nil, content)
+  goldLostMerchantFrame:SetPoint("TOPLEFT", 2360, -15)
+  goldLostMerchantFrame:SetSize(1,1)
+  local goldLostMerchantFS = goldLostMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  goldLostMerchantFS:SetPoint("CENTER")
+  goldLostMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+  local gold = math.floor(totalGoldLostMerchant / 10000)
+  local silver = math.floor(totalGoldLostMerchant / 100 % 100)
+  local copper = math.floor(totalGoldLostMerchant % 100)
+  goldLostMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
+  table.insert(content.values.goldLostMerchant, goldLostMerchantFrame)
   
 
   chart:Show()
@@ -1352,10 +1418,33 @@ function XPC:StatsTracker()
   tracker:RegisterEvent("QUEST_TURNED_IN")
   tracker:RegisterEvent("PLAYER_DEAD")
   tracker:RegisterEvent("CHAT_MSG_MONEY")
+  tracker:RegisterEvent("PLAYER_MONEY")
+  tracker:RegisterEvent("MERCHANT_CLOSED")
+  tracker:RegisterEvent("MERCHANT_SHOW")
 
   tracker:SetScript("OnEvent", function(self, event, ...) 
 
-    -- Gold Tracker
+    -- Gold Gained / Lost Merchant Tracker
+    if (event == "MERCHANT_SHOW") then
+      XPC.prevMoney = GetMoney()
+      XPC.merchantShow = true
+    end
+    if (event == "MERCHANT_CLOSED") then
+      XPC.prevMoney = 0
+      XPC.merchantShow = false
+    end
+    if (event == "PLAYER_MONEY" and XPC.merchantShow == true) then
+      local currMoney = GetMoney()
+      if (currMoney > XPC.prevMoney) then
+        stats.goldGainedMerchant = stats.goldGainedMerchant + (currMoney - XPC.prevMoney)
+      end
+      if (currMoney < XPC.prevMoney) then
+        stats.goldLostMerchant = stats.goldLostMerchant + (XPC.prevMoney - currMoney)
+      end
+      XPC.prevMoney = currMoney
+    end
+
+    -- Gold Looted Tracker
     if (event == "CHAT_MSG_MONEY") then
       local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons = ...
       local gold = string.match(text, "%d+")
@@ -1588,9 +1677,7 @@ function XPC:StatsTracker()
 end
 
 
--- raw gold looted
--- gold vendored
--- gold gained
+-- gold gained total
 -- buffs given
 -- buffs received
 -- # of duels won

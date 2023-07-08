@@ -106,6 +106,8 @@ function XPC:CreateVars()
   XPC.justStartedFlightPath = false
   XPC.isAFK = false
   XPC.currDeleteToon = nil
+  XPC.prevMoney = 0
+  XPC.merchantShow = false
   for k,v in pairs(XPC.db.global.toons) do
     XPC.numOfToons = XPC.numOfToons + 1
   end
@@ -253,6 +255,8 @@ function XPC:CreateStatsData(level)
     hearthstone = 0,
     goldFromQuests = 0,
     goldFromLoot = 0,
+    goldLostMerchant = 0,
+    goldGainedMerchant = 0,
   }
   
   -- init statsData and its level objects
