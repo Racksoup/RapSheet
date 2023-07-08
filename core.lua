@@ -70,7 +70,7 @@ end
 function XPC:OnInitialize()
   self.db = LibStub("AceDB-3.0"):New("XPChartDB", defaults, true)
   icon:Register("XPChart", XPC_LDB, self.db.realm.minimap)
-  -- self.db:ResetDB()
+  self.db:ResetDB()
 
   XPC:CreateVars()
 
@@ -246,6 +246,7 @@ function XPC:CreateStatsData(level)
     duelsLost = 0,
     honorKills = 0,
     flightPaths = 0,
+    timeOnTaxi = 0,
     timeAFK = 0,
     timeInCombat = 0,
     timePlayedAtLevel = 0,

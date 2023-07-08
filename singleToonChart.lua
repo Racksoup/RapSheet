@@ -171,6 +171,7 @@ function XPC:BuildSingleToon()
     timeAFK = {},
     timeInCombat = {},
     timePlayedAtLevel = {},
+    timeOnTaxi = {},
     levelTime = {},
     xpPerHour = {},
     XPFromQuests = {},
@@ -343,6 +344,10 @@ function XPC:BuildSingleToon()
   chart.goldTotal:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.goldTotal:SetPoint("TOPLEFT", 2464, -20)
   chart.goldTotal:SetText('Gold Gained')
+  chart.timeOnTaxi = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.timeOnTaxi:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.timeOnTaxi:SetPoint("TOPLEFT", 2554, -20)
+  chart.timeOnTaxi:SetText('Taxi Time')
 
 
   -- Vertical Seperator Lines
@@ -880,6 +885,25 @@ function XPC:ShowSingleToonChart()
       local copper = math.floor((v.goldGainedMerchant + v.goldFromLoot + v.goldFromQuests) % 100)
       goldTotalFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
       table.insert(content.values.goldTotal, goldTotalFrame)
+
+      -- Time on Taxi
+      local timeOnTaxiFrame = CreateFrame("Frame", nil, content)
+      timeOnTaxiFrame:SetPoint("TOPLEFT", 2520, posY)
+      timeOnTaxiFrame:SetSize(1,1)
+      local timeOnTaxiFS = timeOnTaxiFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      timeOnTaxiFS:SetPoint("CENTER")
+      timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      timex = v.timeOnTaxi
+      days = math.floor(timex / 60 / 60 / 24) 
+      hours = math.floor(timex / 60 / 60) % 24
+      minutes = math.floor(timex / 60) % 60
+      seconds = timex % 60
+      if (days >= 1) then 
+        timeOnTaxiFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+      else
+        timeOnTaxiFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+      end
+      table.insert(content.values.timeOnTaxi, timeOnTaxiFrame)
       
     else
       missedLevels = missedLevels + 1
@@ -914,6 +938,7 @@ function XPC:ShowSingleToonChart()
   local totalGoldFromLoot = 0
   local totalGoldGainedMerchant = 0
   local totalGoldLostMerchant = 0
+  local totalTimeOnTaxi = 0
   local damageDealtFrame = CreateFrame("Frame", nil, content)
   damageDealtFrame:SetPoint("TOPLEFT", 40, -15)
   damageDealtFrame:SetSize(1,1)
@@ -946,6 +971,7 @@ function XPC:ShowSingleToonChart()
     totalGoldFromLoot = totalGoldFromLoot + v.goldFromLoot
     totalGoldGainedMerchant = totalGoldGainedMerchant + v.goldGainedMerchant
     totalGoldLostMerchant = totalGoldLostMerchant + v.goldLostMerchant
+    totalTimeOnTaxi = totalTimeOnTaxi + v.timeOnTaxi
   end
   if (totalDamageDealt >= 1000000) then 
     damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
@@ -1283,6 +1309,25 @@ function XPC:ShowSingleToonChart()
   local copper = math.floor((totalGoldGainedMerchant + totalGoldFromLoot + totalGoldFromQuests) % 100)
   goldTotalFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
   table.insert(content.values.goldTotal, goldTotalFrame)
+
+  -- Time on Taxi
+  local timeOnTaxiFrame = CreateFrame("Frame", nil, content)
+  timeOnTaxiFrame:SetPoint("TOPLEFT", 2520, -15)
+  timeOnTaxiFrame:SetSize(1,1)
+  local timeOnTaxiFS = timeOnTaxiFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  timeOnTaxiFS:SetPoint("CENTER")
+  timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+  timex = totalTimeOnTaxi
+  days = math.floor(timex / 60 / 60 / 24) 
+  hours = math.floor(timex / 60 / 60) % 24
+  minutes = math.floor(timex / 60) % 60
+  seconds = timex % 60
+  if (days >= 1) then 
+    timeOnTaxiFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+  else
+    timeOnTaxiFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+  end
+  table.insert(content.values.timeOnTaxi, timeOnTaxiFrame)
   
 
   chart:Show()
@@ -1543,6 +1588,15 @@ function XPC:StatsTracker()
           stats.flightPaths = stats.flightPaths + 1
         end
       end)
+      local function loop()
+        C_Timer.After(1, function()
+          if (UnitOnTaxi('player')) then
+            stats.timeOnTaxi = stats.timeOnTaxi + 1
+            loop()
+          end
+        end)
+      end
+      loop()
     end
 
     -- level up tracker
@@ -1708,13 +1762,10 @@ function XPC:StatsTracker()
 end
 
 
--- buffs given
--- buffs received
 -- # of duels won
 -- # of duels lost
 -- # of hk's
 -- honor gained
--- time on flight paths
 -- time in combat
 -- % of time in combat
 -- % of xp gained from quests
