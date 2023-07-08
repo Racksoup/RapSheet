@@ -169,20 +169,9 @@ function XPC:BuildMainWindow()
   local xpGraphBtn = main.xpGraphBtn
   xpGraphBtn:SetSize(120, 25)
   xpGraphBtn:SetPoint("TOPLEFT", 20, -14)
-  xpGraphBtn:SetText("XP Gained")
+  xpGraphBtn:SetText("XP Chart")
   xpGraphBtn:SetScript("OnClick", function()
     XPC.db.global.settings.view = 'xpGraph'
-    XPC:ShowView()
-  end)
-
-  -- all toons chart button 
-  main.allToonsBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
-  local allToonsBtn = main.allToonsBtn
-  allToonsBtn:SetSize(120, 25)
-  allToonsBtn:SetPoint("TOPLEFT", 150, -14)
-  allToonsBtn:SetText("Stats - All")
-  allToonsBtn:SetScript("OnClick", function()
-    XPC.db.global.settings.view = 'allToonsChart'
     XPC:ShowView()
   end)
 
@@ -190,12 +179,23 @@ function XPC:BuildMainWindow()
   main.singleToon = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
   local singleToon = main.singleToon
   singleToon:SetSize(120, 25)
-  singleToon:SetPoint("TOPLEFT", 280, -14)
-  singleToon:SetText("Stats - Single")
+  singleToon:SetPoint("TOPLEFT", 150, -14)
+  singleToon:SetText("Stats")
   singleToon:SetScript("OnClick", function()
     XPC.db.global.settings.view = 'singleToonChart'
     XPC:ShowView()
   end)
+
+  -- all toons chart button 
+  -- main.allToonsBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
+  -- local allToonsBtn = main.allToonsBtn
+  -- allToonsBtn:SetSize(120, 25)
+  -- allToonsBtn:SetPoint("TOPLEFT", 280, -14)
+  -- allToonsBtn:SetText("Stats - All")
+  -- allToonsBtn:SetScript("OnClick", function()
+  --   XPC.db.global.settings.view = 'allToonsChart'
+  --   XPC:ShowView()
+  -- end)
   
   XPC:BuildXPGraphOptions()
   XPC:BuildSingleToon()
@@ -366,8 +366,6 @@ function XPC:ShowColorPicker(color, changedCallback)
   ColorPickerFrame:Hide(); -- Need to run the OnShow handler.
   ColorPickerFrame:Show();
 end
-
--- make sure addon opens for level 60s 
 
 -- change addon name to 'Level Stats'??? maybe
 

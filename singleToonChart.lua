@@ -295,17 +295,17 @@ function XPC:BuildSingleToon()
   -- 15
   chart.percentXPQuests = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.percentXPQuests:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.percentXPQuests:SetPoint("TOPLEFT", (80 * 15) -20, -20)
+  chart.percentXPQuests:SetPoint("TOPLEFT", (80 * 15) -19, -20)
   chart.percentXPQuests:SetText('% XP Quests')
   -- 16
   chart.timePlayedAtLevel = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.timePlayedAtLevel:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.timePlayedAtLevel:SetPoint("TOPLEFT", (80 * 16) -16, -20)
+  chart.timePlayedAtLevel:SetPoint("TOPLEFT", (80 * 16) -17, -20)
   chart.timePlayedAtLevel:SetText('Time Played')
   -- 17 
   chart.levelTime = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.levelTime:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.levelTime:SetPoint("TOPLEFT", (80 * 17) -11, -20)
+  chart.levelTime:SetPoint("TOPLEFT", (80 * 17) -13, -20)
   chart.levelTime:SetText('Level Time')
   -- 18
   chart.timeInCombat = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
@@ -325,7 +325,7 @@ function XPC:BuildSingleToon()
   -- 21
   chart.goldFromLoot = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.goldFromLoot:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.goldFromLoot:SetPoint("TOPLEFT", (80 * 21) -9, -20)
+  chart.goldFromLoot:SetPoint("TOPLEFT", (80 * 21) -10, -20)
   chart.goldFromLoot:SetText('Loot Gold')
   -- 22
   chart.goldFromQuests = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
@@ -335,7 +335,7 @@ function XPC:BuildSingleToon()
   -- 23
   chart.goldGainedMerchant = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.goldGainedMerchant:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.goldGainedMerchant:SetPoint("TOPLEFT", (80 * 23) +8, -20)
+  chart.goldGainedMerchant:SetPoint("TOPLEFT", (80 * 23) +7, -20)
   chart.goldGainedMerchant:SetText('Sold')
   -- 24
   chart.goldTotal = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
@@ -350,12 +350,12 @@ function XPC:BuildSingleToon()
   -- 26
   chart.duelsWon = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.duelsWon:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.duelsWon:SetPoint("TOPLEFT", (80 * 26) -11, -20)
+  chart.duelsWon:SetPoint("TOPLEFT", (80 * 26) -12, -20)
   chart.duelsWon:SetText('Duels Won')
   -- 27
   chart.duelsLost = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.duelsLost:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.duelsLost:SetPoint("TOPLEFT", (80 * 27) -10, -20)
+  chart.duelsLost:SetPoint("TOPLEFT", (80 * 27) -11, -20)
   chart.duelsLost:SetText('Duels Lost')
   -- 28
   chart.honorKills = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
@@ -370,7 +370,7 @@ function XPC:BuildSingleToon()
   -- 30
   chart.food = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.food:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.food:SetPoint("TOPLEFT", (80 * 30) +8, -20)
+  chart.food:SetPoint("TOPLEFT", (80 * 30) +6, -20)
   chart.food:SetText('Food')
   -- 31
   chart.drink = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
@@ -400,7 +400,7 @@ function XPC:BuildSingleToon()
   -- 36
   chart.potions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.potions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.potions:SetPoint("TOPLEFT", (80 * 36) -6, -20)
+  chart.potions:SetPoint("TOPLEFT", (80 * 36) -8, -20)
   chart.potions:SetText('Misc Pots')
   -- 37
   chart.hearthstone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
@@ -410,7 +410,7 @@ function XPC:BuildSingleToon()
   -- 38
   chart.dungeons = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.dungeons:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.dungeons:SetPoint("TOPLEFT", (80 * 38) -7, -20)
+  chart.dungeons:SetPoint("TOPLEFT", (80 * 38) -8, -20)
   chart.dungeons:SetText('Dungeons')
   -- 39
   chart.flightPaths = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
@@ -420,7 +420,7 @@ function XPC:BuildSingleToon()
   -- 40
   chart.timeOnTaxi = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.timeOnTaxi:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.timeOnTaxi:SetPoint("TOPLEFT", (80 * 40) -7, -20)
+  chart.timeOnTaxi:SetPoint("TOPLEFT", (80 * 40) -8, -20)
   chart.timeOnTaxi:SetText('Taxi Time')
 
 
