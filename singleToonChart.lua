@@ -185,6 +185,8 @@ function XPC:BuildSingleToon()
     goldLostMerchant = {},
     goldTotal = {},
     percentInCombat = {},
+    percentXPMobs = {},
+    percentXPQuests = {},
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
@@ -372,6 +374,14 @@ function XPC:BuildSingleToon()
   chart.percentInCombat:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
   chart.percentInCombat:SetPoint("TOPLEFT", (80 * 38) -15, -20)
   chart.percentInCombat:SetText('% in Combat')
+  chart.percentXPMobs = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.percentXPMobs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.percentXPMobs:SetPoint("TOPLEFT", (80 * 39) -15, -20)
+  chart.percentXPMobs:SetText('% XP Mobs')
+  chart.percentXPQuests = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.percentXPQuests:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.percentXPQuests:SetPoint("TOPLEFT", (80 * 40) -20, -20)
+  chart.percentXPQuests:SetText('% XP Quests')
 
 
   -- Vertical Seperator Lines
@@ -460,9 +470,11 @@ function XPC:ShowSingleToonChart()
   end
   
   -- chart values for levels. goes through each level and create a value for each data on the chart
+  local totalXP = 0
   missedLevels = 0
   for i=level, 1, -1 do
     if (toon.statsData[tostring(i)] ~= nil) then 
+      totalXP = totalXP + XPC.levelChart[i]
       local v = toon.statsData[tostring(i)]
       local posY = ((level + 1) - i - missedLevels) * -30 -15
 
@@ -1001,6 +1013,30 @@ function XPC:ShowSingleToonChart()
         percentInCombatFS:SetText(math.floor((v.timeInCombat / v.timePlayedAtLevel )* 100) .. "%")
         table.insert(content.values.percentInCombat, percentInCombatFrame)
       end
+
+      -- Percent XP Gained Mobs
+      local percentXPMobsFrame = CreateFrame("Frame", nil, content)
+      percentXPMobsFrame:SetPoint("TOPLEFT", 3080, posY)
+      percentXPMobsFrame:SetSize(1,1)
+      local percentXPMobsFS = percentXPMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      percentXPMobsFS:SetPoint("CENTER")
+      percentXPMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      local percent = math.floor((v.XPFromMobs / XPC.levelChart[i]) * 100)
+      if (percent > 100) then percent = 100 end
+      percentXPMobsFS:SetText(percent .. "%") 
+      table.insert(content.values.percentXPMobs, percentXPMobsFrame)
+      
+      -- Percent XP Gained Quests
+      local percentXPQuestsFrame = CreateFrame("Frame", nil, content)
+      percentXPQuestsFrame:SetPoint("TOPLEFT", 3160, posY)
+      percentXPQuestsFrame:SetSize(1,1)
+      local percentXPQuestsFS = percentXPQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      percentXPQuestsFS:SetPoint("CENTER")
+      percentXPQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      local percent = math.floor((v.XPFromQuests / XPC.levelChart[i]) * 100)
+      if (percent > 100) then percent = 100 end
+      percentXPQuestsFS:SetText(percent .. "%") 
+      table.insert(content.values.percentXPQuests, percentXPQuestsFrame)
       
     else
       missedLevels = missedLevels + 1
@@ -1489,6 +1525,30 @@ function XPC:ShowSingleToonChart()
   percentInCombatFS:SetText(math.floor((totalTimeInCombat / toon.levelData[#toon.levelData].timePlayed) * 100) .. "%")
   table.insert(content.values.percentInCombat, percentInCombatFrame)
 
+  -- Percent XP Gained Mobs
+  local percentXPMobsFrame = CreateFrame("Frame", nil, content)
+  percentXPMobsFrame:SetPoint("TOPLEFT", 3080, -15)
+  percentXPMobsFrame:SetSize(1,1)
+  local percentXPMobsFS = percentXPMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  percentXPMobsFS:SetPoint("CENTER")
+  percentXPMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  local percent = math.floor((totalXPFromMobs / totalXP) * 100) 
+  if (percent > 100) then percent = 100 end
+  percentXPMobsFS:SetText(percent .. "%")
+  table.insert(content.values.percentXPMobs, percentXPMobsFrame)
+
+  -- Percent XP Gained Quests
+  local percentXPQuestsFrame = CreateFrame("Frame", nil, content)
+  percentXPQuestsFrame:SetPoint("TOPLEFT", 3160, -15)
+  percentXPQuestsFrame:SetSize(1,1)
+  local percentXPQuestsFS = percentXPQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  percentXPQuestsFS:SetPoint("CENTER")
+  percentXPQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  local percent = math.floor((totalXPFromQuests / totalXP) * 100)
+  if (percent > 100) then percent = 100 end
+  percentXPQuestsFS:SetText(percent .. "%")
+  table.insert(content.values.percentXPQuests, percentXPQuestsFrame)
+
   chart:Show()
 end
 
@@ -1968,5 +2028,3 @@ function XPC:TimeFormat(timex)
   return days, hours, minutes, seconds
 end
 
--- % of xp gained from quests
--- % of xp gained from mobs
