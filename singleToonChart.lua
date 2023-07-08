@@ -182,6 +182,7 @@ function XPC:BuildSingleToon()
     goldFromLoot = {},
     goldGainedMerchant = {},
     goldLostMerchant = {},
+    goldTotal = {},
   }
   -- Vertical and Horizontal Line Seperator table init
   content.vLines = {}
@@ -336,8 +337,13 @@ function XPC:BuildSingleToon()
   chart.goldGainedMerchant:SetText('Sold')
   chart.goldLostMerchant = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.goldLostMerchant:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.goldLostMerchant:SetPoint("TOPLEFT", 2404, -20)
+  chart.goldLostMerchant:SetPoint("TOPLEFT", 2396, -20)
   chart.goldLostMerchant:SetText('Spent')
+  chart.goldTotal = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.goldTotal:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.goldTotal:SetPoint("TOPLEFT", 2464, -20)
+  chart.goldTotal:SetText('Gold Gained')
+
 
   -- Vertical Seperator Lines
   local i = 1
@@ -862,7 +868,19 @@ function XPC:ShowSingleToonChart()
       goldLostMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
       table.insert(content.values.goldLostMerchant, goldLostMerchantFrame)
       
-
+      -- Gold Gained Total
+      local goldTotalFrame = CreateFrame("Frame", nil, content)
+      goldTotalFrame:SetPoint("TOPLEFT", 2440, posY)
+      goldTotalFrame:SetSize(1,1)
+      local goldTotalFS = goldTotalFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      goldTotalFS:SetPoint("CENTER")
+      goldTotalFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+      local gold = math.floor((v.goldGainedMerchant + v.goldFromLoot + v.goldFromQuests) / 10000)
+      local silver = math.floor((v.goldGainedMerchant + v.goldFromLoot + v.goldFromQuests) / 100 % 100)
+      local copper = math.floor((v.goldGainedMerchant + v.goldFromLoot + v.goldFromQuests) % 100)
+      goldTotalFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+      table.insert(content.values.goldTotal, goldTotalFrame)
+      
     else
       missedLevels = missedLevels + 1
     end
@@ -1252,6 +1270,19 @@ function XPC:ShowSingleToonChart()
   local copper = math.floor(totalGoldLostMerchant % 100)
   goldLostMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
   table.insert(content.values.goldLostMerchant, goldLostMerchantFrame)
+
+  -- Gold Gained Total
+  local goldTotalFrame = CreateFrame("Frame", nil, content)
+  goldTotalFrame:SetPoint("TOPLEFT", 2440, -15)
+  goldTotalFrame:SetSize(1,1)
+  local goldTotalFS = goldTotalFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+  goldTotalFS:SetPoint("CENTER")
+  goldTotalFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+  local gold = math.floor((totalGoldGainedMerchant + totalGoldFromLoot + totalGoldFromQuests)  / 10000)
+  local silver = math.floor((totalGoldGainedMerchant + totalGoldFromLoot + totalGoldFromQuests) / 100 % 100)
+  local copper = math.floor((totalGoldGainedMerchant + totalGoldFromLoot + totalGoldFromQuests) % 100)
+  goldTotalFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
+  table.insert(content.values.goldTotal, goldTotalFrame)
   
 
   chart:Show()
@@ -1677,7 +1708,6 @@ function XPC:StatsTracker()
 end
 
 
--- gold gained total
 -- buffs given
 -- buffs received
 -- # of duels won
