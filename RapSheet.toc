@@ -1,7 +1,7 @@
 ## Interface: 11402
-## Title: XP Chart
-## Author: ZUI
-## SavedVariables: XPChartDB
+## Title: Rap Sheet
+## Author: Connor Rack
+## SavedVariables: RapSheetDB
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
 

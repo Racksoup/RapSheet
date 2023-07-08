@@ -1,10 +1,10 @@
-XPC = LibStub("AceAddon-3.0"):NewAddon("XPChart")
-local L = LibStub("AceLocale-3.0"):GetLocale("XPChartLocale")
+XPC = LibStub("AceAddon-3.0"):NewAddon("RapSheet")
+local L = LibStub("AceLocale-3.0"):GetLocale("RapSheetLocale")
 XPC_GUI = {}
 local icon = LibStub("LibDBIcon-1.0")
 local XPC_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("XPC", {
   type = "data source",
-  text = "XP Chart",
+  text = "Rap Sheet",
   icon = "interface/icons/inv_misc_book_12.blp",
   OnClick = function()
     if (XPC_GUI.main:IsVisible()) then 
@@ -16,7 +16,7 @@ local XPC_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("XPC", {
     end
   end,
   OnTooltipShow = function(tooltip)
-    tooltip:SetText("XP Chart")
+    tooltip:SetText("Rap Sheet")
   end,
 })
 
@@ -68,8 +68,8 @@ SlashCmdList["XPC"] = function()
 end
 
 function XPC:OnInitialize()
-  self.db = LibStub("AceDB-3.0"):New("XPChartDB", defaults, true)
-  icon:Register("XPChart", XPC_LDB, self.db.realm.minimap)
+  self.db = LibStub("AceDB-3.0"):New("RapSheetDB", defaults, true)
+  icon:Register("RapSheet", XPC_LDB, self.db.realm.minimap)
   -- self.db:ResetDB()
 
   XPC:CreateVars()

@@ -1061,7 +1061,7 @@ function XPC:ShowSingleToonChart()
       timeOnTaxiFrame:SetSize(1,1)
       local timeOnTaxiFS = timeOnTaxiFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
       timeOnTaxiFS:SetPoint("CENTER")
-      timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
       local days, hours, minutes, seconds = XPC:TimeFormat(v.timeOnTaxi)
       if (days >= 1) then 
         timeOnTaxiFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
