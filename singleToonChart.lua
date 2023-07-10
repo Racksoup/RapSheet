@@ -210,7 +210,7 @@ function XPC:BuildSingleToon()
   content:SetSize(chart:GetWidth() - 63, chart:GetHeight() - 33)
   content:SetPoint("TOPLEFT", 63 , -43)
 
-  -- Horizonatl Border Line
+  -- Horizontal Border Line
   chart.hLine = chart:CreateLine()
   chart.hLine:SetColorTexture(0.7,0.7,0.7,1)
   chart.hLine:SetStartPoint("TOPLEFT", 60, -40)
@@ -1648,14 +1648,15 @@ function XPC:StatsTracker()
   XPC_GUI.statsTracker = CreateFrame("Frame", statsTracker)
   local tracker = XPC_GUI.statsTracker
   local stats = XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player'))]
-  local foods = {25691, 25690, 25692, 25693, 24707, 29029, 434, 18229, 10257, 22731, 25695, 25700, 26401, 26260, 26472, 29008, 1131, 435, 18231, 18232, 18234, 24869, 6410, 28616, 25886, 433, 7737, 2639, 10256, 24800, 1127, 1129, 25660, 5006, 5005, 5007, 18233, 24005, 5004, 18230, 29073}
-  local drinks = {25691, 25690, 25692, 25693, 24707, 29029, 430, 24355, 1135, 26475, 22734, 1133, 432, 1137, 26473, 10250, 25696, 26261, 29007}
-  local potions = {9030,5634,13444,13457,5816,929,13446,3823,13443,3387,2459,13442,9172,20008,6149,3928,1710,6049,3827,6372,5633,13461,13455,858,9144,13462,3385,13459,6048,5631,13458,118,2455,13506,12190,18253,23579,20002,13456,4623,6052,3386,2456,6051,5632,13460,6050,18841,4596,23578,18839,1450,17348,3087,17351,17349,23696,23698,17352}
-  local elixirs = {9155,10592,8949,13453,3389,9224,9233,3828,9154,9197,6373,3825,17708,6662,9206,9187,8951,21546,9179,18294,3390,2454,2457,5997,2458,3391,9264,13445,13452,13447,5996,8827,3383,9088,13454,20007,3826,20004,3388,3382}
-  local flasks = {13510,13512,13511,13506,13513}
-  local bandages = {10841, 7928, 3278, 18629, 18630, 3276, 3277, 10840, 7929, 3275, 30021, 746, 1159, 3267, 3268, 7926, 24412, 10838, 23568, 23696, 18608, 30020}
+  local foods = {25691, 25690, 25692, 25693, 24707, 29029, 434, 18229, 10257, 22731, 25695, 25700, 26401, 26260, 26472, 29008, 1131, 435, 18231, 18232, 18234, 24869, 6410, 28616, 25886, 433, 7737, 2639, 10256, 24800, 1127, 1129, 25660, 5006, 5005, 5007, 18233, 24005, 5004, 18230, 29073, 53283, 58886, 29073, 28616, 33266, 46898, 43777, 33253, 33269, 33260, 48720, 43180, 33264, 35270, 33255, 61829, 57069, 46812, 42308, 41030, 40768, 35271, 45618, 33725, 57084, 43763, 40745, 33262, 33258, 45548}
+  local drinks = {25691, 25690, 25692, 25693, 24707, 29029, 430, 24355, 1135, 26475, 22734, 1133, 432, 1137, 26473, 10250, 25696, 26261, 29007, 44114, 10250, 22734, 34291, 65363, 69560, 49472, 44116, 43706, 61830, 44115, 27089, 69561, 45020, 43182, 52911, 43183}
+  -- local potions = {9030,5634,13444,13457,5816,929,13446,3823,13443,3387,2459,13442,9172,20008,6149,3928,1710,6049,3827,6372,5633,13461,13455,858,9144,13462,3385,13459,6048,5631,13458,118,2455,13506,12190,18253,23579,20002,13456,4623,6052,3386,2456,6051,5632,13460,6050,18841,4596,23578,18839,1450,17348,3087,17351,17349,23696,23698,17352}
+  -- local elixirs = {9155,10592,8949,13453,3389,9224,9233,3828,9154,9197,6373,3825,17708,6662,9206,9187,8951,21546,9179,18294,3390,2454,2457,5997,2458,3391,9264,13445,13452,13447,5996,8827,3383,9088,13454,20007,3826,20004,3388,3382}
+  -- local flasks = {13510,13512,13511,13506,13513}
+  local bandages = {10841, 7928, 3278, 18629, 18630, 3276, 3277, 10840, 7929, 3275, 30021, 746, 1159, 3267, 3268, 7926, 24412, 10838, 23568, 23696, 18608, 30020, 27030, 27031, 45543, 51827, 45544,51803}
   local potionBuffNames = {
     "Free Action",
+    "Living Free Action",
     "Noggenfogger Elixir",
     "Fire Protection",
     "Nature Protection",
@@ -1674,7 +1675,6 @@ function XPC:StatsTracker()
     "Lesser Invisibility",
     "Invisibility",
     "Resistance",
-    "Living Free Action",
     "Spirit of Boar",
     "Rage of Ages",
     "Strike of the Scorpok",
@@ -1683,6 +1683,10 @@ function XPC:StatsTracker()
     "Greater Dreamless Sleep",
     "Dreamless Sleep",
     "Purification",
+    "Mighty Rage",
+    "Great Rage",
+    "Rage",
+    "Frost Resistance",
   }
   local scrollBuffNames = {
     "Armor",
@@ -1725,7 +1729,8 @@ function XPC:StatsTracker()
     "Posion Resistance",
     "Detect Lesser Invisibility",
     "Detect Demon",
-    "Stealth Detection"
+    "Stealth Detection",
+    "Winterfall Firewater"
   }
   local flaskBuffNames = {
     "Supreme Power",
@@ -1913,11 +1918,12 @@ function XPC:StatsTracker()
           if (b == 'Healing Potion') then
             stats.healingPotions = stats.healingPotions + 1
           end
-          if (b == 'Wildvine Potion' or b == 'Rejuvenation Potion') then
+          if (b == 'Wildvine Potion' or b == 'Rejuvenation Potion' or b == 'Mad Alchemist\'s Potion') then
             stats.MHPotions = stats.MHPotions + 1
           end
         end
         if (subevent == "SPELL_CAST_SUCCESS") then
+          print(b)
           local isPot = false
           for i,v in ipairs(potionBuffNames) do
             if (b == v) then
@@ -2118,3 +2124,6 @@ end
 -- 38 dungeons
 -- 39 taxis
 -- 40 taxi time
+
+
+-- for elixirs potions flasks scrolls need to update from combat log to UNIT_SPELLCAST_SUCCEDED. use spellID's. to get spellID's get itemID list from tsm, look up all items in wowhead, find spell for each item
