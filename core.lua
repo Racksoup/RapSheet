@@ -236,6 +236,9 @@ function XPC:CreateStatsData(level)
     drink = 0,
     bandages = 0,
     potions = 0,
+    scrolls = 0,
+    elixirs = 0,
+    flasks = 0,
     healingPotions = 0,
     manaPotions = 0,
     MHPotions = 0,
@@ -268,9 +271,49 @@ function XPC:CreateStatsData(level)
       toon.statsData[tostring(level)] = statList
     end
   else
-    if (toon.statsData[tostring(UnitLevel('player'))] == nil) then
-      toon.statsData[tostring(UnitLevel('player'))] = statList
+    local stats = toon.statsData[tostring(UnitLevel('player'))]
+    if (stats == nil) then
+      stats = statList
     end
+    if (stats.damageDealt == nil) then stats.damageDealt = 0 end
+    if (stats.damageTaken == nil) then stats.damageTaken = 0 end
+    if (stats.healsGiven == nil) then stats.healsGiven = 0 end
+    if (stats.healsReceived == nil) then stats.healsReceived = 0 end
+    if (stats.monstersKilledSolo == nil) then stats.monstersKilledSolo = 0 end
+    if (stats.monstersKilledInGroup == nil) then stats.monstersKilledInGroup = 0 end
+    if (stats.questsCompleted == nil) then stats.questsCompleted = 0 end
+    if (stats.food == nil) then stats.food = 0 end
+    if (stats.drink == nil) then stats.drink = 0 end
+    if (stats.bandages == nil) then stats.bandages = 0 end
+    if (stats.potions == nil) then stats.potions = 0 end
+    if (stats.scrolls == nil) then stats.scrolls = 0 end
+    print('here')
+    if (stats.elixirs == nil) then stats.elixirs = 0 end
+    if (stats.flasks == nil) then stats.flasks = 0 end
+    if (stats.healingPotions == nil) then stats.healingPotions = 0 end
+    if (stats.manaPotions == nil) then stats.manaPotions = 0 end
+    if (stats.MHPotions == nil) then stats.MHPotions = 0 end
+    if (stats.healsGiven == nil) then stats.healsGiven = 0 end
+    if (stats.healsReceived == nil) then stats.healsReceived = 0 end
+    if (stats.deaths == nil) then stats.deaths = 0 end
+    if (stats.pvpDeaths == nil) then stats.pvpDeaths = 0 end
+    if (stats.duelsWon == nil) then stats.duelsWon = 0 end
+    if (stats.duelsLost == nil) then stats.duelsLost = 0 end
+    if (stats.honorKills == nil) then stats.honorKills = 0 end
+    if (stats.honor == nil) then stats.honor = 0 end
+    if (stats.flightPaths == nil) then stats.flightPaths = 0 end
+    if (stats.timeOnTaxi == nil) then stats.timeOnTaxi = 0 end
+    if (stats.timeAFK == nil) then stats.timeAFK = 0 end
+    if (stats.timeInCombat == nil) then stats.timeInCombat = 0 end
+    if (stats.timePlayedAtLevel == nil) then stats.timePlayedAtLevel = 0 end
+    if (stats.XPFromQuests == nil) then stats.XPFromQuests = 0 end
+    if (stats.XPFromMobs == nil) then stats.XPFromMobs = 0 end
+    if (stats.dungeonsEntered == nil) then stats.dungeonsEntered = 0 end
+    if (stats.hearthstone == nil) then stats.hearthstone = 0 end
+    if (stats.goldFromQuests == nil) then stats.goldFromQuests = 0 end
+    if (stats.goldFromLoot == nil) then stats.goldFromLoot = 0 end
+    if (stats.goldLostMerchant == nil) then stats.goldLostMerchant = 0 end
+    if (stats.goldGainedMerchant == nil) then stats.goldGainedMerchant = 0 end
   end
 end
 

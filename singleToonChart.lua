@@ -157,6 +157,9 @@ function XPC:BuildSingleToon()
     drink = {},
     bandages = {},
     potions = {},
+    elixirs = {},
+    scrolls = {},
+    flasks = {},
     healingPotions = {},
     manaPotions = {},
     MHPotions = {},
@@ -400,27 +403,42 @@ function XPC:BuildSingleToon()
   -- 36
   chart.potions = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.potions:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.potions:SetPoint("TOPLEFT", (80 * 36) -8, -20)
-  chart.potions:SetText('Misc Pots')
+  chart.potions:SetPoint("TOPLEFT", (80 * 36) +0, -20)
+  chart.potions:SetText('Potions')
   -- 37
+  chart.elixirs = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.elixirs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.elixirs:SetPoint("TOPLEFT", (80 * 37) +2, -20)
+  chart.elixirs:SetText('Elixirs')
+  -- 38
+  chart.flasks = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.flasks:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.flasks:SetPoint("TOPLEFT", (80 * 38) +2, -20)
+  chart.flasks:SetText('Flasks')
+  -- 39
+  chart.scrolls = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  chart.scrolls:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+  chart.scrolls:SetPoint("TOPLEFT", (80 * 39) +0, -20)
+  chart.scrolls:SetText('Scrolls')
+  -- 40
   chart.hearthstone = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.hearthstone:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.hearthstone:SetPoint("TOPLEFT", (80 * 37) -19, -20)
+  chart.hearthstone:SetPoint("TOPLEFT", (80 * 40) -19, -20)
   chart.hearthstone:SetText('Hearthstones')
-  -- 38
+  -- 41
   chart.dungeons = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.dungeons:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.dungeons:SetPoint("TOPLEFT", (80 * 38) -8, -20)
+  chart.dungeons:SetPoint("TOPLEFT", (80 * 41) -8, -20)
   chart.dungeons:SetText('Dungeons')
-  -- 39
+  -- 42
   chart.flightPaths = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.flightPaths:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.flightPaths:SetPoint("TOPLEFT", (80 * 39) +4, -20)
+  chart.flightPaths:SetPoint("TOPLEFT", (80 * 42) +4, -20)
   chart.flightPaths:SetText('Taxis')
-  -- 40
+  -- 43
   chart.timeOnTaxi = chart:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
   chart.timeOnTaxi:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  chart.timeOnTaxi:SetPoint("TOPLEFT", (80 * 40) -8, -20)
+  chart.timeOnTaxi:SetPoint("TOPLEFT", (80 * 43) -8, -20)
   chart.timeOnTaxi:SetText('Taxi Time')
 
 
@@ -514,125 +532,141 @@ function XPC:ShowSingleToonChart()
   local totalXP = 0
   missedLevels = 0
   for i=level, 1, -1 do
-    if (toon.statsData[tostring(i)] ~= nil) then 
+    local stats = toon.statsData[tostring(i)]
+    local lastLevelStats = toon.statsData[tostring(i -1)]
+    if (stats ~= nil) then 
       totalXP = totalXP + XPC.levelChart[i]
-      local v = toon.statsData[tostring(i)]
+      local v = stats
       local posY = ((level + 1) - i - missedLevels) * -30 -15
+      local levelTime = 0
 
       -- 17 Level Time
-      local levelTimeFrame = CreateFrame("Frame", nil, content)
-      levelTimeFrame:SetPoint("TOPLEFT", (80 *17) - 40, posY)
-      levelTimeFrame:SetSize(1,1)
-      local levelTimeFS = levelTimeFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      levelTimeFS:SetPoint("CENTER")
-      levelTimeFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-      local levelTime = 0
-      if (
-      v.timePlayedAtLevel ~= 0 and 
-      toon.statsData[tostring(i -1)] ~= nil and 
-      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= nil and 
-      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= 0) then
-        local t1 = v.timePlayedAtLevel
-        local t2 = toon.statsData[tostring(i -1)].timePlayedAtLevel
-        local timex = t1 - t2
-        levelTime = timex
-        local days, hours, minutes, seconds = XPC:TimeFormat(timex)
-        if (days >= 1) then 
-          levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
-        else
-          levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+      if (stats.timePlayedAtLevel ~= nil) then
+        local levelTimeFrame = CreateFrame("Frame", nil, content)
+        levelTimeFrame:SetPoint("TOPLEFT", (80 *17) - 40, posY)
+        levelTimeFrame:SetSize(1,1)
+        local levelTimeFS = levelTimeFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        levelTimeFS:SetPoint("CENTER")
+        levelTimeFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+        if (
+        v.timePlayedAtLevel ~= 0 and 
+        lastLevelStats ~= nil and 
+        lastLevelStats.timePlayedAtLevel ~= nil and 
+        lastLevelStats.timePlayedAtLevel ~= 0) then
+          local t1 = v.timePlayedAtLevel
+          local t2 = lastLevelStats.timePlayedAtLevel
+          local timex = t1 - t2
+          levelTime = timex
+          local days, hours, minutes, seconds = XPC:TimeFormat(timex)
+          if (days >= 1) then 
+            levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+          else
+            levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+          end
+        elseif (
+        lastLevelStats ~= nil and 
+        lastLevelStats.timePlayedAtLevel ~= nil and 
+        lastLevelStats.timePlayedAtLevel ~= 0) then
+          local t2 = lastLevelStats.timePlayedAtLevel
+          local t3 = toon.levelData[#toon.levelData].timePlayed
+          local timex = t3 - t2
+          levelTime = timex
+          local days, hours, minutes, seconds = XPC:TimeFormat(timex)
+          if (days >= 1) then 
+            levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+          else
+            levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+          end
+        elseif (
+        i == 1 and
+        v.timePlayedAtLevel ~= 0) then
+          local days, hours, minutes, seconds = XPC:TimeFormat(v.timePlayedAtLevel)
+          if (days >= 1) then 
+            levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+          else
+            levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+          end
         end
-      elseif (
-      toon.statsData[tostring(i -1)] ~= nil and 
-      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= nil and 
-      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= 0) then
-        local t2 = toon.statsData[tostring(i -1)].timePlayedAtLevel
-        local t3 = toon.levelData[#toon.levelData].timePlayed
-        local timex = t3 - t2
-        levelTime = timex
-        local days, hours, minutes, seconds = XPC:TimeFormat(timex)
-        if (days >= 1) then 
-          levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
-        else
-          levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
-        end
-      elseif (
-      i == 1 and
-      v.timePlayedAtLevel ~= 0) then
-        local days, hours, minutes, seconds = XPC:TimeFormat(v.timePlayedAtLevel)
-        if (days >= 1) then 
-          levelTimeFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
-        else
-          levelTimeFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
-        end
+        table.insert(content.values.levelTime, levelTimeFrame)
       end
-      table.insert(content.values.levelTime, levelTimeFrame)
 
       -- 1 Damage Dealt
-      local damageDealtFrame = CreateFrame("Frame", nil, content)
-      damageDealtFrame:SetPoint("TOPLEFT", (80 *1) -40, posY)
-      damageDealtFrame:SetSize(1,1)
-      local damageDealtFS = damageDealtFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      damageDealtFS:SetPoint("CENTER")
-      damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      if (v.damageDealt >= 1000000) then 
-        damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 10000) / 100) .. 'M')
-      elseif (v.damageDealt >= 1000) then 
-        damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 100) / 10) .. 'K')
-      else
-        damageDealtFS:SetText(tostring(v.damageDealt))
+      if (stats.damageDealt ~= nil) then
+        local damageDealtFrame = CreateFrame("Frame", nil, content)
+        damageDealtFrame:SetPoint("TOPLEFT", (80 *1) -40, posY)
+        damageDealtFrame:SetSize(1,1)
+        local damageDealtFS = damageDealtFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        damageDealtFS:SetPoint("CENTER")
+        damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        if (v.damageDealt >= 1000000) then 
+          damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 10000) / 100) .. 'M')
+        elseif (v.damageDealt >= 1000) then 
+          damageDealtFS:SetText(tostring(math.floor(v.damageDealt / 100) / 10) .. 'K')
+        else
+          damageDealtFS:SetText(tostring(v.damageDealt))
+        end
+        table.insert(content.values.damageDealt, damageDealtFrame)
       end
-      table.insert(content.values.damageDealt, damageDealtFrame)
 
       -- 2 Damage Taken
-      local damageTakenFrame = CreateFrame("Frame", nil, content)
-      damageTakenFrame:SetPoint("TOPLEFT", (80 *2) -40, posY)
-      damageTakenFrame:SetSize(1,1)
-      local damageTakenFS = damageTakenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      damageTakenFS:SetPoint("CENTER")
-      damageTakenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      damageTakenFS:SetText(v.damageTaken) 
-      table.insert(content.values.damageTaken, damageTakenFrame)
+      if (stats.damageTaken ~= nil) then
+        local damageTakenFrame = CreateFrame("Frame", nil, content)
+        damageTakenFrame:SetPoint("TOPLEFT", (80 *2) -40, posY)
+        damageTakenFrame:SetSize(1,1)
+        local damageTakenFS = damageTakenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        damageTakenFS:SetPoint("CENTER")
+        damageTakenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        damageTakenFS:SetText(v.damageTaken) 
+        table.insert(content.values.damageTaken, damageTakenFrame)
+      end
 
       -- 3 Heals Given
-      local healsGivenFrame = CreateFrame("Frame", nil, content)
-      healsGivenFrame:SetPoint("TOPLEFT", (80 *3) -40, posY)
-      healsGivenFrame:SetSize(1,1)
-      local healsGivenFS = healsGivenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      healsGivenFS:SetPoint("CENTER")
-      healsGivenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      healsGivenFS:SetText(v.healsGiven) 
-      table.insert(content.values.healsGiven, healsGivenFrame)
+      if (stats.healsGiven ~= nil) then
+        local healsGivenFrame = CreateFrame("Frame", nil, content)
+        healsGivenFrame:SetPoint("TOPLEFT", (80 *3) -40, posY)
+        healsGivenFrame:SetSize(1,1)
+        local healsGivenFS = healsGivenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        healsGivenFS:SetPoint("CENTER")
+        healsGivenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        healsGivenFS:SetText(v.healsGiven) 
+        table.insert(content.values.healsGiven, healsGivenFrame)
+      end
 
       -- 4 Heals Received
-      local healsReceivedFrame = CreateFrame("Frame", nil, content)
-      healsReceivedFrame:SetPoint("TOPLEFT", (80 *4) -40, posY)
-      healsReceivedFrame:SetSize(1,1)
-      local healsReceivedFS = healsReceivedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      healsReceivedFS:SetPoint("CENTER")
-      healsReceivedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      healsReceivedFS:SetText(v.healsReceived) 
-      table.insert(content.values.healsReceived, healsReceivedFrame)
+      if (stats.healsReceived ~= nil) then
+        local healsReceivedFrame = CreateFrame("Frame", nil, content)
+        healsReceivedFrame:SetPoint("TOPLEFT", (80 *4) -40, posY)
+        healsReceivedFrame:SetSize(1,1)
+        local healsReceivedFS = healsReceivedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        healsReceivedFS:SetPoint("CENTER")
+        healsReceivedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        healsReceivedFS:SetText(v.healsReceived) 
+        table.insert(content.values.healsReceived, healsReceivedFrame)
+      end
       
       -- 5 Kills Solo
-      local monstersKilledSoloFrame = CreateFrame("Frame", nil, content)
-      monstersKilledSoloFrame:SetPoint("TOPLEFT", (80 *5) -40, posY)
-      monstersKilledSoloFrame:SetSize(1,1)
-      local monstersKilledSoloFS = monstersKilledSoloFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      monstersKilledSoloFS:SetPoint("CENTER")
-      monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      monstersKilledSoloFS:SetText(v.monstersKilledSolo) 
-      table.insert(content.values.monstersKilledSolo, monstersKilledSoloFrame)
+      if (stats.monstersKilledSolo ~= nil) then
+        local monstersKilledSoloFrame = CreateFrame("Frame", nil, content)
+        monstersKilledSoloFrame:SetPoint("TOPLEFT", (80 *5) -40, posY)
+        monstersKilledSoloFrame:SetSize(1,1)
+        local monstersKilledSoloFS = monstersKilledSoloFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        monstersKilledSoloFS:SetPoint("CENTER")
+        monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        monstersKilledSoloFS:SetText(v.monstersKilledSolo) 
+        table.insert(content.values.monstersKilledSolo, monstersKilledSoloFrame)
+      end
 
       -- 6 Kills Group
-      local monstersKilledInGroupFrame = CreateFrame("Frame", nil, content)
-      monstersKilledInGroupFrame:SetPoint("TOPLEFT", (80 *6) -40, posY)
-      monstersKilledInGroupFrame:SetSize(1,1)
-      local monstersKilledInGroupFS = monstersKilledInGroupFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      monstersKilledInGroupFS:SetPoint("CENTER")
-      monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      monstersKilledInGroupFS:SetText(v.monstersKilledInGroup) 
-      table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFrame)
+      if (stats.monstersKilledInGroup ~= nil) then
+        local monstersKilledInGroupFrame = CreateFrame("Frame", nil, content)
+        monstersKilledInGroupFrame:SetPoint("TOPLEFT", (80 *6) -40, posY)
+        monstersKilledInGroupFrame:SetSize(1,1)
+        local monstersKilledInGroupFS = monstersKilledInGroupFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        monstersKilledInGroupFS:SetPoint("CENTER")
+        monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        monstersKilledInGroupFS:SetText(v.monstersKilledInGroup) 
+        table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFrame)
+      end
 
       -- 7 Kills Per Hour
       if (levelTime ~= 0) then 
@@ -659,54 +693,64 @@ function XPC:ShowSingleToonChart()
       end
 
       -- 8 Kills
-      local monstersKilledFrame = CreateFrame("Frame", nil, content)
-      monstersKilledFrame:SetPoint("TOPLEFT", (80 *8) -40, posY)
-      monstersKilledFrame:SetSize(1,1)
-      local monstersKilledFS = monstersKilledFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      monstersKilledFS:SetPoint("CENTER")
-      monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      monstersKilledFS:SetText(v.monstersKilledInGroup + v.monstersKilledSolo) 
-      table.insert(content.values.monstersKilled, monstersKilledFrame)
+      if (stats.monstersKilledSolo ~= nil and stats.monstersKilledInGroup ~= nil) then
+        local monstersKilledFrame = CreateFrame("Frame", nil, content)
+        monstersKilledFrame:SetPoint("TOPLEFT", (80 *8) -40, posY)
+        monstersKilledFrame:SetSize(1,1)
+        local monstersKilledFS = monstersKilledFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        monstersKilledFS:SetPoint("CENTER")
+        monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        monstersKilledFS:SetText(v.monstersKilledInGroup + v.monstersKilledSolo) 
+        table.insert(content.values.monstersKilled, monstersKilledFrame)
+      end
 
       -- 9 Deaths
-      local deathsFrame = CreateFrame("Frame", nil, content)
-      deathsFrame:SetPoint("TOPLEFT", (80 *9) -40, posY)
-      deathsFrame:SetSize(1,1)
-      local deathsFS = deathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      deathsFS:SetPoint("CENTER")
-      deathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      deathsFS:SetText(v.deaths) 
-      table.insert(content.values.deaths, deathsFrame)
+      if (stats.deaths ~= nil) then
+        local deathsFrame = CreateFrame("Frame", nil, content)
+        deathsFrame:SetPoint("TOPLEFT", (80 *9) -40, posY)
+        deathsFrame:SetSize(1,1)
+        local deathsFS = deathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        deathsFS:SetPoint("CENTER")
+        deathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        deathsFS:SetText(v.deaths) 
+        table.insert(content.values.deaths, deathsFrame)
+      end
 
       -- 10 Quests Completed
-      local questsCompletedFrame = CreateFrame("Frame", nil, content)
-      questsCompletedFrame:SetPoint("TOPLEFT", (80 *10) -40, posY)
-      questsCompletedFrame:SetSize(1,1)
-      local questsCompletedFS = questsCompletedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      questsCompletedFS:SetPoint("CENTER")
-      questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      questsCompletedFS:SetText(v.questsCompleted) 
-      table.insert(content.values.questsCompleted, questsCompletedFrame)
+      if (stats.questsCompleted ~= nil) then
+        local questsCompletedFrame = CreateFrame("Frame", nil, content)
+        questsCompletedFrame:SetPoint("TOPLEFT", (80 *10) -40, posY)
+        questsCompletedFrame:SetSize(1,1)
+        local questsCompletedFS = questsCompletedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        questsCompletedFS:SetPoint("CENTER")
+        questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        questsCompletedFS:SetText(v.questsCompleted) 
+        table.insert(content.values.questsCompleted, questsCompletedFrame)
+      end
 
       -- 11 Mob XP
-      local XPFromMobsFrame = CreateFrame("Frame", nil, content)
-      XPFromMobsFrame:SetPoint("TOPLEFT", (80 *11) -40, posY)
-      XPFromMobsFrame:SetSize(1,1)
-      local XPFromMobsFS = XPFromMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      XPFromMobsFS:SetPoint("CENTER")
-      XPFromMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      XPFromMobsFS:SetText(v.XPFromMobs) 
-      table.insert(content.values.XPFromMobs, XPFromMobsFrame)
+      if (stats.XPFromMobs ~= nil) then
+        local XPFromMobsFrame = CreateFrame("Frame", nil, content)
+        XPFromMobsFrame:SetPoint("TOPLEFT", (80 *11) -40, posY)
+        XPFromMobsFrame:SetSize(1,1)
+        local XPFromMobsFS = XPFromMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        XPFromMobsFS:SetPoint("CENTER")
+        XPFromMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        XPFromMobsFS:SetText(v.XPFromMobs) 
+        table.insert(content.values.XPFromMobs, XPFromMobsFrame)
+      end
 
       -- 12 Quest XP
-      local XPFromQuestsFrame = CreateFrame("Frame", nil, content)
-      XPFromQuestsFrame:SetPoint("TOPLEFT", (80 *12) -40, posY)
-      XPFromQuestsFrame:SetSize(1,1)
-      local XPFromQuestsFS = XPFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      XPFromQuestsFS:SetPoint("CENTER")
-      XPFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      XPFromQuestsFS:SetText(v.XPFromQuests) 
-      table.insert(content.values.XPFromQuests, XPFromQuestsFrame)
+      if (stats.XPFromQuests ~= nil) then
+        local XPFromQuestsFrame = CreateFrame("Frame", nil, content)
+        XPFromQuestsFrame:SetPoint("TOPLEFT", (80 *12) -40, posY)
+        XPFromQuestsFrame:SetSize(1,1)
+        local XPFromQuestsFS = XPFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        XPFromQuestsFS:SetPoint("CENTER")
+        XPFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        XPFromQuestsFS:SetText(v.XPFromQuests) 
+        table.insert(content.values.XPFromQuests, XPFromQuestsFrame)
+      end
 
       -- 13 XP per hour
       if (levelTime ~= 0) then
@@ -738,31 +782,35 @@ function XPC:ShowSingleToonChart()
       end
 
       -- 14 Percent XP Gained Mobs
-      local percentXPMobsFrame = CreateFrame("Frame", nil, content)
-      percentXPMobsFrame:SetPoint("TOPLEFT", (80 *14) -40, posY)
-      percentXPMobsFrame:SetSize(1,1)
-      local percentXPMobsFS = percentXPMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      percentXPMobsFS:SetPoint("CENTER")
-      percentXPMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      local percent = math.floor((v.XPFromMobs / XPC.levelChart[i]) * 100)
-      if (percent > 100) then percent = 100 end
-      percentXPMobsFS:SetText(percent .. "%") 
-      table.insert(content.values.percentXPMobs, percentXPMobsFrame)
+      if (stats.XPFromMobs ~= nil) then
+        local percentXPMobsFrame = CreateFrame("Frame", nil, content)
+        percentXPMobsFrame:SetPoint("TOPLEFT", (80 *14) -40, posY)
+        percentXPMobsFrame:SetSize(1,1)
+        local percentXPMobsFS = percentXPMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        percentXPMobsFS:SetPoint("CENTER")
+        percentXPMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        local percent = math.floor((v.XPFromMobs / XPC.levelChart[i]) * 100)
+        if (percent > 100) then percent = 100 end
+        percentXPMobsFS:SetText(percent .. "%") 
+        table.insert(content.values.percentXPMobs, percentXPMobsFrame)
+      end
       
       -- 15 Percent XP Gained Quests
-      local percentXPQuestsFrame = CreateFrame("Frame", nil, content)
-      percentXPQuestsFrame:SetPoint("TOPLEFT", (80 *15) -40, posY)
-      percentXPQuestsFrame:SetSize(1,1)
-      local percentXPQuestsFS = percentXPQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      percentXPQuestsFS:SetPoint("CENTER")
-      percentXPQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      local percent = math.floor((v.XPFromQuests / XPC.levelChart[i]) * 100)
-      if (percent > 100) then percent = 100 end
-      percentXPQuestsFS:SetText(percent .. "%") 
-      table.insert(content.values.percentXPQuests, percentXPQuestsFrame)
+      if (stats.XPFromQuests ~= nil) then
+        local percentXPQuestsFrame = CreateFrame("Frame", nil, content)
+        percentXPQuestsFrame:SetPoint("TOPLEFT", (80 *15) -40, posY)
+        percentXPQuestsFrame:SetSize(1,1)
+        local percentXPQuestsFS = percentXPQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        percentXPQuestsFS:SetPoint("CENTER")
+        percentXPQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        local percent = math.floor((v.XPFromQuests / XPC.levelChart[i]) * 100)
+        if (percent > 100) then percent = 100 end
+        percentXPQuestsFS:SetText(percent .. "%") 
+        table.insert(content.values.percentXPQuests, percentXPQuestsFrame)
+      end
 
       -- 16 Time Played
-      if (toon.levelData[#toon.levelData] ~= nil) then
+      if (toon.levelData[#toon.levelData] ~= nil and stats.timePlayedAtLevel ~= nil) then
         local timePlayedFrame = CreateFrame("Frame", nil, content)
         timePlayedFrame:SetPoint("TOPLEFT", (80 *16) -40, posY)
         timePlayedFrame:SetSize(1,1)
@@ -788,287 +836,369 @@ function XPC:ShowSingleToonChart()
       end
 
       -- 18 Time in Combat
-      local timeInCombatFrame = CreateFrame("Frame", nil, content)
-      timeInCombatFrame:SetPoint("TOPLEFT", (80 *18) -40, posY)
-      timeInCombatFrame:SetSize(1,1)
-      local timeInCombatFS = timeInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      timeInCombatFS:SetPoint("CENTER")
-      timeInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-      local days, hours, minutes, seconds = XPC:TimeFormat(v.timeInCombat)
-      if (days >= 1) then 
-        timeInCombatFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
-      else
-        timeInCombatFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+      if (stats.timeInCombat ~= nil) then
+        local timeInCombatFrame = CreateFrame("Frame", nil, content)
+        timeInCombatFrame:SetPoint("TOPLEFT", (80 *18) -40, posY)
+        timeInCombatFrame:SetSize(1,1)
+        local timeInCombatFS = timeInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        timeInCombatFS:SetPoint("CENTER")
+        timeInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+        local days, hours, minutes, seconds = XPC:TimeFormat(v.timeInCombat)
+        if (days >= 1) then 
+          timeInCombatFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+        else
+          timeInCombatFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+        end
+        table.insert(content.values.timeInCombat, timeInCombatFrame)
       end
-      table.insert(content.values.timeInCombat, timeInCombatFrame)
 
       -- 19 Percent Time in Combat
-      if (
-      v.timePlayedAtLevel ~= 0 and 
-      toon.statsData[tostring(i -1)] ~= nil and 
-      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= nil and 
-      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= 0
-      ) then
-        local percentInCombatFrame = CreateFrame("Frame", nil, content)
-        percentInCombatFrame:SetPoint("TOPLEFT", (80 *19) -40, posY)
-        percentInCombatFrame:SetSize(1,1)
-        local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-        percentInCombatFS:SetPoint("CENTER")
-        percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-        percentInCombatFS:SetText(math.floor((v.timeInCombat / (v.timePlayedAtLevel - toon.statsData[tostring(i -1)].timePlayedAtLevel)) * 100) .. "%") 
-        table.insert(content.values.percentInCombat, percentInCombatFrame)
-      elseif (
-      toon.statsData[tostring(i -1)] ~= nil and 
-      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= nil and 
-      toon.statsData[tostring(i -1)].timePlayedAtLevel ~= 0
-      ) then
-        local t3 = toon.levelData[#toon.levelData].timePlayed
-        local percentInCombatFrame = CreateFrame("Frame", nil, content)
-        percentInCombatFrame:SetPoint("TOPLEFT", (80 *19) -40, posY)
-        percentInCombatFrame:SetSize(1,1)
-        local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-        percentInCombatFS:SetPoint("CENTER")
-        percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-        percentInCombatFS:SetText(math.floor((v.timeInCombat / (t3 - toon.statsData[tostring(i -1)].timePlayedAtLevel)) * 100) .. "%") 
-        table.insert(content.values.percentInCombat, percentInCombatFrame)
-      elseif (
-      i == 1 and
-      v.timePlayedAtLevel ~= 0
-      ) then
-        local percentInCombatFrame = CreateFrame("Frame", nil, content)
-        percentInCombatFrame:SetPoint("TOPLEFT", (80 *19) -40, posY)
-        percentInCombatFrame:SetSize(1,1)
-        local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-        percentInCombatFS:SetPoint("CENTER")
-        percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-        percentInCombatFS:SetText(math.floor((v.timeInCombat / v.timePlayedAtLevel )* 100) .. "%")
-        table.insert(content.values.percentInCombat, percentInCombatFrame)
+      if (stats.timeInCombat ~= nil and stats.timePlayedAtLevel ~= nil) then
+        if (
+        v.timePlayedAtLevel ~= 0 and 
+        lastLevelStats ~= nil and 
+        lastLevelStats.timePlayedAtLevel ~= nil and 
+        lastLevelStats.timePlayedAtLevel ~= 0
+        ) then
+          local percentInCombatFrame = CreateFrame("Frame", nil, content)
+          percentInCombatFrame:SetPoint("TOPLEFT", (80 *19) -40, posY)
+          percentInCombatFrame:SetSize(1,1)
+          local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+          percentInCombatFS:SetPoint("CENTER")
+          percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+          percentInCombatFS:SetText(math.floor((v.timeInCombat / (v.timePlayedAtLevel - lastLevelStats.timePlayedAtLevel)) * 100) .. "%") 
+          table.insert(content.values.percentInCombat, percentInCombatFrame)
+        elseif (
+        lastLevelStats ~= nil and 
+        lastLevelStats.timePlayedAtLevel ~= nil and 
+        lastLevelStats.timePlayedAtLevel ~= 0
+        ) then
+          local t3 = toon.levelData[#toon.levelData].timePlayed
+          local percentInCombatFrame = CreateFrame("Frame", nil, content)
+          percentInCombatFrame:SetPoint("TOPLEFT", (80 *19) -40, posY)
+          percentInCombatFrame:SetSize(1,1)
+          local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+          percentInCombatFS:SetPoint("CENTER")
+          percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+          percentInCombatFS:SetText(math.floor((v.timeInCombat / (t3 - lastLevelStats.timePlayedAtLevel)) * 100) .. "%") 
+          table.insert(content.values.percentInCombat, percentInCombatFrame)
+        elseif (
+        i == 1 and
+        v.timePlayedAtLevel ~= 0
+        ) then
+          local percentInCombatFrame = CreateFrame("Frame", nil, content)
+          percentInCombatFrame:SetPoint("TOPLEFT", (80 *19) -40, posY)
+          percentInCombatFrame:SetSize(1,1)
+          local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+          percentInCombatFS:SetPoint("CENTER")
+          percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+          percentInCombatFS:SetText(math.floor((v.timeInCombat / v.timePlayedAtLevel )* 100) .. "%")
+          table.insert(content.values.percentInCombat, percentInCombatFrame)
+        end
       end
 
       -- 20 Time AFK
-      local timeAFKFrame = CreateFrame("Frame", nil, content)
-      timeAFKFrame:SetPoint("TOPLEFT", (80 *20) -40, posY)
-      timeAFKFrame:SetSize(1,1)
-      local timeAFKFS = timeAFKFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      timeAFKFS:SetPoint("CENTER")
-      timeAFKFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      local days, hours, minutes, seconds = XPC:TimeFormat(v.timeAFK)
-      if (days >= 1) then 
-        timeAFKFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
-      else
-        timeAFKFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+      if (stats.timeAFK ~= nil) then
+        local timeAFKFrame = CreateFrame("Frame", nil, content)
+        timeAFKFrame:SetPoint("TOPLEFT", (80 *20) -40, posY)
+        timeAFKFrame:SetSize(1,1)
+        local timeAFKFS = timeAFKFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        timeAFKFS:SetPoint("CENTER")
+        timeAFKFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        local days, hours, minutes, seconds = XPC:TimeFormat(v.timeAFK)
+        if (days >= 1) then 
+          timeAFKFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+        else
+          timeAFKFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+        end
+        table.insert(content.values.timeAFK, timeAFKFrame)
       end
-      table.insert(content.values.timeAFK, timeAFKFrame)
 
       -- 21 Gold From Loot
-      local goldFromLootFrame = CreateFrame("Frame", nil, content)
-      goldFromLootFrame:SetPoint("TOPLEFT", (80 *21) -40, posY)
-      goldFromLootFrame:SetSize(1,1)
-      local goldFromLootFS = goldFromLootFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      goldFromLootFS:SetPoint("CENTER")
-      goldFromLootFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-      local gold, silver, copper = XPC:MoneyFormat(v.goldFromLoot)
-      goldFromLootFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
-      table.insert(content.values.goldFromLoot, goldFromLootFrame)
+      if (stats.goldFromLoot ~= nil) then
+        local goldFromLootFrame = CreateFrame("Frame", nil, content)
+        goldFromLootFrame:SetPoint("TOPLEFT", (80 *21) -40, posY)
+        goldFromLootFrame:SetSize(1,1)
+        local goldFromLootFS = goldFromLootFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        goldFromLootFS:SetPoint("CENTER")
+        goldFromLootFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+        local gold, silver, copper = XPC:MoneyFormat(v.goldFromLoot)
+        goldFromLootFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+        table.insert(content.values.goldFromLoot, goldFromLootFrame)
+      end
 
       -- 22 Quest Gold
-      local goldFromQuestsFrame = CreateFrame("Frame", nil, content)
-      goldFromQuestsFrame:SetPoint("TOPLEFT", (80 *22) -40, posY)
-      goldFromQuestsFrame:SetSize(1,1)
-      local goldFromQuestsFS = goldFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      goldFromQuestsFS:SetPoint("CENTER")
-      goldFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-      local gold, silver, copper = XPC:MoneyFormat(v.goldFromQuests)
-      goldFromQuestsFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
-      table.insert(content.values.goldFromQuests, goldFromQuestsFrame)
+      if (stats.goldFromQuests ~= nil) then
+        local goldFromQuestsFrame = CreateFrame("Frame", nil, content)
+        goldFromQuestsFrame:SetPoint("TOPLEFT", (80 *22) -40, posY)
+        goldFromQuestsFrame:SetSize(1,1)
+        local goldFromQuestsFS = goldFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        goldFromQuestsFS:SetPoint("CENTER")
+        goldFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+        local gold, silver, copper = XPC:MoneyFormat(v.goldFromQuests)
+        goldFromQuestsFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+        table.insert(content.values.goldFromQuests, goldFromQuestsFrame)
+      end
       
       -- 23 Gold Gained Merchant
-      local goldGainedMerchantFrame = CreateFrame("Frame", nil, content)
-      goldGainedMerchantFrame:SetPoint("TOPLEFT", (80 *23) -40, posY)
-      goldGainedMerchantFrame:SetSize(1,1)
-      local goldGainedMerchantFS = goldGainedMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      goldGainedMerchantFS:SetPoint("CENTER")
-      goldGainedMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-      local gold, silver, copper = XPC:MoneyFormat(v.goldGainedMerchant)
-      goldGainedMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
-      table.insert(content.values.goldGainedMerchant, goldGainedMerchantFrame)
+      if (stats.goldGainedMerchant ~= nil) then
+        local goldGainedMerchantFrame = CreateFrame("Frame", nil, content)
+        goldGainedMerchantFrame:SetPoint("TOPLEFT", (80 *23) -40, posY)
+        goldGainedMerchantFrame:SetSize(1,1)
+        local goldGainedMerchantFS = goldGainedMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        goldGainedMerchantFS:SetPoint("CENTER")
+        goldGainedMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+        local gold, silver, copper = XPC:MoneyFormat(v.goldGainedMerchant)
+        goldGainedMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+        table.insert(content.values.goldGainedMerchant, goldGainedMerchantFrame)
+      end
 
       -- 24 Gold Gained Total
-      local goldTotalFrame = CreateFrame("Frame", nil, content)
-      goldTotalFrame:SetPoint("TOPLEFT", (80 *24) -40, posY)
-      goldTotalFrame:SetSize(1,1)
-      local goldTotalFS = goldTotalFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      goldTotalFS:SetPoint("CENTER")
-      goldTotalFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-      local gold, silver, copper = XPC:MoneyFormat(v.goldGainedMerchant + v.goldFromLoot + v.goldFromQuests)
-      goldTotalFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
-      table.insert(content.values.goldTotal, goldTotalFrame)
+      if (stats.goldGainedMerchant ~= nil or stats.goldFromLoot ~= nil or stats.goldFromQuests ~= nil) then
+        local goldTotalFrame = CreateFrame("Frame", nil, content)
+        goldTotalFrame:SetPoint("TOPLEFT", (80 *24) -40, posY)
+        goldTotalFrame:SetSize(1,1)
+        local goldTotalFS = goldTotalFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        goldTotalFS:SetPoint("CENTER")
+        goldTotalFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+        local gold, silver, copper = XPC:MoneyFormat(v.goldGainedMerchant + v.goldFromLoot + v.goldFromQuests)
+        goldTotalFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+        table.insert(content.values.goldTotal, goldTotalFrame)
+      end
 
       -- 25 Gold Lost Merchant
-      local goldLostMerchantFrame = CreateFrame("Frame", nil, content)
-      goldLostMerchantFrame:SetPoint("TOPLEFT", (80 *25) -40, posY)
-      goldLostMerchantFrame:SetSize(1,1)
-      local goldLostMerchantFS = goldLostMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      goldLostMerchantFS:SetPoint("CENTER")
-      goldLostMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-      local gold, silver, copper = XPC:MoneyFormat(v.goldLostMerchant)
-      goldLostMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
-      table.insert(content.values.goldLostMerchant, goldLostMerchantFrame)
+      if (stats.goldLostMerchant ~= nil) then
+        local goldLostMerchantFrame = CreateFrame("Frame", nil, content)
+        goldLostMerchantFrame:SetPoint("TOPLEFT", (80 *25) -40, posY)
+        goldLostMerchantFrame:SetSize(1,1)
+        local goldLostMerchantFS = goldLostMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        goldLostMerchantFS:SetPoint("CENTER")
+        goldLostMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+        local gold, silver, copper = XPC:MoneyFormat(v.goldLostMerchant)
+        goldLostMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+        table.insert(content.values.goldLostMerchant, goldLostMerchantFrame)
+      end
 
       -- 26 Duels Won
-      local duelsWonFrame = CreateFrame("Frame", nil, content)
-      duelsWonFrame:SetPoint("TOPLEFT", (80 *26) -40, posY)
-      duelsWonFrame:SetSize(1,1)
-      local duelsWonFS = duelsWonFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      duelsWonFS:SetPoint("CENTER")
-      duelsWonFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      duelsWonFS:SetText(v.duelsWon) 
-      table.insert(content.values.duelsWon, duelsWonFrame)
+      if (stats.duelsWon ~= nil) then
+        local duelsWonFrame = CreateFrame("Frame", nil, content)
+        duelsWonFrame:SetPoint("TOPLEFT", (80 *26) -40, posY)
+        duelsWonFrame:SetSize(1,1)
+        local duelsWonFS = duelsWonFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        duelsWonFS:SetPoint("CENTER")
+        duelsWonFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        duelsWonFS:SetText(v.duelsWon) 
+        table.insert(content.values.duelsWon, duelsWonFrame)
+      end
       
       -- 27 Duels Lost
-      local duelsLostFrame = CreateFrame("Frame", nil, content)
-      duelsLostFrame:SetPoint("TOPLEFT", (80 *27) -40, posY)
-      duelsLostFrame:SetSize(1,1)
-      local duelsLostFS = duelsLostFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      duelsLostFS:SetPoint("CENTER")
-      duelsLostFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      duelsLostFS:SetText(v.duelsLost) 
-      table.insert(content.values.duelsLost, duelsLostFrame)
+      if (stats.duelsLost ~= nil) then
+        local duelsLostFrame = CreateFrame("Frame", nil, content)
+        duelsLostFrame:SetPoint("TOPLEFT", (80 *27) -40, posY)
+        duelsLostFrame:SetSize(1,1)
+        local duelsLostFS = duelsLostFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        duelsLostFS:SetPoint("CENTER")
+        duelsLostFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        duelsLostFS:SetText(v.duelsLost) 
+        table.insert(content.values.duelsLost, duelsLostFrame)
+      end
 
       -- 28 Honor Kills
-      local honorKillsFrame = CreateFrame("Frame", nil, content)
-      honorKillsFrame:SetPoint("TOPLEFT", (80 *28) -40, posY)
-      honorKillsFrame:SetSize(1,1)
-      local honorKillsFS = honorKillsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      honorKillsFS:SetPoint("CENTER")
-      honorKillsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      honorKillsFS:SetText(v.honorKills) 
-      table.insert(content.values.honorKills, honorKillsFrame)
+      if (stats.honorKills ~= nil) then
+        local honorKillsFrame = CreateFrame("Frame", nil, content)
+        honorKillsFrame:SetPoint("TOPLEFT", (80 *28) -40, posY)
+        honorKillsFrame:SetSize(1,1)
+        local honorKillsFS = honorKillsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        honorKillsFS:SetPoint("CENTER")
+        honorKillsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        honorKillsFS:SetText(v.honorKills) 
+        table.insert(content.values.honorKills, honorKillsFrame)
+      end
 
       -- 29 Honor
-      local honorFrame = CreateFrame("Frame", nil, content)
-      honorFrame:SetPoint("TOPLEFT", (80 *29) -40, posY)
-      honorFrame:SetSize(1,1)
-      local honorFS = honorFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      honorFS:SetPoint("CENTER")
-      honorFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      honorFS:SetText(v.honor) 
-      table.insert(content.values.honor, honorFrame)
+      if (stats.honor ~= nil) then
+        local honorFrame = CreateFrame("Frame", nil, content)
+        honorFrame:SetPoint("TOPLEFT", (80 *29) -40, posY)
+        honorFrame:SetSize(1,1)
+        local honorFS = honorFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        honorFS:SetPoint("CENTER")
+        honorFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        honorFS:SetText(v.honor) 
+        table.insert(content.values.honor, honorFrame)
+      end
 
       -- 30 Food
-      local foodFrame = CreateFrame("Frame", nil, content)
-      foodFrame:SetPoint("TOPLEFT", (80 *30) -40, posY)
-      foodFrame:SetSize(1,1)
-      local foodFS = foodFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      foodFS:SetPoint("CENTER")
-      foodFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      foodFS:SetText(v.food) 
-      table.insert(content.values.food, foodFrame)
+      if (stats.food ~= nil) then
+        local foodFrame = CreateFrame("Frame", nil, content)
+        foodFrame:SetPoint("TOPLEFT", (80 *30) -40, posY)
+        foodFrame:SetSize(1,1)
+        local foodFS = foodFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        foodFS:SetPoint("CENTER")
+        foodFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        foodFS:SetText(v.food) 
+        table.insert(content.values.food, foodFrame)
+      end
 
       -- 31 Drink
-      local drinkFrame = CreateFrame("Frame", nil, content)
-      drinkFrame:SetPoint("TOPLEFT", (80 *31) -40, posY)
-      drinkFrame:SetSize(1,1)
-      local drinkFS = drinkFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      drinkFS:SetPoint("CENTER")
-      drinkFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      drinkFS:SetText(v.drink) 
-      table.insert(content.values.drink, drinkFrame)
+      if (stats.drink ~= nil) then
+        local drinkFrame = CreateFrame("Frame", nil, content)
+        drinkFrame:SetPoint("TOPLEFT", (80 *31) -40, posY)
+        drinkFrame:SetSize(1,1)
+        local drinkFS = drinkFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        drinkFS:SetPoint("CENTER")
+        drinkFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        drinkFS:SetText(v.drink) 
+        table.insert(content.values.drink, drinkFrame)
+      end
 
       -- 32 Bandages
-      local bandagesFrame = CreateFrame("Frame", nil, content)
-      bandagesFrame:SetPoint("TOPLEFT", (80 *32) -40, posY)
-      bandagesFrame:SetSize(1,1)
-      local bandagesFS = bandagesFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      bandagesFS:SetPoint("CENTER")
-      bandagesFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      bandagesFS:SetText(v.bandages) 
-      table.insert(content.values.bandages, bandagesFrame)
+      if (stats.bandages ~= nil) then
+        local bandagesFrame = CreateFrame("Frame", nil, content)
+        bandagesFrame:SetPoint("TOPLEFT", (80 *32) -40, posY)
+        bandagesFrame:SetSize(1,1)
+        local bandagesFS = bandagesFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        bandagesFS:SetPoint("CENTER")
+        bandagesFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        bandagesFS:SetText(v.bandages) 
+        table.insert(content.values.bandages, bandagesFrame)
+      end
 
       -- 33 Healing Potions
-      local healingPotionsFrame = CreateFrame("Frame", nil, content)
-      healingPotionsFrame:SetPoint("TOPLEFT", (80 *33) -40, posY)
-      healingPotionsFrame:SetSize(1,1)
-      local healingPotionsFS = healingPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      healingPotionsFS:SetPoint("CENTER")
-      healingPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      healingPotionsFS:SetText(v.healingPotions) 
-      table.insert(content.values.healingPotions, healingPotionsFrame)
+      if (stats.healingPotions ~= nil) then
+        local healingPotionsFrame = CreateFrame("Frame", nil, content)
+        healingPotionsFrame:SetPoint("TOPLEFT", (80 *33) -40, posY)
+        healingPotionsFrame:SetSize(1,1)
+        local healingPotionsFS = healingPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        healingPotionsFS:SetPoint("CENTER")
+        healingPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        healingPotionsFS:SetText(v.healingPotions) 
+        table.insert(content.values.healingPotions, healingPotionsFrame)
+      end
 
       -- 34 Mana Potions
-      local manaPotionsFrame = CreateFrame("Frame", nil, content)
-      manaPotionsFrame:SetPoint("TOPLEFT", (80 *34) -40, posY)
-      manaPotionsFrame:SetSize(1,1)
-      local manaPotionsFS = manaPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      manaPotionsFS:SetPoint("CENTER")
-      manaPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      manaPotionsFS:SetText(v.manaPotions) 
-      table.insert(content.values.manaPotions, manaPotionsFrame)
+      if (stats.manaPotions ~= nil) then
+        local manaPotionsFrame = CreateFrame("Frame", nil, content)
+        manaPotionsFrame:SetPoint("TOPLEFT", (80 *34) -40, posY)
+        manaPotionsFrame:SetSize(1,1)
+        local manaPotionsFS = manaPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        manaPotionsFS:SetPoint("CENTER")
+        manaPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        manaPotionsFS:SetText(v.manaPotions) 
+        table.insert(content.values.manaPotions, manaPotionsFrame)
+      end
 
       -- 35 Healing / Mana Potions
-      local MHPotionsFrame = CreateFrame("Frame", nil, content)
-      MHPotionsFrame:SetPoint("TOPLEFT", (80 *35) -40, posY)
-      MHPotionsFrame:SetSize(1,1)
-      local MHPotionsFS = MHPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      MHPotionsFS:SetPoint("CENTER")
-      MHPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      MHPotionsFS:SetText(v.MHPotions) 
-      table.insert(content.values.MHPotions, MHPotionsFrame)
+      if (stats.MHPotions ~= nil) then
+        local MHPotionsFrame = CreateFrame("Frame", nil, content)
+        MHPotionsFrame:SetPoint("TOPLEFT", (80 *35) -40, posY)
+        MHPotionsFrame:SetSize(1,1)
+        local MHPotionsFS = MHPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        MHPotionsFS:SetPoint("CENTER")
+        MHPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        MHPotionsFS:SetText(v.MHPotions) 
+        table.insert(content.values.MHPotions, MHPotionsFrame)
+      end
       
       -- 36 Potions
-      local potionsFrame = CreateFrame("Frame", nil, content)
-      potionsFrame:SetPoint("TOPLEFT", (80 *36) -40, posY)
-      potionsFrame:SetSize(1,1)
-      local potionsFS = potionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      potionsFS:SetPoint("CENTER")
-      potionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      potionsFS:SetText(v.potions) 
-      table.insert(content.values.potions, potionsFrame)
-
-      -- 37 Hearthstones
-      local hearthstoneFrame = CreateFrame("Frame", nil, content)
-      hearthstoneFrame:SetPoint("TOPLEFT", (80 *37) -40, posY)
-      hearthstoneFrame:SetSize(1,1)
-      local hearthstoneFS = hearthstoneFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      hearthstoneFS:SetPoint("CENTER")
-      hearthstoneFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      hearthstoneFS:SetText(v.hearthstone) 
-      table.insert(content.values.hearthstone, hearthstoneFrame)
-
-      -- 38 Dungeons
-      local dungeonsFrame = CreateFrame("Frame", nil, content)
-      dungeonsFrame:SetPoint("TOPLEFT", (80 *38) -40, posY)
-      dungeonsFrame:SetSize(1,1)
-      local dungeonsFS = dungeonsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      dungeonsFS:SetPoint("CENTER")
-      dungeonsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      dungeonsFS:SetText(v.dungeonsEntered) 
-      table.insert(content.values.dungeons, dungeonsFrame)
-
-      -- 39 Flight Paths 
-      local flightPathsFrame = CreateFrame("Frame", nil, content)
-      flightPathsFrame:SetPoint("TOPLEFT", (80 *39) -40, posY)
-      flightPathsFrame:SetSize(1,1)
-      local flightPathsFS = flightPathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      flightPathsFS:SetPoint("CENTER")
-      flightPathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-      flightPathsFS:SetText(v.flightPaths) 
-      table.insert(content.values.flightPaths, flightPathsFrame)
-
-      -- 40 Time on Taxi
-      local timeOnTaxiFrame = CreateFrame("Frame", nil, content)
-      timeOnTaxiFrame:SetPoint("TOPLEFT", (80 *40) -40, posY)
-      timeOnTaxiFrame:SetSize(1,1)
-      local timeOnTaxiFS = timeOnTaxiFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-      timeOnTaxiFS:SetPoint("CENTER")
-      timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-      local days, hours, minutes, seconds = XPC:TimeFormat(v.timeOnTaxi)
-      if (days >= 1) then 
-        timeOnTaxiFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
-      else
-        timeOnTaxiFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+      if (stats.potions ~= nil) then
+        local potionsFrame = CreateFrame("Frame", nil, content)
+        potionsFrame:SetPoint("TOPLEFT", (80 *36) -40, posY)
+        potionsFrame:SetSize(1,1)
+        local potionsFS = potionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        potionsFS:SetPoint("CENTER")
+        potionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        potionsFS:SetText(v.potions) 
+        table.insert(content.values.potions, potionsFrame)
       end
-      table.insert(content.values.timeOnTaxi, timeOnTaxiFrame)
+      
+      -- 37 elixirs
+      if (stats.elixirs ~= nil) then
+        local elixirsFrame = CreateFrame("Frame", nil, content)
+        elixirsFrame:SetPoint("TOPLEFT", (80 *37) -40, posY)
+        elixirsFrame:SetSize(1,1)
+        local elixirsFS = elixirsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        elixirsFS:SetPoint("CENTER")
+        elixirsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        elixirsFS:SetText(v.elixirs) 
+        table.insert(content.values.elixirs, elixirsFrame)
+      end
+      
+      -- 38 flasks
+      if (stats.flasks ~= nil) then
+        local flasksFrame = CreateFrame("Frame", nil, content)
+        flasksFrame:SetPoint("TOPLEFT", (80 *38) -40, posY)
+        flasksFrame:SetSize(1,1)
+        local flasksFS = flasksFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        flasksFS:SetPoint("CENTER")
+        flasksFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        flasksFS:SetText(v.flasks) 
+        table.insert(content.values.flasks, flasksFrame)
+      end
+
+      -- 39 scrolls
+      if (stats.scrolls ~= nil) then
+        local scrollsFrame = CreateFrame("Frame", nil, content)
+        scrollsFrame:SetPoint("TOPLEFT", (80 *39) -40, posY)
+        scrollsFrame:SetSize(1,1)
+        local scrollsFS = scrollsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        scrollsFS:SetPoint("CENTER")
+        scrollsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        scrollsFS:SetText(v.scrolls) 
+        table.insert(content.values.scrolls, scrollsFrame)
+      end
+      
+      -- 40 Hearthstones
+      if (stats.hearthstone ~= nil) then
+        local hearthstoneFrame = CreateFrame("Frame", nil, content)
+        hearthstoneFrame:SetPoint("TOPLEFT", (80 *40) -40, posY)
+        hearthstoneFrame:SetSize(1,1)
+        local hearthstoneFS = hearthstoneFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        hearthstoneFS:SetPoint("CENTER")
+        hearthstoneFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        hearthstoneFS:SetText(v.hearthstone) 
+        table.insert(content.values.hearthstone, hearthstoneFrame)
+      end
+      
+      -- 41 Dungeons
+      if (stats.dungeonsEntered ~= nil) then
+        local dungeonsFrame = CreateFrame("Frame", nil, content)
+        dungeonsFrame:SetPoint("TOPLEFT", (80 *41) -40, posY)
+        dungeonsFrame:SetSize(1,1)
+        local dungeonsFS = dungeonsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        dungeonsFS:SetPoint("CENTER")
+        dungeonsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        dungeonsFS:SetText(v.dungeonsEntered) 
+        table.insert(content.values.dungeons, dungeonsFrame)
+      end
+
+      -- 42 Flight Paths 
+      if (stats.flightPaths ~= nil) then
+        local flightPathsFrame = CreateFrame("Frame", nil, content)
+        flightPathsFrame:SetPoint("TOPLEFT", (80 *42) -40, posY)
+        flightPathsFrame:SetSize(1,1)
+        local flightPathsFS = flightPathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        flightPathsFS:SetPoint("CENTER")
+        flightPathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+        flightPathsFS:SetText(v.flightPaths) 
+        table.insert(content.values.flightPaths, flightPathsFrame)
+      end
+
+      -- 43 Time on Taxi
+      if (stats.timeOnTaxi ~= nil) then
+        local timeOnTaxiFrame = CreateFrame("Frame", nil, content)
+        timeOnTaxiFrame:SetPoint("TOPLEFT", (80 *43) -40, posY)
+        timeOnTaxiFrame:SetSize(1,1)
+        local timeOnTaxiFS = timeOnTaxiFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+        timeOnTaxiFS:SetPoint("CENTER")
+        timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+        local days, hours, minutes, seconds = XPC:TimeFormat(v.timeOnTaxi)
+        if (days >= 1) then 
+          timeOnTaxiFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+        else
+          timeOnTaxiFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+        end
+        table.insert(content.values.timeOnTaxi, timeOnTaxiFrame)
+      end
       
     else
       missedLevels = missedLevels + 1
@@ -1076,8 +1206,9 @@ function XPC:ShowSingleToonChart()
 
     i = i + 1
   end
-  
+
   -- chart values for total
+  stats = toon.statsData[tostring(level)]
   local totalDamageDealt = 0
   local totalMonstersKilledSolo = 0
   local totalMonstersKilledInGroup = 0
@@ -1092,6 +1223,9 @@ function XPC:ShowSingleToonChart()
   local totalTimeAFK = 0
   local totalDungeons = 0
   local totalPotions = 0
+  local totalElixirs = 0
+  local totalFlasks = 0
+  local totalScrolls = 0
   local totalHealingPotions = 0
   local totalManaPotions = 0
   local totalMHPotions = 0
@@ -1110,170 +1244,196 @@ function XPC:ShowSingleToonChart()
   local totalHonor = 0
   local totalTimeInCombat = 0
   for k,v in pairs(toon.statsData) do
-    totalDamageDealt = totalDamageDealt + v.damageDealt
-    totalMonstersKilledSolo = totalMonstersKilledSolo + v.monstersKilledSolo
-    totalMonstersKilledInGroup = totalMonstersKilledInGroup + v.monstersKilledInGroup
-    totalQuestsCompleted = totalQuestsCompleted + v.questsCompleted
-    totalFood = totalFood + v.food
-    totalDrink = totalDrink + v.drink
-    totalFlightPaths = totalFlightPaths + v.flightPaths
-    totalHearthstone = totalHearthstone + v.hearthstone
-    totalDamageTaken = totalDamageTaken + v.damageTaken
-    totalHealsGiven = totalHealsGiven + v.healsGiven
-    totalHealsReceived = totalHealsReceived + v.healsReceived
-    totalTimeAFK = totalTimeAFK + v.timeAFK
-    totalDungeons = totalDungeons + v.dungeonsEntered
-    totalPotions = totalPotions + v.potions
-    totalHealingPotions = totalHealingPotions + v.healingPotions
-    totalManaPotions = totalManaPotions + v.manaPotions
-    totalMHPotions = totalMHPotions + v.MHPotions
-    totalXPFromMobs = totalXPFromMobs + v.XPFromMobs
-    totalXPFromQuests = totalXPFromQuests + v.XPFromQuests
-    totalGoldFromQuests = totalGoldFromQuests + v.goldFromQuests
-    totalDeaths = totalDeaths + v.deaths
-    totalBandages = totalBandages + v.bandages
-    totalGoldFromLoot = totalGoldFromLoot + v.goldFromLoot
-    totalGoldGainedMerchant = totalGoldGainedMerchant + v.goldGainedMerchant
-    totalGoldLostMerchant = totalGoldLostMerchant + v.goldLostMerchant
-    totalTimeOnTaxi = totalTimeOnTaxi + v.timeOnTaxi
-    totalHonorKills = totalHonorKills + v.honorKills
-    totalDuelsWon = totalDuelsWon + v.duelsWon
-    totalDuelsLost = totalDuelsLost + v.duelsLost
-    totalHonor = totalHonor + v.honor
-    totalTimeInCombat = totalTimeInCombat + v.timeInCombat
+    if (v.damageDealt) then totalDamageDealt = totalDamageDealt + v.damageDealt end
+    if (v.monstersKilledSolo) then totalMonstersKilledSolo = totalMonstersKilledSolo + v.monstersKilledSolo end
+    if (v.montersKilledInGroup) then totalMonstersKilledInGroup = totalMonstersKilledInGroup + v.monstersKilledInGroup end
+    if (v.questsCompleted) then totalQuestsCompleted = totalQuestsCompleted + v.questsCompleted end
+    if (v.food) then totalFood = totalFood + v.food end
+    if (v.drink) then totalDrink = totalDrink + v.drink end
+    if (v.flightPaths) then totalFlightPaths = totalFlightPaths + v.flightPaths end
+    if (v.hearthstone) then totalHearthstone = totalHearthstone + v.hearthstone end
+    if (v.damageTaken) then totalDamageTaken = totalDamageTaken + v.damageTaken end
+    if (v.healsGiven) then totalHealsGiven = totalHealsGiven + v.healsGiven end
+    if (v.healsReceived) then totalHealsReceived = totalHealsReceived + v.healsReceived end
+    if (v.timeAFK) then totalTimeAFK = totalTimeAFK + v.timeAFK end
+    if (v.dungeonsEntered) then totalDungeons = totalDungeons + v.dungeonsEntered end
+    if (v.potions) then totalPotions = totalPotions + v.potions end
+    if (v.elixirs) then totalElixirs = totalElixirs + v.elixirs  end
+    if (v.flasks) then totalFlasks = totalFlasks + v.flasks  end
+    if (v.scrolls) then totalScrolls = totalScrolls + v.scrolls  end
+    if (v.healingPotions) then totalHealingPotions = totalHealingPotions + v.healingPotions end
+    if (v.manaPotions) then totalManaPotions = totalManaPotions + v.manaPotions end
+    if (v.MHPotions) then totalMHPotions = totalMHPotions + v.MHPotions end
+    if (v.XPFromMobs) then totalXPFromMobs = totalXPFromMobs + v.XPFromMobs end
+    if (v.XPFromQuests) then totalXPFromQuests = totalXPFromQuests + v.XPFromQuests end
+    if (v.goldFromQuests) then totalGoldFromQuests = totalGoldFromQuests + v.goldFromQuests end
+    if (v.deaths) then totalDeaths = totalDeaths + v.deaths end
+    if (v.bandages) then totalBandages = totalBandages + v.bandages end
+    if (v.goldFromLoot) then totalGoldFromLoot = totalGoldFromLoot + v.goldFromLoot end
+    if (v.goldGainedMerchant) then totalGoldGainedMerchant = totalGoldGainedMerchant + v.goldGainedMerchant end
+    if (v.goldLostMerchant) then totalGoldLostMerchant = totalGoldLostMerchant + v.goldLostMerchant end
+    if (v.timeOnTaxi) then totalTimeOnTaxi = totalTimeOnTaxi + v.timeOnTaxi end
+    if (v.honorKills) then totalHonorKills = totalHonorKills + v.honorKills end
+    if (v.duelsWon) then totalDuelsWon = totalDuelsWon + v.duelsWon end
+    if (v.duelsLost) then totalDuelsLost = totalDuelsLost + v.duelsLost end
+    if (v.honor) then totalHonor = totalHonor + v.honor end
+    if (v.timeInCombat) then totalTimeInCombat = totalTimeInCombat + v.timeInCombat end
   end
 
   -- 1 Damage Dealt
-  local damageDealtFrame = CreateFrame("Frame", nil, content)
-  damageDealtFrame:SetPoint("TOPLEFT", (80 *1) -40, -15)
-  damageDealtFrame:SetSize(1,1)
-  local damageDealtFS = damageDealtFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  damageDealtFS:SetPoint("CENTER")
-  damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  if (totalDamageDealt >= 1000000) then 
-    damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
-  elseif (totalDamageDealt >= 1000) then 
-    damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 100) / 10) .. 'K')
-  else
-    damageDealtFS:SetText(tostring(totalDamageDealt))
+  if (stats.damageDealt ~= nil) then
+    local damageDealtFrame = CreateFrame("Frame", nil, content)
+    damageDealtFrame:SetPoint("TOPLEFT", (80 *1) -40, -15)
+    damageDealtFrame:SetSize(1,1)
+    local damageDealtFS = damageDealtFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    damageDealtFS:SetPoint("CENTER")
+    damageDealtFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    if (totalDamageDealt >= 1000000) then 
+      damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 10000) / 100) .. 'M')
+    elseif (totalDamageDealt >= 1000) then 
+      damageDealtFS:SetText(tostring(math.floor(totalDamageDealt / 100) / 10) .. 'K')
+    else
+      damageDealtFS:SetText(tostring(totalDamageDealt))
+    end
+    table.insert(content.values.damageDealt, damageDealtFrame)
   end
-  table.insert(content.values.damageDealt, damageDealtFrame)
 
-  -- 2 Damage Taken
-  local damageTakenFrame = CreateFrame("Frame", nil, content)
-  damageTakenFrame:SetPoint("TOPLEFT", (80 *2) -40, -15)
-  damageTakenFrame:SetSize(1,1)
-  local damageTakenFS = damageTakenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  damageTakenFS:SetPoint("CENTER")
-  damageTakenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  damageTakenFS:SetText(totalDamageTaken) 
-  table.insert(content.values.damageTaken, damageTakenFrame)
+    -- 2 Damage Taken
+  if (stats.damageTaken ~= nil) then
+    local damageTakenFrame = CreateFrame("Frame", nil, content)
+    damageTakenFrame:SetPoint("TOPLEFT", (80 *2) -40, -15)
+    damageTakenFrame:SetSize(1,1)
+    local damageTakenFS = damageTakenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    damageTakenFS:SetPoint("CENTER")
+    damageTakenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    damageTakenFS:SetText(totalDamageTaken) 
+    table.insert(content.values.damageTaken, damageTakenFrame)
+  end
 
-  -- 3 Heals Given
-  local healsGivenFrame = CreateFrame("Frame", nil, content)
-  healsGivenFrame:SetPoint("TOPLEFT", (80 *3) -40, -15)
-  healsGivenFrame:SetSize(1,1)
-  local healsGivenFS = healsGivenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  healsGivenFS:SetPoint("CENTER")
-  healsGivenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  healsGivenFS:SetText(totalHealsGiven) 
-  table.insert(content.values.healsGiven, healsGivenFrame)
+    -- 3 Heals Given
+  if (stats.healsGiven ~= nil) then
+    local healsGivenFrame = CreateFrame("Frame", nil, content)
+    healsGivenFrame:SetPoint("TOPLEFT", (80 *3) -40, -15)
+    healsGivenFrame:SetSize(1,1)
+    local healsGivenFS = healsGivenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    healsGivenFS:SetPoint("CENTER")
+    healsGivenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    healsGivenFS:SetText(totalHealsGiven) 
+    table.insert(content.values.healsGiven, healsGivenFrame)
+  end
 
-  -- 4 Heals Received
-  local healsReceivedFrame = CreateFrame("Frame", nil, content)
-  healsReceivedFrame:SetPoint("TOPLEFT", (80 *4) -40, -15)
-  healsReceivedFrame:SetSize(1,1)
-  local healsReceivedFS = healsReceivedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  healsReceivedFS:SetPoint("CENTER")
-  healsReceivedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  healsReceivedFS:SetText(totalHealsReceived) 
-  table.insert(content.values.healsReceived, healsReceivedFrame)
+    -- 4 Heals Received
+  if (stats.healsReceived ~= nil) then
+    local healsReceivedFrame = CreateFrame("Frame", nil, content)
+    healsReceivedFrame:SetPoint("TOPLEFT", (80 *4) -40, -15)
+    healsReceivedFrame:SetSize(1,1)
+    local healsReceivedFS = healsReceivedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    healsReceivedFS:SetPoint("CENTER")
+    healsReceivedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    healsReceivedFS:SetText(totalHealsReceived) 
+    table.insert(content.values.healsReceived, healsReceivedFrame)
+  end
 
-  -- 5 Kills Solo
-  local monstersKilledSoloFrame = CreateFrame("Frame", nil, content)
-  monstersKilledSoloFrame:SetPoint("TOPLEFT", (80 *5) -40, -15)
-  monstersKilledSoloFrame:SetSize(1,1)
-  local monstersKilledSoloFS = monstersKilledSoloFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  monstersKilledSoloFS:SetPoint("CENTER")
-  monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  monstersKilledSoloFS:SetText(totalMonstersKilledSolo) 
-  table.insert(content.values.monstersKilledSolo, monstersKilledSoloFrame)
+    -- 5 Kills Solo
+  if (stats.monstersKilledSolo ~= nil) then
+    local monstersKilledSoloFrame = CreateFrame("Frame", nil, content)
+    monstersKilledSoloFrame:SetPoint("TOPLEFT", (80 *5) -40, -15)
+    monstersKilledSoloFrame:SetSize(1,1)
+    local monstersKilledSoloFS = monstersKilledSoloFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    monstersKilledSoloFS:SetPoint("CENTER")
+    monstersKilledSoloFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    monstersKilledSoloFS:SetText(totalMonstersKilledSolo) 
+    table.insert(content.values.monstersKilledSolo, monstersKilledSoloFrame)
+  end
 
-  -- 6 Kills Group
-  local monstersKilledInGroupFrame = CreateFrame("Frame", nil, content)
-  monstersKilledInGroupFrame:SetPoint("TOPLEFT", (80 *6) -40, -15)
-  monstersKilledInGroupFrame:SetSize(1,1)
-  local monstersKilledInGroupFS = monstersKilledInGroupFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  monstersKilledInGroupFS:SetPoint("CENTER")
-  monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  monstersKilledInGroupFS:SetText(totalMonstersKilledInGroup) 
-  table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFrame)
-
-  
-  -- 7 Kills Per Hour
-  if (toon.levelData[#toon.levelData] ~= nil) then
-    local killsPerHourFrame = CreateFrame("Frame", nil, content)
-    killsPerHourFrame:SetPoint("TOPLEFT", (80 *7) -40, -15)
-    killsPerHourFrame:SetSize(1,1)
-    local killsPerHourFS = killsPerHourFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    killsPerHourFS:SetPoint("CENTER")
-    killsPerHourFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    local timePlayed = toon.levelData[#toon.levelData].timePlayed
-    local killsPerHour = math.floor((totalMonstersKilledInGroup + totalMonstersKilledSolo) / (timePlayed / 60 / 60) * 10) / 10
-    killsPerHourFS:SetText(killsPerHour .. '/h') 
-    table.insert(content.values.killsPerHour, killsPerHourFrame)
+    -- 6 Kills Group
+  if (stats.monstersKilledInGroup ~= nil) then
+    local monstersKilledInGroupFrame = CreateFrame("Frame", nil, content)
+    monstersKilledInGroupFrame:SetPoint("TOPLEFT", (80 *6) -40, -15)
+    monstersKilledInGroupFrame:SetSize(1,1)
+    local monstersKilledInGroupFS = monstersKilledInGroupFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    monstersKilledInGroupFS:SetPoint("CENTER")
+    monstersKilledInGroupFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    monstersKilledInGroupFS:SetText(totalMonstersKilledInGroup) 
+    table.insert(content.values.monstersKilledInGroup, monstersKilledInGroupFrame)
+  end
+    
+    -- 7 Kills Per Hour
+  if (stats.monstersKilledSolo ~= nil and stats.monstersKilledInGroup ~= nil) then
+    if (toon.levelData[#toon.levelData] ~= nil) then
+      local killsPerHourFrame = CreateFrame("Frame", nil, content)
+      killsPerHourFrame:SetPoint("TOPLEFT", (80 *7) -40, -15)
+      killsPerHourFrame:SetSize(1,1)
+      local killsPerHourFS = killsPerHourFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      killsPerHourFS:SetPoint("CENTER")
+      killsPerHourFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      local timePlayed = toon.levelData[#toon.levelData].timePlayed
+      local killsPerHour = math.floor((totalMonstersKilledInGroup + totalMonstersKilledSolo) / (timePlayed / 60 / 60) * 10) / 10
+      killsPerHourFS:SetText(killsPerHour .. '/h') 
+      table.insert(content.values.killsPerHour, killsPerHourFrame)
+    end
   end
   
   -- 8 Killed
-  local monstersKilledFrame = CreateFrame("Frame", nil, content)
-  monstersKilledFrame:SetPoint("TOPLEFT", (80 *8) -40, -15)
-  monstersKilledFrame:SetSize(1,1)
-  local monstersKilledFS = monstersKilledFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  monstersKilledFS:SetPoint("CENTER")
-  monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  monstersKilledFS:SetText(totalMonstersKilledInGroup + totalMonstersKilledSolo) 
-  table.insert(content.values.monstersKilled, monstersKilledFrame)
+  if (stats.monstersKilledSolo ~= nil and stats.monstersKilledInGroup ~= nil) then
+    local monstersKilledFrame = CreateFrame("Frame", nil, content)
+    monstersKilledFrame:SetPoint("TOPLEFT", (80 *8) -40, -15)
+    monstersKilledFrame:SetSize(1,1)
+    local monstersKilledFS = monstersKilledFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    monstersKilledFS:SetPoint("CENTER")
+    monstersKilledFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    monstersKilledFS:SetText(totalMonstersKilledInGroup + totalMonstersKilledSolo) 
+    table.insert(content.values.monstersKilled, monstersKilledFrame)
+  end
 
-  -- 9 Deaths
-  local deathsFrame = CreateFrame("Frame", nil, content)
-  deathsFrame:SetPoint("TOPLEFT", (80 *9) -40, -15)
-  deathsFrame:SetSize(1,1)
-  local deathsFS = deathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  deathsFS:SetPoint("CENTER")
-  deathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  deathsFS:SetText(totalDeaths) 
-  table.insert(content.values.deaths, deathsFrame)
-  
-  -- 10 Quests Completed
-  local questsCompletedFrame = CreateFrame("Frame", nil, content)
-  questsCompletedFrame:SetPoint("TOPLEFT", (80 *10) -40, -15)
-  questsCompletedFrame:SetSize(1,1)
-  local questsCompletedFS = questsCompletedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  questsCompletedFS:SetPoint("CENTER")
-  questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  questsCompletedFS:SetText(totalQuestsCompleted) 
-  table.insert(content.values.questsCompleted, questsCompletedFrame)
+    -- 9 Deaths
+  if (stats.deaths ~= nil) then
+    local deathsFrame = CreateFrame("Frame", nil, content)
+    deathsFrame:SetPoint("TOPLEFT", (80 *9) -40, -15)
+    deathsFrame:SetSize(1,1)
+    local deathsFS = deathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    deathsFS:SetPoint("CENTER")
+    deathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    deathsFS:SetText(totalDeaths) 
+    table.insert(content.values.deaths, deathsFrame)
+  end
+    
+    -- 10 Quests Completed
+  if (stats.questsCompleted ~= nil) then
+    local questsCompletedFrame = CreateFrame("Frame", nil, content)
+    questsCompletedFrame:SetPoint("TOPLEFT", (80 *10) -40, -15)
+    questsCompletedFrame:SetSize(1,1)
+    local questsCompletedFS = questsCompletedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    questsCompletedFS:SetPoint("CENTER")
+    questsCompletedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    questsCompletedFS:SetText(totalQuestsCompleted) 
+    table.insert(content.values.questsCompleted, questsCompletedFrame)
+  end
 
-  -- 11 Mob XP
-  local XPFromMobsFrame = CreateFrame("Frame", nil, content)
-  XPFromMobsFrame:SetPoint("TOPLEFT", (80 *11) -40, -15)
-  XPFromMobsFrame:SetSize(1,1)
-  local XPFromMobsFS = XPFromMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  XPFromMobsFS:SetPoint("CENTER")
-  XPFromMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  XPFromMobsFS:SetText(totalXPFromMobs) 
-  table.insert(content.values.XPFromMobs, XPFromMobsFrame)
+    -- 11 Mob XP
+  if (stats.XPFromMobs ~= nil) then
+    local XPFromMobsFrame = CreateFrame("Frame", nil, content)
+    XPFromMobsFrame:SetPoint("TOPLEFT", (80 *11) -40, -15)
+    XPFromMobsFrame:SetSize(1,1)
+    local XPFromMobsFS = XPFromMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    XPFromMobsFS:SetPoint("CENTER")
+    XPFromMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    XPFromMobsFS:SetText(totalXPFromMobs) 
+    table.insert(content.values.XPFromMobs, XPFromMobsFrame)
+  end
 
-  -- 12 Quest XP
-  local XPFromQuestsFrame = CreateFrame("Frame", nil, content)
-  XPFromQuestsFrame:SetPoint("TOPLEFT", (80 *12) -40, -15)
-  XPFromQuestsFrame:SetSize(1,1)
-  local XPFromQuestsFS = XPFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  XPFromQuestsFS:SetPoint("CENTER")
-  XPFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  XPFromQuestsFS:SetText(totalXPFromQuests) 
-  table.insert(content.values.XPFromQuests, XPFromQuestsFrame)
-  
+    -- 12 Quest XP
+  if (stats.XPFromQuests ~= nil) then
+    local XPFromQuestsFrame = CreateFrame("Frame", nil, content)
+    XPFromQuestsFrame:SetPoint("TOPLEFT", (80 *12) -40, -15)
+    XPFromQuestsFrame:SetSize(1,1)
+    local XPFromQuestsFS = XPFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    XPFromQuestsFS:SetPoint("CENTER")
+    XPFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    XPFromQuestsFS:SetText(totalXPFromQuests) 
+    table.insert(content.values.XPFromQuests, XPFromQuestsFrame)
+  end
+    
   -- 13 XP Per Hour
   if (toon.levelData[#toon.levelData] ~= nil) then
     local xpPerHourFrame = CreateFrame("Frame", nil, content)
@@ -1288,30 +1448,34 @@ function XPC:ShowSingleToonChart()
     xpPerHourFS:SetText(xpPerHour .. '/h') 
     table.insert(content.values.xpPerHour, xpPerHourFrame)
   end
-  
-  -- 14 Percent XP Gained Mobs
-  local percentXPMobsFrame = CreateFrame("Frame", nil, content)
-  percentXPMobsFrame:SetPoint("TOPLEFT", (80 *14) -40, -15)
-  percentXPMobsFrame:SetSize(1,1)
-  local percentXPMobsFS = percentXPMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  percentXPMobsFS:SetPoint("CENTER")
-  percentXPMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  local percent = math.floor((totalXPFromMobs / totalXP) * 100) 
-  if (percent > 100) then percent = 100 end
-  percentXPMobsFS:SetText(percent .. "%")
-  table.insert(content.values.percentXPMobs, percentXPMobsFrame)
+    
+    -- 14 Percent XP Gained Mobs
+  if (stats.XPFromMobs ~= nil) then
+    local percentXPMobsFrame = CreateFrame("Frame", nil, content)
+    percentXPMobsFrame:SetPoint("TOPLEFT", (80 *14) -40, -15)
+    percentXPMobsFrame:SetSize(1,1)
+    local percentXPMobsFS = percentXPMobsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    percentXPMobsFS:SetPoint("CENTER")
+    percentXPMobsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    local percent = math.floor((totalXPFromMobs / totalXP) * 100) 
+    if (percent > 100) then percent = 100 end
+    percentXPMobsFS:SetText(percent .. "%")
+    table.insert(content.values.percentXPMobs, percentXPMobsFrame)
+  end
 
-  -- 15 Percent XP Gained Quests
-  local percentXPQuestsFrame = CreateFrame("Frame", nil, content)
-  percentXPQuestsFrame:SetPoint("TOPLEFT", (80 *15) -40, -15)
-  percentXPQuestsFrame:SetSize(1,1)
-  local percentXPQuestsFS = percentXPQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  percentXPQuestsFS:SetPoint("CENTER")
-  percentXPQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  local percent = math.floor((totalXPFromQuests / totalXP) * 100)
-  if (percent > 100) then percent = 100 end
-  percentXPQuestsFS:SetText(percent .. "%")
-  table.insert(content.values.percentXPQuests, percentXPQuestsFrame)
+    -- 15 Percent XP Gained Quests
+  if (stats.XPFromQuests ~= nil) then
+    local percentXPQuestsFrame = CreateFrame("Frame", nil, content)
+    percentXPQuestsFrame:SetPoint("TOPLEFT", (80 *15) -40, -15)
+    percentXPQuestsFrame:SetSize(1,1)
+    local percentXPQuestsFS = percentXPQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    percentXPQuestsFS:SetPoint("CENTER")
+    percentXPQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    local percent = math.floor((totalXPFromQuests / totalXP) * 100)
+    if (percent > 100) then percent = 100 end
+    percentXPQuestsFS:SetText(percent .. "%")
+    table.insert(content.values.percentXPQuests, percentXPQuestsFrame)
+  end
 
   -- 16 Time Played
   if (toon.levelData[#toon.levelData] ~= nil) then
@@ -1331,257 +1495,338 @@ function XPC:ShowSingleToonChart()
   end
 
   -- 18 Time in Combat
-  local timeInCombatFrame = CreateFrame("Frame", nil, content)
-  timeInCombatFrame:SetPoint("TOPLEFT", (80 *18) -40, -15)
-  timeInCombatFrame:SetSize(1,1)
-  local timeInCombatFS = timeInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  timeInCombatFS:SetPoint("CENTER")
-  timeInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-  local days, hours, minutes, seconds = XPC:TimeFormat(totalTimeInCombat)
-  if (days >= 1) then 
-    timeInCombatFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
-  else
-    timeInCombatFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+  if (stats.timeInCombat ~= nil) then
+    local timeInCombatFrame = CreateFrame("Frame", nil, content)
+    timeInCombatFrame:SetPoint("TOPLEFT", (80 *18) -40, -15)
+    timeInCombatFrame:SetSize(1,1)
+    local timeInCombatFS = timeInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    timeInCombatFS:SetPoint("CENTER")
+    timeInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+    local days, hours, minutes, seconds = XPC:TimeFormat(totalTimeInCombat)
+    if (days >= 1) then 
+      timeInCombatFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+    else
+      timeInCombatFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+    end
+    table.insert(content.values.timeInCombat, timeInCombatFrame)
   end
-  table.insert(content.values.timeInCombat, timeInCombatFrame)
   
   -- 19 Percent Time In Combat
-  if (toon.levelData[#toon.levelData] ~= nil) then
-    local percentInCombatFrame = CreateFrame("Frame", nil, content)
-    percentInCombatFrame:SetPoint("TOPLEFT", (80 *19) -40, -15)
-    percentInCombatFrame:SetSize(1,1)
-    local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-    percentInCombatFS:SetPoint("CENTER")
-    percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    percentInCombatFS:SetText(math.floor((totalTimeInCombat / toon.levelData[#toon.levelData].timePlayed) * 100) .. "%")
-    table.insert(content.values.percentInCombat, percentInCombatFrame)
+  if (stats.timeInCombat ~= nil) then
+    if (toon.levelData[#toon.levelData] ~= nil) then
+      local percentInCombatFrame = CreateFrame("Frame", nil, content)
+      percentInCombatFrame:SetPoint("TOPLEFT", (80 *19) -40, -15)
+      percentInCombatFrame:SetSize(1,1)
+      local percentInCombatFS = percentInCombatFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+      percentInCombatFS:SetPoint("CENTER")
+      percentInCombatFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+      percentInCombatFS:SetText(math.floor((totalTimeInCombat / toon.levelData[#toon.levelData].timePlayed) * 100) .. "%")
+      table.insert(content.values.percentInCombat, percentInCombatFrame)
+    end
   end
 
-  -- 20 Time AFK
-  local timeAFKFrame = CreateFrame("Frame", nil, content)
-  timeAFKFrame:SetPoint("TOPLEFT", (80 *20) -40, -15)
-  timeAFKFrame:SetSize(1,1)
-  local timeAFKFS = timeAFKFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  timeAFKFS:SetPoint("CENTER")
-  timeAFKFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  local days, hours, minutes, seconds = XPC:TimeFormat(totalTimeAFK)
-  if (days >= 1) then 
-    timeAFKFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
-  else
-    timeAFKFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+    -- 20 Time AFK
+  if (stats.timeAFK ~= nil) then
+    local timeAFKFrame = CreateFrame("Frame", nil, content)
+    timeAFKFrame:SetPoint("TOPLEFT", (80 *20) -40, -15)
+    timeAFKFrame:SetSize(1,1)
+    local timeAFKFS = timeAFKFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    timeAFKFS:SetPoint("CENTER")
+    timeAFKFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    local days, hours, minutes, seconds = XPC:TimeFormat(totalTimeAFK)
+    if (days >= 1) then 
+      timeAFKFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+    else
+      timeAFKFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+    end
+    table.insert(content.values.timeAFK, timeAFKFrame)
   end
-  table.insert(content.values.timeAFK, timeAFKFrame)
 
-  -- 21 Gold From Loot
-  local goldFromLootFrame = CreateFrame("Frame", nil, content)
-  goldFromLootFrame:SetPoint("TOPLEFT", (80 *21) -40, -15)
-  goldFromLootFrame:SetSize(1,1)
-  local goldFromLootFS = goldFromLootFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  goldFromLootFS:SetPoint("CENTER")
-  goldFromLootFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-  local gold, silver, copper = XPC:MoneyFormat(totalGoldFromLoot)
-  goldFromLootFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
-  table.insert(content.values.goldFromLoot, goldFromLootFrame)
-
-  
-  -- 22 Quest Gold
-  local goldFromQuestsFrame = CreateFrame("Frame", nil, content)
-  goldFromQuestsFrame:SetPoint("TOPLEFT", (80 *22) -40, -15)
-  goldFromQuestsFrame:SetSize(1,1)
-  local goldFromQuestsFS = goldFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  goldFromQuestsFS:SetPoint("CENTER")
-  goldFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-  local gold, silver, copper = XPC:MoneyFormat(totalGoldFromQuests)
-  goldFromQuestsFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
-  table.insert(content.values.goldFromQuests, goldFromQuestsFrame)
-
-  -- 23 Gold Gained Merchant
-  local goldGainedMerchantFrame = CreateFrame("Frame", nil, content)
-  goldGainedMerchantFrame:SetPoint("TOPLEFT", (80 *23) -40, -15)
-  goldGainedMerchantFrame:SetSize(1,1)
-  local goldGainedMerchantFS = goldGainedMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  goldGainedMerchantFS:SetPoint("CENTER")
-  goldGainedMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-  local gold, silver, copper = XPC:MoneyFormat(totalGoldGainedMerchant)
-  goldGainedMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
-  table.insert(content.values.goldGainedMerchant, goldGainedMerchantFrame)
-
-  -- 24 Gold Gained Total
-  local goldTotalFrame = CreateFrame("Frame", nil, content)
-  goldTotalFrame:SetPoint("TOPLEFT", (80 *24) -40, -15)
-  goldTotalFrame:SetSize(1,1)
-  local goldTotalFS = goldTotalFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  goldTotalFS:SetPoint("CENTER")
-  goldTotalFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-  local gold, silver, copper = XPC:MoneyFormat(totalGoldGainedMerchant + totalGoldFromLoot + totalGoldFromQuests)
-  goldTotalFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
-  table.insert(content.values.goldTotal, goldTotalFrame)
-
-  -- 25 Gold Lost Merchant
-  local goldLostMerchantFrame = CreateFrame("Frame", nil, content)
-  goldLostMerchantFrame:SetPoint("TOPLEFT", (80 *25) -40, -15)
-  goldLostMerchantFrame:SetSize(1,1)
-  local goldLostMerchantFS = goldLostMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  goldLostMerchantFS:SetPoint("CENTER")
-  goldLostMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-  local gold, silver, copper = XPC:MoneyFormat(totalGoldLostMerchant)
-  goldLostMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
-  table.insert(content.values.goldLostMerchant, goldLostMerchantFrame)
-
-  -- 26 Duels Won
-  local duelsWonFrame = CreateFrame("Frame", nil, content)
-  duelsWonFrame:SetPoint("TOPLEFT", (80 *26) -40, -15)
-  duelsWonFrame:SetSize(1,1)
-  local duelsWonFS = duelsWonFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  duelsWonFS:SetPoint("CENTER")
-  duelsWonFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  duelsWonFS:SetText(totalDuelsWon) 
-  table.insert(content.values.duelsWon, duelsWonFrame)
-  
-  -- 27 Duels Lost
-  local duelsLostFrame = CreateFrame("Frame", nil, content)
-  duelsLostFrame:SetPoint("TOPLEFT", (80 *27) -40, -15)
-  duelsLostFrame:SetSize(1,1)
-  local duelsLostFS = duelsLostFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  duelsLostFS:SetPoint("CENTER")
-  duelsLostFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  duelsLostFS:SetText(totalDuelsLost) 
-  table.insert(content.values.duelsLost, duelsLostFrame)
-
-  -- 28 Honor Kills
-  local honorKillsFrame = CreateFrame("Frame", nil, content)
-  honorKillsFrame:SetPoint("TOPLEFT", (80 *28) -40, -15)
-  honorKillsFrame:SetSize(1,1)
-  local honorKillsFS = honorKillsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  honorKillsFS:SetPoint("CENTER")
-  honorKillsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  honorKillsFS:SetText(totalHonorKills) 
-  table.insert(content.values.honorKills, honorKillsFrame)
-
-  -- 29 Honor
-  local honorFrame = CreateFrame("Frame", nil, content)
-  honorFrame:SetPoint("TOPLEFT", (80 *29) -40, -15)
-  honorFrame:SetSize(1,1)
-  local honorFS = honorFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  honorFS:SetPoint("CENTER")
-  honorFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  honorFS:SetText(totalHonor) 
-  table.insert(content.values.honor, honorFrame)
-  
-  -- 30 Food
-  local foodFrame = CreateFrame("Frame", nil, content)
-  foodFrame:SetPoint("TOPLEFT", (80 *30) -40, -15)
-  foodFrame:SetSize(1,1)
-  local foodFS = foodFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  foodFS:SetPoint("CENTER")
-  foodFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  foodFS:SetText(totalFood) 
-  table.insert(content.values.food, foodFrame)
-
-  -- 31 Drink
-  local drinkFrame = CreateFrame("Frame", nil, content)
-  drinkFrame:SetPoint("TOPLEFT", (80 *31) -40, -15)
-  drinkFrame:SetSize(1,1)
-  local drinkFS = drinkFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  drinkFS:SetPoint("CENTER")
-  drinkFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  drinkFS:SetText(totalDrink) 
-  table.insert(content.values.drink, drinkFrame)
-
-  -- 32 Bandages
-  local bandagesFrame = CreateFrame("Frame", nil, content)
-  bandagesFrame:SetPoint("TOPLEFT", (80 *32) -40, -15)
-  bandagesFrame:SetSize(1,1)
-  local bandagesFS = bandagesFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  bandagesFS:SetPoint("CENTER")
-  bandagesFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  bandagesFS:SetText(totalBandages) 
-  table.insert(content.values.bandages, bandagesFrame)
-
-  -- 33 Healing Potions
-  local healingPotionsFrame = CreateFrame("Frame", nil, content)
-  healingPotionsFrame:SetPoint("TOPLEFT", (80 *33) -40, -15)
-  healingPotionsFrame:SetSize(1,1)
-  local healingPotionsFS = healingPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  healingPotionsFS:SetPoint("CENTER")
-  healingPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  healingPotionsFS:SetText(totalHealingPotions) 
-  table.insert(content.values.healingPotions, healingPotionsFrame)
-
-  -- 34 Mana Potions
-  local manaPotionsFrame = CreateFrame("Frame", nil, content)
-  manaPotionsFrame:SetPoint("TOPLEFT", (80 *34) -40, -15)
-  manaPotionsFrame:SetSize(1,1)
-  local manaPotionsFS = manaPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  manaPotionsFS:SetPoint("CENTER")
-  manaPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  manaPotionsFS:SetText(totalManaPotions) 
-  table.insert(content.values.manaPotions, manaPotionsFrame)
-
-  -- 35 Mana/Healing Potions
-  local MHPotionsFrame = CreateFrame("Frame", nil, content)
-  MHPotionsFrame:SetPoint("TOPLEFT", (80 *35) -40, -15)
-  MHPotionsFrame:SetSize(1,1)
-  local MHPotionsFS = MHPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  MHPotionsFS:SetPoint("CENTER")
-  MHPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  MHPotionsFS:SetText(totalMHPotions) 
-  table.insert(content.values.MHPotions, MHPotionsFrame)
-
-  -- 36 Potions
-  local potionsFrame = CreateFrame("Frame", nil, content)
-  potionsFrame:SetPoint("TOPLEFT", (80 *36) -40, -15)
-  potionsFrame:SetSize(1,1)
-  local potionsFS = potionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  potionsFS:SetPoint("CENTER")
-  potionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  potionsFS:SetText(totalPotions) 
-  table.insert(content.values.potions, potionsFrame)
-
-  -- 37 Hearthstones
-  local hearthstoneFrame = CreateFrame("Frame", nil, content)
-  hearthstoneFrame:SetPoint("TOPLEFT", (80 *37) -40, -15)
-  hearthstoneFrame:SetSize(1,1)
-  local hearthstoneFS = hearthstoneFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  hearthstoneFS:SetPoint("CENTER")
-  hearthstoneFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  hearthstoneFS:SetText(totalHearthstone) 
-  table.insert(content.values.hearthstone, hearthstoneFrame)
-  
-  -- 38 Dungeons
-  local dungeonsFrame = CreateFrame("Frame", nil, content)
-  dungeonsFrame:SetPoint("TOPLEFT", (80 *38) -40, -15)
-  dungeonsFrame:SetSize(1,1)
-  local dungeonsFS = dungeonsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  dungeonsFS:SetPoint("CENTER")
-  dungeonsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  dungeonsFS:SetText(totalDungeons) 
-  table.insert(content.values.dungeons, dungeonsFrame)
-
-  -- 39 Flight Paths
-  local flightPathsFrame = CreateFrame("Frame", nil, content)
-  flightPathsFrame:SetPoint("TOPLEFT", (80 *39) -40, -15)
-  flightPathsFrame:SetSize(1,1)
-  local flightPathsFS = flightPathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  flightPathsFS:SetPoint("CENTER")
-  flightPathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-  flightPathsFS:SetText(totalFlightPaths) 
-  table.insert(content.values.flightPaths, flightPathsFrame)
-
-  -- 40 Time on Taxi
-  local timeOnTaxiFrame = CreateFrame("Frame", nil, content)
-  timeOnTaxiFrame:SetPoint("TOPLEFT", (80 *40) -40, -15)
-  timeOnTaxiFrame:SetSize(1,1)
-  local timeOnTaxiFS = timeOnTaxiFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
-  timeOnTaxiFS:SetPoint("CENTER")
-  timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
-  local days, hours, minutes, seconds = XPC:TimeFormat(totalTimeOnTaxi)
-  if (days >= 1) then 
-    timeOnTaxiFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
-  else
-    timeOnTaxiFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+    -- 21 Gold From Loot
+  if (stats.goldFromLoot ~= nil) then
+    local goldFromLootFrame = CreateFrame("Frame", nil, content)
+    goldFromLootFrame:SetPoint("TOPLEFT", (80 *21) -40, -15)
+    goldFromLootFrame:SetSize(1,1)
+    local goldFromLootFS = goldFromLootFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    goldFromLootFS:SetPoint("CENTER")
+    goldFromLootFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+    local gold, silver, copper = XPC:MoneyFormat(totalGoldFromLoot)
+    goldFromLootFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
+    table.insert(content.values.goldFromLoot, goldFromLootFrame)
   end
-  table.insert(content.values.timeOnTaxi, timeOnTaxiFrame)
+    
+    -- 22 Quest Gold
+  if (stats.goldFromQuests ~= nil) then
+    local goldFromQuestsFrame = CreateFrame("Frame", nil, content)
+    goldFromQuestsFrame:SetPoint("TOPLEFT", (80 *22) -40, -15)
+    goldFromQuestsFrame:SetSize(1,1)
+    local goldFromQuestsFS = goldFromQuestsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    goldFromQuestsFS:SetPoint("CENTER")
+    goldFromQuestsFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+    local gold, silver, copper = XPC:MoneyFormat(totalGoldFromQuests)
+    goldFromQuestsFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c") 
+    table.insert(content.values.goldFromQuests, goldFromQuestsFrame)
+  end
+
+    -- 23 Gold Gained Merchant
+  if (stats.goldGainedMerchant ~= nil) then
+    local goldGainedMerchantFrame = CreateFrame("Frame", nil, content)
+    goldGainedMerchantFrame:SetPoint("TOPLEFT", (80 *23) -40, -15)
+    goldGainedMerchantFrame:SetSize(1,1)
+    local goldGainedMerchantFS = goldGainedMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    goldGainedMerchantFS:SetPoint("CENTER")
+    goldGainedMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+    local gold, silver, copper = XPC:MoneyFormat(totalGoldGainedMerchant)
+    goldGainedMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
+    table.insert(content.values.goldGainedMerchant, goldGainedMerchantFrame)
+  end
+
+    -- 24 Gold Gained Total
+  if (stats.goldGainedMerchant ~= nil  and stats.goldFromLoot ~= nil and stats.goldFromQuests ~= nil) then
+    local goldTotalFrame = CreateFrame("Frame", nil, content)
+    goldTotalFrame:SetPoint("TOPLEFT", (80 *24) -40, -15)
+    goldTotalFrame:SetSize(1,1)
+    local goldTotalFS = goldTotalFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    goldTotalFS:SetPoint("CENTER")
+    goldTotalFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+    local gold, silver, copper = XPC:MoneyFormat(totalGoldGainedMerchant + totalGoldFromLoot + totalGoldFromQuests)
+    goldTotalFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
+    table.insert(content.values.goldTotal, goldTotalFrame)
+  end
+
+    -- 25 Gold Lost Merchant
+  if (stats.goldLostMerchant ~= nil) then
+    local goldLostMerchantFrame = CreateFrame("Frame", nil, content)
+    goldLostMerchantFrame:SetPoint("TOPLEFT", (80 *25) -40, -15)
+    goldLostMerchantFrame:SetSize(1,1)
+    local goldLostMerchantFS = goldLostMerchantFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    goldLostMerchantFS:SetPoint("CENTER")
+    goldLostMerchantFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+    local gold, silver, copper = XPC:MoneyFormat(totalGoldLostMerchant)
+    goldLostMerchantFS:SetText(gold .. "g " .. silver .. "s " .. copper .. "c")
+    table.insert(content.values.goldLostMerchant, goldLostMerchantFrame)
+  end
+
+    -- 26 Duels Won
+  if (stats.duelsWon ~= nil) then
+    local duelsWonFrame = CreateFrame("Frame", nil, content)
+    duelsWonFrame:SetPoint("TOPLEFT", (80 *26) -40, -15)
+    duelsWonFrame:SetSize(1,1)
+    local duelsWonFS = duelsWonFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    duelsWonFS:SetPoint("CENTER")
+    duelsWonFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    duelsWonFS:SetText(totalDuelsWon) 
+    table.insert(content.values.duelsWon, duelsWonFrame)
+  end
+    
+    -- 27 Duels Lost
+  if (stats.duelsLost ~= nil) then
+    local duelsLostFrame = CreateFrame("Frame", nil, content)
+    duelsLostFrame:SetPoint("TOPLEFT", (80 *27) -40, -15)
+    duelsLostFrame:SetSize(1,1)
+    local duelsLostFS = duelsLostFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    duelsLostFS:SetPoint("CENTER")
+    duelsLostFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    duelsLostFS:SetText(totalDuelsLost) 
+    table.insert(content.values.duelsLost, duelsLostFrame)
+  end
+
+    -- 28 Honor Kills
+  if (stats.honorKills ~= nil) then
+    local honorKillsFrame = CreateFrame("Frame", nil, content)
+    honorKillsFrame:SetPoint("TOPLEFT", (80 *28) -40, -15)
+    honorKillsFrame:SetSize(1,1)
+    local honorKillsFS = honorKillsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    honorKillsFS:SetPoint("CENTER")
+    honorKillsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    honorKillsFS:SetText(totalHonorKills) 
+    table.insert(content.values.honorKills, honorKillsFrame)
+  end
+
+    -- 29 Honor
+  if (stats.honor ~= nil) then
+    local honorFrame = CreateFrame("Frame", nil, content)
+    honorFrame:SetPoint("TOPLEFT", (80 *29) -40, -15)
+    honorFrame:SetSize(1,1)
+    local honorFS = honorFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    honorFS:SetPoint("CENTER")
+    honorFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    honorFS:SetText(totalHonor) 
+    table.insert(content.values.honor, honorFrame)
+  end
+    
+    -- 30 Food
+  if (stats.food ~= nil) then
+    local foodFrame = CreateFrame("Frame", nil, content)
+    foodFrame:SetPoint("TOPLEFT", (80 *30) -40, -15)
+    foodFrame:SetSize(1,1)
+    local foodFS = foodFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    foodFS:SetPoint("CENTER")
+    foodFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    foodFS:SetText(totalFood) 
+    table.insert(content.values.food, foodFrame)
+  end
+
+    -- 31 Drink
+  if (stats.drink ~= nil) then
+    local drinkFrame = CreateFrame("Frame", nil, content)
+    drinkFrame:SetPoint("TOPLEFT", (80 *31) -40, -15)
+    drinkFrame:SetSize(1,1)
+    local drinkFS = drinkFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    drinkFS:SetPoint("CENTER")
+    drinkFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    drinkFS:SetText(totalDrink) 
+    table.insert(content.values.drink, drinkFrame)
+  end
+
+    -- 32 Bandages
+  if (stats.bandages ~= nil) then
+    local bandagesFrame = CreateFrame("Frame", nil, content)
+    bandagesFrame:SetPoint("TOPLEFT", (80 *32) -40, -15)
+    bandagesFrame:SetSize(1,1)
+    local bandagesFS = bandagesFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    bandagesFS:SetPoint("CENTER")
+    bandagesFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    bandagesFS:SetText(totalBandages) 
+    table.insert(content.values.bandages, bandagesFrame)
+  end
+
+    -- 33 Healing Potions
+  if (stats.healingPotions ~= nil) then
+    local healingPotionsFrame = CreateFrame("Frame", nil, content)
+    healingPotionsFrame:SetPoint("TOPLEFT", (80 *33) -40, -15)
+    healingPotionsFrame:SetSize(1,1)
+    local healingPotionsFS = healingPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    healingPotionsFS:SetPoint("CENTER")
+    healingPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    healingPotionsFS:SetText(totalHealingPotions) 
+    table.insert(content.values.healingPotions, healingPotionsFrame)
+  end
+
+    -- 34 Mana Potions
+  if (stats.manaPotions ~= nil) then
+    local manaPotionsFrame = CreateFrame("Frame", nil, content)
+    manaPotionsFrame:SetPoint("TOPLEFT", (80 *34) -40, -15)
+    manaPotionsFrame:SetSize(1,1)
+    local manaPotionsFS = manaPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    manaPotionsFS:SetPoint("CENTER")
+    manaPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    manaPotionsFS:SetText(totalManaPotions) 
+    table.insert(content.values.manaPotions, manaPotionsFrame)
+  end
+
+    -- 35 Mana/Healing Potions
+  if (stats.MHPotions ~= nil) then
+    local MHPotionsFrame = CreateFrame("Frame", nil, content)
+    MHPotionsFrame:SetPoint("TOPLEFT", (80 *35) -40, -15)
+    MHPotionsFrame:SetSize(1,1)
+    local MHPotionsFS = MHPotionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    MHPotionsFS:SetPoint("CENTER")
+    MHPotionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    MHPotionsFS:SetText(totalMHPotions) 
+    table.insert(content.values.MHPotions, MHPotionsFrame)
+  end
+
+    -- 36 Potions
+  if (stats.potions ~= nil) then
+    local potionsFrame = CreateFrame("Frame", nil, content)
+    potionsFrame:SetPoint("TOPLEFT", (80 *36) -40, -15)
+    potionsFrame:SetSize(1,1)
+    local potionsFS = potionsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    potionsFS:SetPoint("CENTER")
+    potionsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    potionsFS:SetText(totalPotions) 
+    table.insert(content.values.potions, potionsFrame)
+  end
+
+    -- 37 Elixirs
+  if (stats.elixirs ~= nil) then
+    local elixirsFrame = CreateFrame("Frame", nil, content)
+    elixirsFrame:SetPoint("TOPLEFT", (80 *37) -40, -15)
+    elixirsFrame:SetSize(1,1)
+    local elixirsFS = elixirsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    elixirsFS:SetPoint("CENTER")
+    elixirsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    elixirsFS:SetText(totalElixirs) 
+    table.insert(content.values.elixirs, elixirsFrame)
+  end
+
+    -- 38 Flasks
+  if (stats.flasks ~= nil) then
+    local flasksFrame = CreateFrame("Frame", nil, content)
+    flasksFrame:SetPoint("TOPLEFT", (80 *38) -40, -15)
+    flasksFrame:SetSize(1,1)
+    local flasksFS = flasksFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    flasksFS:SetPoint("CENTER")
+    flasksFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    flasksFS:SetText(totalFlasks) 
+    table.insert(content.values.flasks, flasksFrame)
+  end
+
+    -- 39 Scrolls
+  if (stats.scrolls ~= nil) then
+    local scrollsFrame = CreateFrame("Frame", nil, content)
+    scrollsFrame:SetPoint("TOPLEFT", (80 *39) -40, -15)
+    scrollsFrame:SetSize(1,1)
+    local scrollsFS = scrollsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    scrollsFS:SetPoint("CENTER")
+    scrollsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    scrollsFS:SetText(totalScrolls) 
+    table.insert(content.values.scrolls, scrollsFrame)
+  end
+
+    -- 40 Hearthstones
+  if (stats.hearthstone ~= nil) then
+    local hearthstoneFrame = CreateFrame("Frame", nil, content)
+    hearthstoneFrame:SetPoint("TOPLEFT", (80 *40) -40, -15)
+    hearthstoneFrame:SetSize(1,1)
+    local hearthstoneFS = hearthstoneFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    hearthstoneFS:SetPoint("CENTER")
+    hearthstoneFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    hearthstoneFS:SetText(totalHearthstone) 
+    table.insert(content.values.hearthstone, hearthstoneFrame)
+  end
+    
+    -- 41 Dungeons
+  if (stats.dungeonsEntered ~= nil) then
+    local dungeonsFrame = CreateFrame("Frame", nil, content)
+    dungeonsFrame:SetPoint("TOPLEFT", (80 *41) -40, -15)
+    dungeonsFrame:SetSize(1,1)
+    local dungeonsFS = dungeonsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    dungeonsFS:SetPoint("CENTER")
+    dungeonsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    dungeonsFS:SetText(totalDungeons) 
+    table.insert(content.values.dungeons, dungeonsFrame)
+  end
+
+    -- 42 Flight Paths
+  if (stats.flightPaths ~= nil) then
+    local flightPathsFrame = CreateFrame("Frame", nil, content)
+    flightPathsFrame:SetPoint("TOPLEFT", (80 *42) -40, -15)
+    flightPathsFrame:SetSize(1,1)
+    local flightPathsFS = flightPathsFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    flightPathsFS:SetPoint("CENTER")
+    flightPathsFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
+    flightPathsFS:SetText(totalFlightPaths) 
+    table.insert(content.values.flightPaths, flightPathsFrame)
+  end
+
+    -- 43 Time on Taxi
+  if (stats.timeOnTaxi ~= nil) then
+    local timeOnTaxiFrame = CreateFrame("Frame", nil, content)
+    timeOnTaxiFrame:SetPoint("TOPLEFT", (80 *43) -40, -15)
+    timeOnTaxiFrame:SetSize(1,1)
+    local timeOnTaxiFS = timeOnTaxiFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
+    timeOnTaxiFS:SetPoint("CENTER")
+    timeOnTaxiFS:SetFont("Fonts\\FRIZQT__.TTF", 11, "THINOUTLINE")
+    local days, hours, minutes, seconds = XPC:TimeFormat(totalTimeOnTaxi)
+    if (days >= 1) then 
+      timeOnTaxiFS:SetText(days .. 'd ' .. hours .. 'h ' .. minutes .. 'm') 
+    else
+      timeOnTaxiFS:SetText(hours .. 'h ' .. minutes .. 'm ' .. seconds .. 's') 
+    end
+    table.insert(content.values.timeOnTaxi, timeOnTaxiFrame)
+  end
 
   chart:Show()
 end
@@ -1650,9 +1895,17 @@ function XPC:StatsTracker()
   local stats = XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player'))]
   local foods = {25691, 25690, 25692, 25693, 24707, 29029, 434, 18229, 10257, 22731, 25695, 25700, 26401, 26260, 26472, 29008, 1131, 435, 18231, 18232, 18234, 24869, 6410, 28616, 25886, 433, 7737, 2639, 10256, 24800, 1127, 1129, 25660, 5006, 5005, 5007, 18233, 24005, 5004, 18230, 29073, 53283, 58886, 29073, 28616, 33266, 46898, 43777, 33253, 33269, 33260, 48720, 43180, 33264, 35270, 33255, 61829, 57069, 46812, 42308, 41030, 40768, 35271, 45618, 33725, 57084, 43763, 40745, 33262, 33258, 45548}
   local drinks = {25691, 25690, 25692, 25693, 24707, 29029, 430, 24355, 1135, 26475, 22734, 1133, 432, 1137, 26473, 10250, 25696, 26261, 29007, 44114, 10250, 22734, 34291, 65363, 69560, 49472, 44116, 43706, 61830, 44115, 27089, 69561, 45020, 43182, 52911, 43183}
-  -- local potions = {9030,5634,13444,13457,5816,929,13446,3823,13443,3387,2459,13442,9172,20008,6149,3928,1710,6049,3827,6372,5633,13461,13455,858,9144,13462,3385,13459,6048,5631,13458,118,2455,13506,12190,18253,23579,20002,13456,4623,6052,3386,2456,6051,5632,13460,6050,18841,4596,23578,18839,1450,17348,3087,17351,17349,23696,23698,17352}
-  -- local elixirs = {9155,10592,8949,13453,3389,9224,9233,3828,9154,9197,6373,3825,17708,6662,9206,9187,8951,21546,9179,18294,3390,2454,2457,5997,2458,3391,9264,13445,13452,13447,5996,8827,3383,9088,13454,20007,3826,20004,3388,3382}
-  -- local flasks = {13510,13512,13511,13506,13513}
+  -- potionItemIDs = {9030,5634,13444,13457,5816,929,13446,3823,13443,3387,2459,13442,9172,20008,6149,3928,1710,6049,3827,6372,5633,13461,13455,858,9144,13462,3385,13459,6048,5631,13458,118,2455,13506,12190,18253,23579,20002,13456,4623,6052,3386,2456,6051,5632,13460,6050,18841,4596,23578,18839,1450,17348,3087,17351,17349,23696,23698,17352, i:40211,i:40212,i:40093,i:33448,i:42545,i:40081,i:39671,i:33447,i:40077,i:40067,i:41166,i:40087,i:40216,i:40217,i:40214,i:40215,i:40213, i:22832,i:22829,i:34440,i:22836,i:28100,i:33093,i:22838,i:22841,i:22850,i:22845,i:22849,i:22842,i:31677,i:33092,i:22828,i:22844,i:22847,i:22871,i:22839,i:22846,i:22826,i:31676,i:22837,i:28101}
+  local potionSpellIDs = {11359, 6615, 17543, 6724, 3680, 3169, 2379, 17528, 11392, 24364, 7233, 7840, 6613, 17549, 17540, 17550, 17548, 7242, 6612, 17546, 17624, 15822, 24360, 17544, 4941, 7254, 26677, 7245, 6614, 17545, 7239, 806, 53908, 53909, 53762, 53914, 53915, 53911, 53913, 53910, 28504, 28507, 28511, 28512, 28515, 28536, 28517, 28494, 28492, 28537, 28508, 28548, 28538, 28513, 28506}
+  local healingPotionSpellIDs = {441, 17534, 4042, 2024, 440, 439, 17534, 21393, 21394, 28495, 43185, 67489, 17534, 67486, 38908, }
+  local manaPotionSpellIDs = {17530, 17531, 11903, 2023, 438, 437, 29236, 21395, 21396, 43186, 67490, 28499, 67487, 38929, }
+  local wildVineSpellIDs = {11387, 22729, 2370, 53753, 53750, 53761, 45051, }
+  -- elixirItemIDs = {9155,10592,8949,13453,3389,9224,9233,3828,9154,9197,6373,3825,17708,6662,9206,9187,8951,21546,9179,18294,3390,2454,2457,5997,2458,3391,9264,13445,13452,13447,5996,8827,3383,9088,13454,20007,3826,20004,3388,3382, i:40070,i:44012,i:40073,i:39666,i:45621,i:44332,i:44327,i:40072,i:44331,i:40076,i:40109,i:44330,i:44329,i:40068,i:40078,i:40097,i:44328,i:37449,i:44325 i:22831,i:32067,i:22840,i:22825,i:28103,i:22835,i:32062,i:28104,i:22834,i:22833,i:32068,i:31679,i:22824,i:32063,i:22848,i:25539,i:28102,i:22827,i:22823,i:22830,i:23871,i:23444,i:34537,i:34130}
+  local elixirSpellIDs = {3219, 11390, 12608, 11328, 17537, 3220, 11406, 11407, 6512, 11389, 11403, 7844, 3593, 21920, 8212, 11405, 11334, 11349, 26276, 11396, 22807, 3160, 2367, 2374, 673, 2378, 3164, 11474, 11348, 17538, 17535, 7178, 11319, 3166, 11371, 17539, 24363, 3223, 24361, 3222, 33721, 59640, 53748, 28497, 63729, 60347, 60341, 53747, 60346, 53749, 53764, 60345, 60344, 53746, 53751, 53763, 60343, 48719, 60340, 54494, 39627, 28509, 28491, 54452, 28503, 39625, 33726, 28502, 28501, 39628, 38954, 28490, 39626, 28514, 22807, 33720, 28493, 28489, 28496, 7178, 29348, 45373, 44467}
+  -- flaskItemIDs = {13510,13512,13511,13506,13513, i:22854,i:22866,i:22861,i:32901,i:33208,i:22851,i:35716,i:13511,i:22853,i:32898,i:13512,i:35717,i:32900,i:32899,i:32598,i:32601,i:13513,i:32599,i:32600,i:32597,i:32596,i:13510, i:46376,i:40082,i:46377,i:46378,i:40404,i:40084,i:40083,i:46379,i:40079,i:44939}
+  local flaskSpellIDs = {17629, 17624, 17627, 17628, 17626, 28520, 28540, 28521, 41608, 42735, 28518, 46837, 17627, 28519, 41609, 17628, 46839, 41611, 41610, 40572, 40576, 17629, 40567, 40573, 40575, 40568, 17626, 53755, 53760, 54212, 53758, 53752, 62380}
+  -- scrollItemIDs = {i:955,i:1180,i:3012,i:1711,i:2290,i:3013,i:4425,i:4419,i:1478,i:4421,i:4422,i:10305,i:954,i:1477,i:4426,i:2289,i:10307,i:10308,i:10309,i:10310,i:27503,i:27498,i:27500,i:27502,i:27499,i:43465,i:33458,i:37091,i:43467,i:37093,i:43463,i:33457,i:33459,i:33462,i:33461,i:37092,i:43466,i:37094,i:43464}
+  local scrollSpellIDs = {8112, 8113, 8114, 12177, 33080, 43197, 48103, 48104, 8096, 8099, 8115, 8100, 8097, 8091, 8117, 8094, 8095, 8101, 12175, 8118, 8116, 8120, 8119, 12178, 12176, 12174, 12179, 33082, 33077, 33079, 33081, 33078, 58448, 43195, 48099, 58452, 48101, 58450, 43194, 43196, 43199, 43198, 48100, 58449, 48102, 58451}
   local bandages = {10841, 7928, 3278, 18629, 18630, 3276, 3277, 10840, 7929, 3275, 30021, 746, 1159, 3267, 3268, 7926, 24412, 10838, 23568, 23696, 18608, 30020, 27030, 27031, 45543, 51827, 45544,51803}
   local potionBuffNames = {
     "Free Action",
@@ -1667,7 +1920,7 @@ function XPC:StatsTracker()
     "Restoration",
     "Mana Regeneration",
     "Speed",
-    "Swim Speed",
+    "Swim Speed", 
     "Regeneration",
     "Greater Stoneshield",
     "Stoneshield",
@@ -1909,48 +2162,6 @@ function XPC:StatsTracker()
     if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
       local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, a, b, c, d, e, f, g, h, i, j, k = CombatLogGetCurrentEventInfo()
 
-      -- potions/elixirs/flasks
-      if (sourceName == GetUnitName('player')) then
-        if (subevent == "SPELL_CAST_SUCCESS") then
-          if (b == 'Restore Mana') then
-            stats.manaPotions = stats.manaPotions + 1
-          end
-          if (b == 'Healing Potion') then
-            stats.healingPotions = stats.healingPotions + 1
-          end
-          if (b == 'Wildvine Potion' or b == 'Rejuvenation Potion' or b == 'Mad Alchemist\'s Potion') then
-            stats.MHPotions = stats.MHPotions + 1
-          end
-        end
-        if (subevent == "SPELL_CAST_SUCCESS") then
-          print(b)
-          local isPot = false
-          for i,v in ipairs(potionBuffNames) do
-            if (b == v) then
-              isPot = true
-            end
-          end
-          for i,v in ipairs(elixirBuffNames) do
-            if (b == v) then
-              isPot = true
-            end
-          end
-          for i,v in ipairs(flaskBuffNames) do
-            if (b == v) then
-              isPot = true
-            end
-          end
-          for i,v in ipairs(scrollBuffNames) do
-            if (b == v) then
-              isPot = true
-            end
-          end
-          if (isPot == true) then
-            stats.potions = stats.potions + 1
-          end
-        end
-      end
-
       -- damage dealt tracker
       if (sourceName == GetUnitName("player")) then
         if (subevent == "SWING_DAMAGE" or subevent == "SPELL_DAMAGE" or subevent == "RANGE_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "SPELL_BUILDING_DAMAGE" or subevent == "ENVIRONMENTAL_DAMAGE") then
@@ -2055,6 +2266,48 @@ function XPC:StatsTracker()
             stats.bandages = stats.bandages + 1
           end
         end
+        -- scrolls
+        for i,v in ipairs(scrollSpellIDs) do
+          if (spellID == v ) then
+            stats.scrolls = stats.scrolls + 1
+          end
+        end
+        -- potions
+        for i,v in ipairs(potionSpellIDs) do
+          if (spellID == v ) then
+            stats.potions = stats.potions + 1
+          end
+        end      
+        -- elixirs  
+        for i,v in ipairs(elixirSpellIDs) do
+          if (spellID == v ) then
+            stats.elixirs = stats.elixirs + 1
+          end
+        end       
+        -- flasks 
+        for i,v in ipairs(flaskSpellIDs) do
+          if (spellID == v ) then
+            stats.flasks = stats.flasks + 1
+          end
+        end        
+        -- Mana / Health Potions
+        for i,v in ipairs(wildVineSpellIDs) do
+          if (spellID == v ) then
+            stats.MHPotions = stats.MHPotions + 1
+          end
+        end        
+        -- Health Potions
+        for i,v in ipairs(healingPotionSpellIDs) do
+          if (spellID == v ) then
+            stats.healingPotions = stats.healingPotions + 1
+          end
+        end        
+        -- Mana Potions
+        for i,v in ipairs(manaPotionSpellIDs) do
+          if (spellID == v ) then
+            stats.manaPotions = stats.manaPotions + 1
+          end
+        end             
       end
     end
   end)
@@ -2118,12 +2371,14 @@ end
 -- 33 health pots
 -- 34 mana pots
 -- 35 h/m pots
--- 36 misc pots
+-- 36 potions
+-- 37 elixirs
+-- 38 flasks
+-- 39 scrolls
 
--- 37 hearthstones
--- 38 dungeons
--- 39 taxis
--- 40 taxi time
+-- 40 hearthstones
+-- 41 dungeons
+-- 42 taxis
+-- 43 taxi time
 
 
--- for elixirs potions flasks scrolls need to update from combat log to UNIT_SPELLCAST_SUCCEDED. use spellID's. to get spellID's get itemID list from tsm, look up all items in wowhead, find spell for each item
