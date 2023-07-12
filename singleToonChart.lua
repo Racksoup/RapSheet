@@ -616,7 +616,13 @@ function XPC:ShowSingleToonChart()
         local damageTakenFS = damageTakenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
         damageTakenFS:SetPoint("CENTER")
         damageTakenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-        damageTakenFS:SetText(v.damageTaken) 
+        if (v.damageTaken >= 1000000) then 
+          damageTakenFS:SetText(tostring(math.floor(v.damageTaken / 10000) / 100) .. 'M')
+        elseif (v.damageTaken >= 1000) then 
+          damageTakenFS:SetText(tostring(math.floor(v.damageTaken / 100) / 10) .. 'K')
+        else
+          damageTakenFS:SetText(tostring(v.damageTaken))
+        end
         table.insert(content.values.damageTaken, damageTakenFrame)
       end
 
@@ -628,7 +634,13 @@ function XPC:ShowSingleToonChart()
         local healsGivenFS = healsGivenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
         healsGivenFS:SetPoint("CENTER")
         healsGivenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-        healsGivenFS:SetText(v.healsGiven) 
+        if (v.healsGiven >= 1000000) then 
+          healsGivenFS:SetText(tostring(math.floor(v.healsGiven / 10000) / 100) .. 'M')
+        elseif (v.healsGiven >= 1000) then 
+          healsGivenFS:SetText(tostring(math.floor(v.healsGiven / 100) / 10) .. 'K')
+        else
+          healsGivenFS:SetText(tostring(v.healsGiven))
+        end
         table.insert(content.values.healsGiven, healsGivenFrame)
       end
 
@@ -640,7 +652,13 @@ function XPC:ShowSingleToonChart()
         local healsReceivedFS = healsReceivedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
         healsReceivedFS:SetPoint("CENTER")
         healsReceivedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-        healsReceivedFS:SetText(v.healsReceived) 
+        if (v.healsReceived >= 1000000) then 
+          healsReceivedFS:SetText(tostring(math.floor(v.healsReceived / 10000) / 100) .. 'M')
+        elseif (v.healsReceived >= 1000) then 
+          healsReceivedFS:SetText(tostring(math.floor(v.healsReceived / 100) / 10) .. 'K')
+        else
+          healsReceivedFS:SetText(tostring(v.healsReceived))
+        end
         table.insert(content.values.healsReceived, healsReceivedFrame)
       end
       
@@ -1246,7 +1264,7 @@ function XPC:ShowSingleToonChart()
   for k,v in pairs(toon.statsData) do
     if (v.damageDealt) then totalDamageDealt = totalDamageDealt + v.damageDealt end
     if (v.monstersKilledSolo) then totalMonstersKilledSolo = totalMonstersKilledSolo + v.monstersKilledSolo end
-    if (v.montersKilledInGroup) then totalMonstersKilledInGroup = totalMonstersKilledInGroup + v.monstersKilledInGroup end
+    if (v.monstersKilledInGroup) then totalMonstersKilledInGroup = totalMonstersKilledInGroup + v.monstersKilledInGroup end
     if (v.questsCompleted) then totalQuestsCompleted = totalQuestsCompleted + v.questsCompleted end
     if (v.food) then totalFood = totalFood + v.food end
     if (v.drink) then totalDrink = totalDrink + v.drink end
@@ -1306,7 +1324,13 @@ function XPC:ShowSingleToonChart()
     local damageTakenFS = damageTakenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
     damageTakenFS:SetPoint("CENTER")
     damageTakenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    damageTakenFS:SetText(totalDamageTaken) 
+    if (totalDamageTaken >= 1000000) then 
+      damageTakenFS:SetText(tostring(math.floor(totalDamageTaken / 10000) / 100) .. 'M')
+    elseif (totalDamageTaken >= 1000) then 
+      damageTakenFS:SetText(tostring(math.floor(totalDamageTaken / 100) / 10) .. 'K')
+    else
+      damageTakenFS:SetText(tostring(totalDamageTaken))
+    end
     table.insert(content.values.damageTaken, damageTakenFrame)
   end
 
@@ -1318,7 +1342,13 @@ function XPC:ShowSingleToonChart()
     local healsGivenFS = healsGivenFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
     healsGivenFS:SetPoint("CENTER")
     healsGivenFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    healsGivenFS:SetText(totalHealsGiven) 
+    if (totalHealsGiven >= 1000000) then 
+      healsGivenFS:SetText(tostring(math.floor(totalHealsGiven / 10000) / 100) .. 'M')
+    elseif (totalHealsGiven >= 1000) then 
+      healsGivenFS:SetText(tostring(math.floor(totalHealsGiven / 100) / 10) .. 'K')
+    else
+      healsGivenFS:SetText(tostring(totalHealsGiven))
+    end
     table.insert(content.values.healsGiven, healsGivenFrame)
   end
 
@@ -1330,7 +1360,13 @@ function XPC:ShowSingleToonChart()
     local healsReceivedFS = healsReceivedFrame:CreateFontString(nil, "OVERLAY", 'SharedTooltipTemplate')
     healsReceivedFS:SetPoint("CENTER")
     healsReceivedFS:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    healsReceivedFS:SetText(totalHealsReceived) 
+    if (totalHealsReceived >= 1000000) then 
+      healsReceivedFS:SetText(tostring(math.floor(totalHealsReceived / 10000) / 100) .. 'M')
+    elseif (totalHealsReceived >= 1000) then 
+      healsReceivedFS:SetText(tostring(math.floor(totalHealsReceived / 100) / 10) .. 'K')
+    else
+      healsReceivedFS:SetText(tostring(totalHealsReceived))
+    end
     table.insert(content.values.healsReceived, healsReceivedFrame)
   end
 
@@ -1906,7 +1942,7 @@ function XPC:StatsTracker()
   local flaskSpellIDs = {17629, 17624, 17627, 17628, 17626, 28520, 28540, 28521, 41608, 42735, 28518, 46837, 17627, 28519, 41609, 17628, 46839, 41611, 41610, 40572, 40576, 17629, 40567, 40573, 40575, 40568, 17626, 53755, 53760, 54212, 53758, 53752, 62380}
   -- scrollItemIDs = {i:955,i:1180,i:3012,i:1711,i:2290,i:3013,i:4425,i:4419,i:1478,i:4421,i:4422,i:10305,i:954,i:1477,i:4426,i:2289,i:10307,i:10308,i:10309,i:10310,i:27503,i:27498,i:27500,i:27502,i:27499,i:43465,i:33458,i:37091,i:43467,i:37093,i:43463,i:33457,i:33459,i:33462,i:33461,i:37092,i:43466,i:37094,i:43464}
   local scrollSpellIDs = {8112, 8113, 8114, 12177, 33080, 43197, 48103, 48104, 8096, 8099, 8115, 8100, 8097, 8091, 8117, 8094, 8095, 8101, 12175, 8118, 8116, 8120, 8119, 12178, 12176, 12174, 12179, 33082, 33077, 33079, 33081, 33078, 58448, 43195, 48099, 58452, 48101, 58450, 43194, 43196, 43199, 43198, 48100, 58449, 48102, 58451}
-  local bandages = {10841, 7928, 3278, 18629, 18630, 3276, 3277, 10840, 7929, 3275, 30021, 746, 1159, 3267, 3268, 7926, 24412, 10838, 23568, 23696, 18608, 30020, 27030, 27031, 45543, 51827, 45544,51803}
+  local bandageSpellIDs = {746, 1159, 3267, 3268, 7926, 7927, 10838, 10839, 18608, 18610, 27030, 27031, 45543, 51827, 45544, 51803}
   local potionBuffNames = {
     "Free Action",
     "Living Free Action",
@@ -2261,7 +2297,7 @@ function XPC:StatsTracker()
           stats.hearthstone = stats.hearthstone + 1
         end
         -- bandages
-        for i,v in ipairs(bandages) do 
+        for i,v in ipairs(bandageSpellIDs) do 
           if (spellID == v) then
             stats.bandages = stats.bandages + 1
           end

@@ -287,7 +287,6 @@ function XPC:CreateStatsData(level)
     if (stats.bandages == nil) then stats.bandages = 0 end
     if (stats.potions == nil) then stats.potions = 0 end
     if (stats.scrolls == nil) then stats.scrolls = 0 end
-    print('here')
     if (stats.elixirs == nil) then stats.elixirs = 0 end
     if (stats.flasks == nil) then stats.flasks = 0 end
     if (stats.healingPotions == nil) then stats.healingPotions = 0 end
