@@ -219,7 +219,7 @@ function XPC:InitToonData()
     RequestTimePlayed()
   end
   
- XPC:CreateStatsData(0)
+ XPC:CreateStatsData(UnitLevel('player'))
 end
 
 function XPC:CreateStatsData(level) 
@@ -264,7 +264,6 @@ function XPC:CreateStatsData(level)
     goldLostMerchant = 0,
     goldGainedMerchant = 0,
   }
-  
   -- init statsData and its level objects
   if (XPC.justLeveled) then 
     if (toon.statsData[tostring(level)] == nil) then
@@ -273,7 +272,8 @@ function XPC:CreateStatsData(level)
   else
     local stats = toon.statsData[tostring(UnitLevel('player'))]
     if (stats == nil) then
-      stats = statList
+      toon.statsData[tostring(UnitLevel('player'))] = statList
+      stats = toon.statsData[tostring(UnitLevel('player'))]
     end
     if (stats.damageDealt == nil) then stats.damageDealt = 0 end
     if (stats.damageTaken == nil) then stats.damageTaken = 0 end

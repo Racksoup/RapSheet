@@ -466,10 +466,8 @@ function XPC:ShowSingleToonChart()
   local content = chart.content
   local toon = XPC.db.global.toons[XPC.currSingleToon]
   local levelData = toon.levelData
-  local level = 1
+  local level = UnitLevel('player')
 
-  local level = 60
-  if (levelData[#levelData] ~= nil) then level = levelData[#levelData].level end
   XPC_GUI.main.single:Show()
   single.vSlider:Show()
   single.hSlider:Show()
@@ -1226,7 +1224,7 @@ function XPC:ShowSingleToonChart()
   end
 
   -- chart values for total
-  stats = toon.statsData[tostring(level)]
+  local stats = toon.statsData[tostring(level)]
   local totalDamageDealt = 0
   local totalMonstersKilledSolo = 0
   local totalMonstersKilledInGroup = 0
