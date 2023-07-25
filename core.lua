@@ -384,8 +384,7 @@ function XPC:OnTimePlayedEvent(self, event, ...)
 
     if (XPC.justLeveled == true) then
       XPC.justLeveled = false
-      local stats = XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player') -1)]
-      stats.timePlayedAtLevel = arg1
+      XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player') -1)].timePlayedAtLevel = arg1
     end
   end
 end
