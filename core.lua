@@ -368,23 +368,25 @@ function XPC:OnTimePlayedEvent(self, event, ...)
     local currLvl = UnitLevel("player")
     local arg1, arg2 = ...
     local totalXP = 0
-    for i = 1, currLvl -1 do 
-      totalXP = totalXP + XPC.levelChart[i]
-    end
-    totalXP = totalXP + currXP
-
-    local levelData = {
-      timePlayed = arg1, 
-      level = currLvl, 
-      XPGainedThisLevel = currXP, 
-      totalXP = totalXP
-    }
-
-    table.insert(XPC.db.global.toons[XPC.currToonName].levelData, levelData)
-
-    if (XPC.justLeveled == true) then
-      XPC.justLeveled = false
-      XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player') -1)].timePlayedAtLevel = arg1
+    if (currXP > 0) then 
+      for i = 1, currLvl -1 do 
+        totalXP = totalXP + XPC.levelChart[i]
+      end
+      totalXP = totalXP + currXP
+      
+      local levelData = {
+        timePlayed = arg1, 
+        level = currLvl, 
+        XPGainedThisLevel = currXP, 
+        totalXP = totalXP
+      }
+      
+      table.insert(XPC.db.global.toons[XPC.currToonName].levelData, levelData)
+      
+      if (XPC.justLeveled == true) then
+        XPC.justLeveled = false
+        XPC.db.global.toons[XPC.currSingleToon].statsData[tostring(UnitLevel('player') -1)].timePlayedAtLevel = arg1
+      end
     end
   end
 end
@@ -408,7 +410,9 @@ function XPC:ShowColorPicker(color, changedCallback)
   ColorPickerFrame:Show();
 end
 
--- change addon name to 'Level Stats'??? maybe
 
 -- list of quests completed per level
 -- list of monsters killed by name.  per level. solo and total
+
+-- new character if same name same server but is a new character
+

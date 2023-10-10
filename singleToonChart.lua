@@ -2416,3 +2416,7 @@ end
 -- 43 taxi time
 
 
+-- stats page only shows up to current player level, needs to show all selected player levels
+-- move time trackers to first columns
+-- change color of seperator lines for each column
+-- make grid move without hiding label column/row

@@ -414,6 +414,7 @@ end
 
 -- max levels checkbox. perspective with max xp as height for the chart (shows progress out of full level 60 xp amount, 6,079,800)
 -- even levels checkbox. view where every level is spaced equally on y-axis
+-- push graph in so it isn't on the labels
 
 -- if no lines visible on startup show current toon
 -- create real graph object to hold all lines and fstrings. makes hiding a lot easier
