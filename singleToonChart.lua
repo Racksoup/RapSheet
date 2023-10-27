@@ -466,7 +466,7 @@ function XPC:ShowSingleToonChart()
   local content = chart.content
   local toon = XPC.db.global.toons[XPC.currSingleToon]
   local levelData = toon.levelData
-  local level = UnitLevel('player')
+  local level = levelData[#levelData].level
 
   XPC_GUI.main.single:Show()
   single.vSlider:Show()
@@ -2416,7 +2416,6 @@ end
 -- 43 taxi time
 
 
--- stats page only shows up to current player level, needs to show all selected player levels
 -- move time trackers to first columns
 -- change color of seperator lines for each column
 -- make grid move without hiding label column/row

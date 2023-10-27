@@ -207,6 +207,33 @@ end
 
 function XPC:InitToonData()
   local toons = XPC.db.global.toons
+
+  -- deep copy func
+  local function copy2(obj)
+    if type(obj) ~= 'table' then return obj end
+    local res = setmetatable({}, getmetatable(obj))
+    for k, v in pairs(obj) do res[copy2(k)] = copy2(v) end
+    return res
+  end
+
+  -- if toon data exists but a new character with the same name and a lower level is logedin
+  if (toons[XPC.currToonName] ~= nil) then
+    if (toons[XPC.currToonName].levelData[#toons[XPC.currToonName].levelData] ~= nil) then 
+      if (toons[XPC.currToonName].levelData[#toons[XPC.currToonName].levelData].level > UnitLevel('player')) then 
+        -- append a number to the old toon data
+        -- check for old toons with appended numbers, add number when one isn't found
+        for i = 1, 1000, 1 do
+          print(XPC.currToonName .. '-' .. tostring(i))
+          if (toons[XPC.currToonName .. '-' .. tostring(i)] == nil) then 
+            toons[XPC.currToonName .. '-' .. tostring(i)] = copy2(toons[XPC.currToonName])
+            toons[XPC.currToonName] = nil
+            break
+          end
+        end
+      end
+    end
+  end
+
   -- if toon data doesn't exist create it
   if (toons[XPC.currToonName] == nil) then 
     toons[XPC.currToonName] = {
@@ -414,5 +441,7 @@ end
 -- list of quests completed per level
 -- list of monsters killed by name.  per level. solo and total
 
--- new character if same name same server but is a new character
+-- bug, time played message doesn't always show, but it seems to still be tracking stats
+-- bug, some levels get fucked when time played message isn't showing, (i think its when the message isn't showing)
+-- bug at level 60 fucks shit up
 
