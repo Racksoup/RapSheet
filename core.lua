@@ -381,8 +381,10 @@ function XPC:StartTimePlayedLoop()
     
     -- request time played every 15min, works on login too
     function TimePlayedLoop()
-      RequestTimePlayed() 
-      C_Timer.After(900, function() TimePlayedLoop() end)
+      C_Timer.After(900, function() 
+        RequestTimePlayed() 
+        TimePlayedLoop() 
+      end)
     end
     -- starts 60 seconds after login
     C_Timer.After(60, function() TimePlayedLoop() end)
@@ -438,10 +440,8 @@ function XPC:ShowColorPicker(color, changedCallback)
 end
 
 
--- list of quests completed per level
--- list of monsters killed by name.  per level. solo and total
-
--- bug, time played message doesn't always show, but it seems to still be tracking stats
--- bug, some levels get fucked when time played message isn't showing, (i think its when the message isn't showing)
+-- escape key should close windows
 -- bug at level 60 fucks shit up
 
+-- fixed? bug, time played message doesn't always show, but it seems to still be tracking stats
+-- fixed? bug, some levels get fucked when time played message isn't showing, (i think its when the message isn't showing)
