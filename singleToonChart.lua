@@ -58,17 +58,17 @@ function XPC:ChartScroller(slider, maxValue)
   local sliderValue = slider:GetValue()
   local scrollDist = sliderValue / maxValue
   if (slider:GetOrientation() == "HORIZONTAL") then 
-    local scrollMaxLength = content:GetWidth() - single:GetWidth()
+    local scrollMaxLength = content:GetWidth()+45 - single:GetWidth()
     local scrollPos = (scrollMaxLength / 100) * (-scrollDist * 100)
     if (scrollPos > -slider:GetValueStep()) then scrollPos = 0 end
     content:SetPoint(point, relativeTo, relativePoint, scrollPos, offsetY)
-    hHeader:SetPoint(point, relativeTo, relativePoint, scrollPos -63, offsetY +43)
+    hHeader:SetPoint(point, relativeTo, relativePoint, scrollPos -63, 43)
   elseif (slider:GetOrientation() == "VERTICAL") then
-    local scrollMaxLength = content:GetHeight() - single:GetHeight()
+    local scrollMaxLength = content:GetHeight()+37 - single:GetHeight()
     local scrollPos = (scrollMaxLength / 100) * (scrollDist * 100)
     if (scrollPos < slider:GetValueStep() - 6) then scrollPos = 0 end
     content:SetPoint(point, relativeTo, relativePoint, offsetX, scrollPos)
-    vHeader:SetPoint(point, relativeTo, relativePoint, offsetX -63, scrollPos +43)
+    vHeader:SetPoint(point, relativeTo, relativePoint, -63, scrollPos +43)
   end
 end
 
@@ -161,7 +161,7 @@ function XPC:BuildSingleToon()
   -- Horizontal Header
   chart.hHeader = CreateFrame("Frame", hHeader, hHeaderClipper)
   local hHeader = chart.hHeader
-  hHeader:SetPoint("TOPLEFT")
+  hHeader:SetPoint("TOPLEFT", -63, 0)
   -- Vertical Header Clipper
   chart.vHeaderClipper = CreateFrame("Frame", vHeaderClipper, chart)
   local vHeaderClipper = chart.vHeaderClipper
@@ -170,7 +170,7 @@ function XPC:BuildSingleToon()
   -- Vertical Header
   chart.vHeader = CreateFrame("Frame", vHeader, vHeaderClipper)
   local vHeader = chart.vHeader
-  vHeader:SetPoint("TOPLEFT")
+  vHeader:SetPoint("TOPLEFT", 0, 43)
   
   -- Vertical Value table init
   vHeader.values = {}
@@ -239,8 +239,8 @@ function XPC:BuildSingleToon()
     chart:SetSize(j * 80, l * 30 + 35)
   end
   chart:SetPoint("TOPLEFT", 0, 0)
-  content:SetSize(chart:GetWidth() - 63, chart:GetHeight() - 33)
-  contentClipper:SetSize(content:GetWidth(), content:GetHeight())
+  content:SetSize(chart:GetWidth(), chart:GetHeight())
+  contentClipper:SetSize(content:GetWidth()+63, content:GetHeight()+41)
   hHeaderClipper:SetSize(chart:GetWidth() - 63, 45)
   hHeader:SetSize(chart:GetWidth() - 63, 45)
 
