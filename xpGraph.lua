@@ -31,8 +31,8 @@ function XPC:GetGraphData()
   totalXPOfHighestLevelToon = totalXPOfHighestLevelToon + XPOnLastLvl
 
   -- frame values
-  local frameWidth = 1150
-  local frameHeight = 590
+  local frameWidth = XPC_GUI.main.graph:GetWidth() - 10
+  local frameHeight = XPC_GUI.main.graph:GetHeight()
   local frameWidthInterval = frameWidth / mostTimePlayed 
   local frameHeightInterval = frameHeight / totalXPOfHighestLevelToon
   local mostDaysPlayed = math.floor(XPC:StoD(mostTimePlayed))
@@ -42,10 +42,11 @@ end
 
 function XPC:HideXPGraph()
   XPC_GUI.main.optionsBtn:Hide()
+  XPC_GUI.main.graph:Hide()
   -- reset axis and lines
   for i, v in ipairs(XPC_GUI.XAxis) do
     v.fstring:Hide()
-    v.line:Hide()
+    if (v.line ~= nil) then v.line:Hide() end
   end
   for i, v in ipairs(XPC_GUI.YAxis) do
     v.fstring:Hide()
@@ -59,6 +60,7 @@ end
 function XPC:ShowXPGraph()
   XPC:HideXPGraph()
   XPC_GUI.main.optionsBtn:Show()
+  XPC_GUI.main.graph:Show()
 
   -- setup values to make graph and lines
   local mostTimePlayed, highestLevel, totalXPOfHighestLevelToon, frameWidth, frameHeight, frameWidthInterval, frameHeightInterval, mostDaysPlayed = XPC:GetGraphData()
@@ -77,7 +79,7 @@ function XPC:BuildXAxis(mostTimePlayed, mostDaysPlayed, frameWidthInterval, fram
     local numOfTextObjs = 0
     local modNum = 0
     local alignLines = 8
-    local offset = 10
+    local offset = 0
 
     -- mod mostDaysPlayed from 5 to 1.
     for i=5, 0, -1 do      
@@ -93,15 +95,21 @@ function XPC:BuildXAxis(mostTimePlayed, mostDaysPlayed, frameWidthInterval, fram
 
     -- make x-axis text
     for i=1, numOfTextObjs do 
-      local fstring = XPC_GUI.main:CreateFontString(nil, "OVERLAY", "GameToolTipText")
+      local lastValOffset = 0
+      if (i == numOfTextObjs) then lastValOffset = -40 end
+      local fstring = XPC_GUI.main.graph:CreateFontString(nil, "OVERLAY", "GameToolTipText")
       fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
       fstring:SetText(math.floor(10 * (mostDaysPlayed * hoursOrDays) * (i / numOfTextObjs)) /10)
-      fstring:SetPoint("BOTTOMLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) - alignLines + offset, 4)
-      local line = XPC_GUI.main:CreateLine()
-      line:SetColorTexture(0.7,0.7,0.7,.1)
-      line:SetStartPoint("BOTTOMLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) + alignLines + offset, 0)
-      line:SetEndPoint("TOPLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) + alignLines + offset, -40)
-      table.insert(XPC_GUI.XAxis, {line = line, fstring = fstring})
+      fstring:SetPoint("BOTTOMLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) - alignLines + lastValOffset, -24)
+      if (i ~= numOfTextObjs) then
+        local line = XPC_GUI.main.graph:CreateLine()
+        line:SetColorTexture(0.7,0.7,0.7,.1)
+        line:SetStartPoint("BOTTOMLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) + alignLines, 0)
+        line:SetEndPoint("TOPLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) + alignLines, 0)
+        table.insert(XPC_GUI.XAxis, {line = line, fstring = fstring})
+      else
+        table.insert(XPC_GUI.XAxis, {line = nil, fstring = fstring})
+      end
     end
   end
     
@@ -152,12 +160,13 @@ function XPC:BuildYAxis(highestLevel, frameHeightInterval, totalXPOfHighestLevel
       for j = 2, (highestLevel * lineLevelPercentage) do 
         totalXPOfGraphIndex = totalXPOfGraphIndex + XPC.levelChart[j - 1]
       end
-      local fstring = XPC_GUI.main:CreateFontString(nil, "OVERLAY", "GameToolTipText")
+      local fstring = XPC_GUI.main.graph:CreateFontString(nil, "OVERLAY", "GameToolTipText")
       fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
       fstring:SetText(highestLevel * lineLevelPercentage)
-
-      fstring:SetPoint("BOTTOMLEFT", 5, frameHeightInterval * totalXPOfGraphIndex -alignLines + offset)
-      local line = XPC_GUI.main:CreateLine()
+      local XOffset = -24
+      if (highestLevel * lineLevelPercentage > 9) then XOffset = -31 end
+      fstring:SetPoint("BOTTOMLEFT", XOffset, frameHeightInterval * totalXPOfGraphIndex -alignLines + offset)
+      local line = XPC_GUI.main.graph:CreateLine()
       line:SetColorTexture(0.7,0.7,0.7,.1)
       line:SetStartPoint("BOTTOMLEFT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines + offset)
       line:SetEndPoint("BOTTOMRIGHT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines + offset)
@@ -180,15 +189,15 @@ function XPC:BuildAllLines(frameWidthInterval, frameHeightInterval)
   -- set number of data point to skip (when data gets larger, skip some data)
   if (longestDB > 100) then counterLimit = 2 end
   if (longestDB > 300) then counterLimit = 3 end
-  if (longestDB > 400) then counterLimit = 4 end
-  if (longestDB > 500) then counterLimit = 6 end
-  if (longestDB > 1000) then counterLimit = 9 end
-  if (longestDB > 1500) then counterLimit = 10 end
-  if (longestDB > 2000) then counterLimit = 13 end
-  if (longestDB > 2500) then counterLimit = 16 end
-  if (longestDB > 3000) then counterLimit = 19 end
-  if (longestDB > 4000) then counterLimit = 25 end
-  if (longestDB > 5000) then counterLimit = 30 end
+  if (longestDB > 500) then counterLimit = 4 end
+  if (longestDB > 700) then counterLimit = 6 end
+  if (longestDB > 1000) then counterLimit = 7 end
+  if (longestDB > 1500) then counterLimit = 9 end
+  if (longestDB > 2000) then counterLimit = 11 end
+  if (longestDB > 2500) then counterLimit = 14 end
+  if (longestDB > 3000) then counterLimit = 16 end
+  if (longestDB > 4000) then counterLimit = 20 end
+  if (longestDB > 5000) then counterLimit = 25 end
 
   -- build lines
   for k, toon in pairs(XPC.db.global.toons) do
@@ -221,12 +230,12 @@ function XPC:BuildFullLine(frameWidthInterval, frameHeightInterval, toon, counte
 end
 
 function XPC:BuildALine(frameWidthInterval, frameHeightInterval, StartTime, StartXP, EndTime, EndXP, color)
-  local line = XPC_GUI.main:CreateLine()
-  local offset = 10
+  local line = XPC_GUI.main.graph:CreateLine()
+  local offset = 0
   
   line:SetColorTexture(color.r, color.g, color.b, color.a)
-  line:SetStartPoint("BOTTOMLEFT", frameWidthInterval * StartTime + offset, frameHeightInterval * StartXP + offset )
-  line:SetEndPoint("BOTTOMLEFT", frameWidthInterval * EndTime + offset, frameHeightInterval * EndXP + offset )
+  line:SetStartPoint("BOTTOMLEFT", frameWidthInterval * StartTime + offset, frameHeightInterval * StartXP)
+  line:SetEndPoint("BOTTOMLEFT", frameWidthInterval * EndTime + offset, frameHeightInterval * EndXP )
 
   table.insert(XPC_GUI.Lines, line)
 end

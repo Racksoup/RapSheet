@@ -197,6 +197,10 @@ function XPC:BuildMainWindow()
   --   XPC:ShowView()
   -- end)
   
+  -- Graph Frame
+  main.graph = CreateFrame("Frame", graph, main)
+  main.graph:SetSize(main:GetWidth() - 35, main:GetHeight() - 80)
+  main.graph:SetPoint("BOTTOMLEFT", 35, 30)
   XPC:BuildXPGraphOptions()
   XPC:BuildSingleToon()
   -- show chart or graph
