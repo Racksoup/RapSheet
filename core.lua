@@ -59,9 +59,9 @@ local defaults = {
   }
 }
 
-SLASH_XPC1 = "/xpc"
+SLASH_RS1 = "/rs"
 
-SlashCmdList["XPC"] = function()
+SlashCmdList["RS"] = function()
   RequestTimePlayed()
   XPC:ShowView()
   XPC_GUI.main:Show()

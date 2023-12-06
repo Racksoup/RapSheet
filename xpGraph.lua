@@ -172,47 +172,23 @@ function XPC:BuildAllLines(frameWidthInterval, frameHeightInterval)
   local longestDB = 1
   local counterLimit = 1
   for i, v in pairs(XPC.db.global.toons) do 
-      if(XPC.db.global.toons[XPC.currToonName].lineVisible == true) then 
-        if (longestDB < #v) then longestDB = #v end
+    if(v.lineVisible == true) then 
+      if (longestDB < #v.levelData) then longestDB = #v.levelData end
     end
   end
 
   -- set number of data point to skip (when data gets larger, skip some data)
   if (longestDB > 100) then counterLimit = 2 end
   if (longestDB > 300) then counterLimit = 3 end
-  if (longestDB > 500) then counterLimit = 4 end
-  if (longestDB > 1000) then counterLimit = 5 end
-  if (longestDB > 1500) then counterLimit = 6 end
-  if (longestDB > 2000) then counterLimit = 7 end
-  if (longestDB > 2500) then counterLimit = 8 end
-  if (longestDB > 3000) then counterLimit = 9 end
-  if (longestDB > 3500) then counterLimit = 10 end
-  if (longestDB > 4000) then counterLimit = 11 end
-  if (longestDB > 4500) then counterLimit = 12 end
-  if (longestDB > 5000) then counterLimit = 13 end
-  if (longestDB > 5500) then counterLimit = 14 end
-  if (longestDB > 6000) then counterLimit = 15 end
-  if (longestDB > 6500) then counterLimit = 16 end
-  if (longestDB > 7000) then counterLimit = 17 end
-  if (longestDB > 7500) then counterLimit = 18 end
-  if (longestDB > 8000) then counterLimit = 19 end
-  if (longestDB > 8500) then counterLimit = 20 end
-  if (longestDB > 9000) then counterLimit = 21 end
-  if (longestDB > 9500) then counterLimit = 22 end
-  if (longestDB > 10000) then counterLimit = 23 end
-  if (longestDB > 10500) then counterLimit = 24 end
-  if (longestDB > 11000) then counterLimit = 25 end
-  if (longestDB > 11500) then counterLimit = 26 end
-  if (longestDB > 12000) then counterLimit = 27 end
-  if (longestDB > 12500) then counterLimit = 28 end
-  if (longestDB > 13000) then counterLimit = 29 end
-  if (longestDB > 13500) then counterLimit = 30 end
-  if (longestDB > 14000) then counterLimit = 31 end
-  if (longestDB > 14500) then counterLimit = 32 end
-  if (longestDB > 15000) then counterLimit = 33 end
-  if (longestDB > 15500) then counterLimit = 34 end
-  if (longestDB > 16000) then counterLimit = 35 end
-  if (longestDB > 16500) then counterLimit = 36 end
+  if (longestDB > 400) then counterLimit = 4 end
+  if (longestDB > 500) then counterLimit = 6 end
+  if (longestDB > 1000) then counterLimit = 9 end
+  if (longestDB > 1500) then counterLimit = 10 end
+  if (longestDB > 2000) then counterLimit = 13 end
+  if (longestDB > 2500) then counterLimit = 16 end
+  if (longestDB > 3000) then counterLimit = 19 end
+  if (longestDB > 4000) then counterLimit = 25 end
+  if (longestDB > 5000) then counterLimit = 30 end
 
   -- build lines
   for k, toon in pairs(XPC.db.global.toons) do
