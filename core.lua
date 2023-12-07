@@ -62,9 +62,13 @@ local defaults = {
 SLASH_RS1 = "/rs"
 
 SlashCmdList["RS"] = function()
-  RequestTimePlayed()
-  XPC:ShowView()
-  XPC_GUI.main:Show()
+  if (XPC_GUI.main:IsVisible()) then 
+    XPC_GUI.main:Hide()
+  else 
+    RequestTimePlayed()
+    XPC:ShowView()
+    XPC_GUI.main:Show()
+  end
 end
 
 function XPC:OnInitialize()
@@ -138,10 +142,22 @@ function XPC:BuildMainWindow()
   main:SetScript("OnDragStop", function(self)
     self:StopMovingOrSizing()
   end)
-  main:SetFrameStrata("HIGH")
+  main:SetFrameStrata("MEDIUM")
   main:SetPoint("CENTER")
   main:SetWidth(1200)
   main:SetHeight(650)
+
+  -- escape key close
+  main:SetPropagateKeyboardInput(true)
+  main:SetScript("OnKeyDown", function(self, key)
+      if (key == "ESCAPE" and main:IsVisible()) then
+          main:Hide()
+          main:SetPropagateKeyboardInput(false)
+          C_Timer.After(.001, function() 
+              main:SetPropagateKeyboardInput(true)
+          end)
+      end
+  end)
 
   -- close button 
   main.closeBtn = CreateFrame("Button", nil, main, "UIPanelCloseButtonNoScripts")
@@ -163,6 +179,13 @@ function XPC:BuildMainWindow()
       options:Show()
     end
   end)
+
+  -- title
+  main.title = main:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  main.title:SetFont("Fonts\\FRIZQT__.TTF", 18, "THINOUTLINE")
+  main.title:SetPoint("TOP", 0, -11)
+  main.title:SetTextColor(1,1,0,1)
+  main.title:SetText("Rap Sheet")
 
   -- xp graph view button
   main.xpGraphBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
@@ -199,8 +222,22 @@ function XPC:BuildMainWindow()
   
   -- Graph Frame
   main.graph = CreateFrame("Frame", graph, main)
-  main.graph:SetSize(main:GetWidth() - 35, main:GetHeight() - 80)
-  main.graph:SetPoint("BOTTOMLEFT", 35, 30)
+  main.graph:SetSize(main:GetWidth() - 45, main:GetHeight() - 95)
+  main.graph:SetPoint("BOTTOMLEFT", 43, 35)
+  local Num0 = main.graph:CreateFontString(nil, "OVERLAY", "GameToolTipText")
+  Num0:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
+  Num0:SetPoint("BOTTOMLEFT", -29, -24)
+  Num0:SetText("0")
+  local line1 = XPC_GUI.main.graph:CreateLine()
+  line1:SetColorTexture(1,1,1,1)
+  line1:SetStartPoint("BOTTOMLEFT", 0, 0)
+  line1:SetEndPoint("TOPLEFT", 0, 3)
+  local line2 = XPC_GUI.main.graph:CreateLine()
+  line2:SetColorTexture(1,1,1,1)
+  line2:SetStartPoint("BOTTOMLEFT", 0, 0)
+  line2:SetEndPoint("BOTTOMRIGHT", 0, 0)
+
+
   XPC:BuildXPGraphOptions()
   XPC:BuildSingleToon()
   -- show chart or graph

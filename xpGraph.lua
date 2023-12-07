@@ -100,7 +100,7 @@ function XPC:BuildXAxis(mostTimePlayed, mostDaysPlayed, frameWidthInterval, fram
       local fstring = XPC_GUI.main.graph:CreateFontString(nil, "OVERLAY", "GameToolTipText")
       fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
       fstring:SetText(math.floor(10 * (mostDaysPlayed * hoursOrDays) * (i / numOfTextObjs)) /10)
-      fstring:SetPoint("BOTTOMLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) - alignLines + lastValOffset, -24)
+      fstring:SetPoint("BOTTOMLEFT", frameWidthInterval * mostTimePlayed * (i / numOfTextObjs) - alignLines + lastValOffset, -28)
       if (i ~= numOfTextObjs) then
         local line = XPC_GUI.main.graph:CreateLine()
         line:SetColorTexture(0.7,0.7,0.7,.1)
@@ -126,7 +126,7 @@ function XPC:BuildYAxis(highestLevel, frameHeightInterval, totalXPOfHighestLevel
   -- else go with divide by 4 and decimal points
 
   local alignLines = 5
-  local offset = 6
+  local offset = 0
 
   if (highestLevel < 60) then
     local numOfTextObjs = 0
@@ -160,16 +160,18 @@ function XPC:BuildYAxis(highestLevel, frameHeightInterval, totalXPOfHighestLevel
       for j = 2, (highestLevel * lineLevelPercentage) do 
         totalXPOfGraphIndex = totalXPOfGraphIndex + XPC.levelChart[j - 1]
       end
+      local lastOffset = 0
+      if (frameHeightInterval * totalXPOfGraphIndex > XPC_GUI.main.graph:GetHeight() -9) then lastOffset = frameHeightInterval * totalXPOfGraphIndex - XPC_GUI.main.graph:GetHeight() -3 end
       local fstring = XPC_GUI.main.graph:CreateFontString(nil, "OVERLAY", "GameToolTipText")
       fstring:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
       fstring:SetText(highestLevel * lineLevelPercentage)
-      local XOffset = -24
-      if (highestLevel * lineLevelPercentage > 9) then XOffset = -31 end
-      fstring:SetPoint("BOTTOMLEFT", XOffset, frameHeightInterval * totalXPOfGraphIndex -alignLines + offset)
+      local XOffset = -29
+      if (highestLevel * lineLevelPercentage > 9) then XOffset = -36 end
+      fstring:SetPoint("BOTTOMLEFT", XOffset, frameHeightInterval * totalXPOfGraphIndex -alignLines + lastOffset)
       local line = XPC_GUI.main.graph:CreateLine()
       line:SetColorTexture(0.7,0.7,0.7,.1)
-      line:SetStartPoint("BOTTOMLEFT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines + offset)
-      line:SetEndPoint("BOTTOMRIGHT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines + offset)
+      line:SetStartPoint("BOTTOMLEFT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines)
+      line:SetEndPoint("BOTTOMRIGHT", 0, frameHeightInterval * totalXPOfGraphIndex +alignLines)
 
       table.insert(XPC_GUI.YAxis, {line = line, fstring = fstring})
     end

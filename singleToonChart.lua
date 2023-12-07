@@ -79,6 +79,7 @@ function XPC:HideSingleToonChart()
   single.vSlider:Hide()
   single.hSlider:Hide()
   single.toonsBtn:Hide()
+  single.title:Hide()
   single:Hide()
 end
 
@@ -104,6 +105,12 @@ function XPC:BuildSingleToon()
       chooseToon:Show()
     end
   end)
+
+  -- title label name
+  single.title = XPC_GUI.main:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
+  single.title:SetFont("Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE")
+  single.title:SetPoint("TOP", 0, -38)
+  single.title:SetText(XPC.currSingleToon)
 
   -- Chart hSlider
   XPC_GUI.main.single.hSlider = CreateFrame("Slider", nil, XPC_GUI.main, "OptionsSliderTemplate")
@@ -435,12 +442,12 @@ function XPC:BuildSingleToon()
     -- 36
     hHeader.elixirs = hHeader:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
     hHeader.elixirs:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    hHeader.elixirs:SetPoint("TOPLEFT", (80 * 36) +6, -20)
+    hHeader.elixirs:SetPoint("TOPLEFT", (80 * 36) +5, -20)
     hHeader.elixirs:SetText('Elixirs')
     -- 37
     hHeader.flasks = hHeader:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
     hHeader.flasks:SetFont("Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE")
-    hHeader.flasks:SetPoint("TOPLEFT", (80 * 37) +5, -20)
+    hHeader.flasks:SetPoint("TOPLEFT", (80 * 37) +4, -20)
     hHeader.flasks:SetText('Flasks')
     -- 38
     hHeader.scrolls = hHeader:CreateFontString(nil, "OVERLAY", "SharedTooltipTemplate")
@@ -495,6 +502,7 @@ function XPC:ShowSingleToonChart()
   single.vSlider:Show()
   single.hSlider:Show()
   single.toonsBtn:Show()
+  single.title:Show()
   
   -- Hide content that changes
   chart:Hide()
@@ -1979,6 +1987,7 @@ function XPC:BuildChooseToon()
     nameBtn:SetScript("OnClick", function() 
       XPC.currSingleToon = k  
       XPC:ShowSingleToonChart()
+      XPC_GUI.main.single.title:SetText(XPC.currSingleToon)
     end)
 
     i = i + 1
