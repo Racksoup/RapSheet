@@ -496,7 +496,10 @@ function XPC:ShowSingleToonChart()
   local content = chart.content
   local toon = XPC.db.global.toons[XPC.currSingleToon]
   local levelData = toon.levelData
-  local level = levelData[#levelData].level
+  local level = 1
+  if (levelData[#levelData] ~= nil) then 
+    level = levelData[#levelData].level
+  end
 
   XPC_GUI.main.single:Show()
   single.vSlider:Show()
