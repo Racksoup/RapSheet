@@ -1,0 +1,14 @@
+## Interface: 100207
+## Title: Rap Sheet
+## Author: Connor Rack
+## SavedVariables: RapSheetDB
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
+embeds.xml
+
+enUS.lua
+core.lua
+xpGraph.lua
+singleToonChart.lua
+allToonsChart.lua
