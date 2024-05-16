@@ -21,6 +21,9 @@ local XPC_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("XPC", {
 })
 
 local defaults = {
+  realm = {
+    minimap = { hide = false },
+  },
   global = {
     settings = {
       view = 'xpGraph'
@@ -79,7 +82,10 @@ function XPC:OnInitialize()
   XPC:CreateVars()
 
   XPC:StartTimePlayedLoop()
-  XPC:StatsTracker()
+
+  if (XPC.gameVersion == "wrath" or XPC.gameVersion == "classic" ) then 
+    XPC:StatsTracker()
+  end
 
   XPC:BuildMainWindow()
 end
@@ -113,6 +119,7 @@ function XPC:CreateVars()
   XPC.prevMoney = 0
   XPC.merchantShow = false
   XPC.combatTime = 0
+  XPC.gameVersion = "classic"
   for k,v in pairs(XPC.db.global.toons) do
     XPC.numOfToons = XPC.numOfToons + 1
   end
@@ -122,9 +129,11 @@ function XPC:CreateVars()
   XPC.levelChart = XPC.db.global.levelCharts.classic
   version, build, datex, tocversion = GetBuildInfo()
   if (tocversion > 30000) then 
+    XPC.gameVersion = "wrath"
     XPC.levelChart = XPC.db.global.levelCharts.wrath
   end
-  if (tocversion > 40000) then 
+  if (tocversion > 90000) then 
+    XPC.gameVersion = "retail"
     XPC.levelChart = XPC.db.global.levelCharts.dragonlands
   end
 end
@@ -187,27 +196,29 @@ function XPC:BuildMainWindow()
   main.title:SetTextColor(1,1,0,1)
   main.title:SetText("Rap Sheet")
 
-  -- xp graph view button
-  main.xpGraphBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
-  local xpGraphBtn = main.xpGraphBtn
-  xpGraphBtn:SetSize(120, 25)
-  xpGraphBtn:SetPoint("TOPLEFT", 20, -14)
-  xpGraphBtn:SetText("XP Chart")
-  xpGraphBtn:SetScript("OnClick", function()
-    XPC.db.global.settings.view = 'xpGraph'
-    XPC:ShowView()
-  end)
+  if (XPC.gameVersion == "wrath" or XPC.gameVersion == "classic") then 
+    -- xp graph view button
+    main.xpGraphBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
+    local xpGraphBtn = main.xpGraphBtn
+    xpGraphBtn:SetSize(120, 25)
+    xpGraphBtn:SetPoint("TOPLEFT", 20, -14)
+    xpGraphBtn:SetText("XP Chart")
+    xpGraphBtn:SetScript("OnClick", function()
+      XPC.db.global.settings.view = 'xpGraph'
+      XPC:ShowView()
+    end)
 
   -- single toon chart button 
-  main.singleToon = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
-  local singleToon = main.singleToon
-  singleToon:SetSize(120, 25)
-  singleToon:SetPoint("TOPLEFT", 150, -14)
-  singleToon:SetText("Stats")
-  singleToon:SetScript("OnClick", function()
-    XPC.db.global.settings.view = 'singleToonChart'
-    XPC:ShowView()
-  end)
+    main.singleToon = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
+    local singleToon = main.singleToon
+    singleToon:SetSize(120, 25)
+    singleToon:SetPoint("TOPLEFT", 150, -14)
+    singleToon:SetText("Stats")
+    singleToon:SetScript("OnClick", function()
+      XPC.db.global.settings.view = 'singleToonChart'
+      XPC:ShowView()
+    end)
+  end
 
   -- all toons chart button 
   -- main.allToonsBtn = CreateFrame("Button", nil, main, "UIPanelButtonTemplate")
@@ -239,7 +250,9 @@ function XPC:BuildMainWindow()
 
 
   XPC:BuildXPGraphOptions()
-  XPC:BuildSingleToon()
+  if (XPC.gameVersion == "wrath" or XPC.gameVersion == "classic" ) then 
+    XPC:BuildSingleToon()
+  end
   -- show chart or graph
   -- XPC:ShowView()
   
@@ -387,13 +400,20 @@ end
 function XPC:ShowView()
   local view = XPC.db.global.settings.view
   XPC:HideXPGraph()
-  XPC:HideSingleToonChart()
+  if (XPC.gameVersion == "wrath" or XPC.gameVersion == "classic" ) then 
+    XPC:HideSingleToonChart()
+  end
   XPC:HideAllToonsChart()
+
   if (view == 'xpGraph') then
     XPC:ShowXPGraph()
   end
   if (view == 'singleToonChart') then
-    XPC:ShowSingleToonChart()
+    if (XPC.gameVersion == "wrath" or XPC.gameVersion == "classic") then 
+      XPC:ShowSingleToonChart()
+    else
+      XPC:ShowXPGraph()
+    end
   end
   if (view == 'AllToonsChart') then
     XPC:ShowAllToonsChart()
